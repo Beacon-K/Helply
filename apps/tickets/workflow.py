@@ -15,6 +15,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.accounts.models import User
+from apps.notifications import events
 from apps.sla import services as sla
 
 from .choices import OPEN_STATUSES, Status
@@ -113,6 +114,24 @@ def perform(ticket, name, user, note=""):
             ticket=ticket, actor=user, kind=TicketEvent.Kind.TRANSITION,
             from_status=from_status, to_status=ticket.status, note=note,
         )
+        events.status_changed(ticket, name, user, note)
+    return ticket
+
+
+def auto_close(ticket, days):
+    """Close a resolved ticket the requester never confirmed (run by the scheduled follow-up job)."""
+    if ticket.status != Status.RESOLVED:
+        raise TransitionError("Only resolved tickets can be closed automatically.")
+    with transaction.atomic():
+        ticket.status = Status.CLOSED
+        ticket.closed_at = timezone.now()
+        ticket.save()
+        _record_ai_feedback(ticket, confirmed_category=ticket.category)
+        TicketEvent.objects.create(
+            ticket=ticket, kind=TicketEvent.Kind.TRANSITION, from_status=Status.RESOLVED, to_status=Status.CLOSED,
+            note=f"Closed automatically after {days} days without confirmation",
+        )
+        events.auto_closed(ticket, days)
     return ticket
 
 
@@ -135,6 +154,7 @@ def assign(ticket, assignee, actor=None):
             ticket=ticket, actor=actor, kind=TicketEvent.Kind.ASSIGNED,
             from_status=from_status, to_status=ticket.status, note=f"Assigned to {assignee}",
         )
+        events.ticket_assigned(ticket, actor)
     return ticket
 
 

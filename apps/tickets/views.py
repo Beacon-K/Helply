@@ -49,6 +49,7 @@ def ticket_create(request):
 def ticket_detail(request, pk):
     ticket = get_object_or_404(visible_tickets(request.user), pk=pk)
     user = request.user
+    ticket.notifications.filter(recipient=user, is_read=False).update(is_read=True)
     comments = ticket.comments.select_related("author")
     if not user.is_agent:
         comments = comments.filter(is_internal=False)

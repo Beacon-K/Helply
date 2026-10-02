@@ -88,6 +88,7 @@ def find_at_risk(now=None):
 
 def mark_breaches(now=None):
     """Flag newly breached open tickets and write an audit event. Returns them."""
+    from apps.notifications import events
     from apps.tickets.models import Ticket, TicketEvent
 
     now = now or timezone.now()
@@ -108,5 +109,20 @@ def mark_breaches(now=None):
                 TicketEvent.objects.create(
                     ticket=ticket, kind=TicketEvent.Kind.SLA, note="SLA breached: " + ", ".join(reasons)
                 )
+                events.sla_breached(ticket, reasons)
                 breached.append(ticket)
     return breached
+
+
+def warn_at_risk(now=None):
+    """Notify once per ticket when it becomes at risk of breaching. Returns the tickets warned."""
+    from apps.notifications import events
+
+    warned = []
+    for ticket in find_at_risk(now):
+        if not ticket.sla_risk_notified:
+            ticket.sla_risk_notified = True
+            ticket.save(update_fields=["sla_risk_notified", "updated_at"])
+            events.sla_at_risk(ticket)
+            warned.append(ticket)
+    return warned

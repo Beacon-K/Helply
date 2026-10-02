@@ -10,6 +10,20 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def load_env_file(path):
+    """Read KEY=VALUE lines from a local .env file. Real environment variables take precedence."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            key, _, value = line.partition("=")
+            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+load_env_file(BASE_DIR / ".env")
+
+
 def env_bool(name, default=False):
     return os.environ.get(name, str(default)).lower() in ("1", "true", "yes", "on")
 
@@ -33,6 +47,7 @@ INSTALLED_APPS = [
     "apps.assets",
     "apps.kb",
     "apps.ai",
+    "apps.notifications",
 ]
 
 MIDDLEWARE = [
@@ -57,6 +72,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.notifications.context_processors.notifications",
             ],
         },
     },
@@ -80,7 +96,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": os.environ.get("SQLITE_PATH", BASE_DIR / "db.sqlite3"),
         }
     }
 
@@ -118,3 +134,21 @@ HELPLY_AI_AUTO_TRIAGE_THRESHOLD = float(os.environ.get("HELPLY_AI_AUTO_TRIAGE_TH
 HELPLY_AI_AUTO_ASSIGN = env_bool("HELPLY_AI_AUTO_ASSIGN", True)
 # Share of the resolution window elapsed after which a ticket is flagged "at risk".
 HELPLY_SLA_AT_RISK_RATIO = float(os.environ.get("HELPLY_SLA_AT_RISK_RATIO", "0.75"))
+
+# --- Notifications -------------------------------------------------------------
+# Development prints emails to the console. For real email set DJANGO_EMAIL_BACKEND to
+# django.core.mail.backends.smtp.EmailBackend and the EMAIL_* variables below.
+EMAIL_BACKEND = os.environ.get("DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Helply IT Service Desk <helpdesk@example.com>")
+# Used to build links in emails.
+HELPLY_SITE_URL = os.environ.get("HELPLY_SITE_URL", "http://127.0.0.1:8000").rstrip("/")
+# At most one email of the same kind per ticket per person within this window; in-app notifications are not throttled.
+HELPLY_EMAIL_THROTTLE_MINUTES = int(os.environ.get("HELPLY_EMAIL_THROTTLE_MINUTES", "10"))
+# Resolved tickets: remind the requester after N days, close automatically after M days.
+HELPLY_CONFIRM_REMINDER_DAYS = int(os.environ.get("HELPLY_CONFIRM_REMINDER_DAYS", "2"))
+HELPLY_AUTO_CLOSE_DAYS = int(os.environ.get("HELPLY_AUTO_CLOSE_DAYS", "5"))

@@ -25,6 +25,11 @@
     {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin</a>{% endif %}
   </nav>
   <div class="who">
+    <a class="bell" href="{% url 'notifications:list' %}" data-bell data-url="{% url 'notifications:unread' %}"
+       aria-label="Notifications{% if unread_notifications %}, {{ unread_notifications }} unread{% endif %}">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg>
+      <span class="bell-count" data-unread {% if not unread_notifications %}hidden{% endif %}>{% if unread_notifications > 99 %}99+{% else %}{{ unread_notifications }}{% endif %}</span>
+    </a>
     <span>{{ user }} <small class="role role-{{ user.role }}">{{ user.get_role_display }}</small></span>
     <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">Log out</button></form>
   </div>
@@ -34,6 +39,7 @@
   {% for message in messages %}<div class="flash flash-{{ message.tags }}">{{ message }}</div>{% endfor %}
   {% block content %}{% endblock %}
 </main>
+{% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}" defer></script>{% endif %}
 {% block scripts %}{% endblock %}
 </body>
 </html>

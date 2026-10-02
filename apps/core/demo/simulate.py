@@ -9,6 +9,8 @@ from django.utils import timezone
 from apps.accounts.models import Department, User
 from apps.assets.models import Asset
 from apps.core.reference_data import SLA, ensure_categories
+from apps.notifications.models import Notification
+from apps.notifications.services import email_muted
 from apps.sla import services as sla
 from apps.sla.models import SLAPolicy
 from apps.tickets import services, workflow
@@ -99,7 +101,7 @@ def run(stdout=None):
     def fmt(text):
         return text.format(**refs) if "{" in text else text
 
-    with transaction.atomic():
+    with transaction.atomic(), email_muted():
         for at, order, _, scenario, step in build_timeline(real_now):
             with clock(at):
                 sla.mark_breaches(now=at)
@@ -124,6 +126,8 @@ def run(stdout=None):
                     raise ValueError(f"'{scenario.title}': step {step} failed: {e}") from e
 
         sla.mark_breaches(now=real_now)
+        # Older demo notifications count as already seen, so the bell shows only recent activity.
+        Notification.objects.filter(created_at__lt=real_now - timedelta(days=1)).update(is_read=True)
 
     if stdout:
         stdout.write(f"Replayed {len(SCENARIOS)} tickets.")
@@ -163,7 +167,8 @@ def clear_tickets():
     from apps.tickets.models import Satisfaction, TicketComment, TicketEvent
 
     deleted = Ticket.objects.all().delete()[0]
-    tables = [m._meta.db_table for m in (Ticket, TicketComment, TicketEvent, Satisfaction, AISuggestion)]
+    Notification.objects.all().delete()
+    tables = [m._meta.db_table for m in (Ticket, TicketComment, TicketEvent, Satisfaction, AISuggestion, Notification)]
     sql = connection.ops.sequence_reset_by_name_sql(no_style(), [{"table": t, "column": "id"} for t in tables])
     with connection.cursor() as cursor:
         for statement in sql:

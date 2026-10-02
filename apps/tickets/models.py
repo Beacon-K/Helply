@@ -81,6 +81,8 @@ class Ticket(models.Model):
     resolution_due_at = models.DateTimeField(null=True, blank=True)
     sla_paused_at = models.DateTimeField(null=True, blank=True)
     sla_breached = models.BooleanField(default=False)
+    sla_risk_notified = models.BooleanField(default=False)
+    confirmation_reminded_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_at"]

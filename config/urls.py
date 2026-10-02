@@ -12,5 +12,6 @@ urlpatterns = [
     path("tickets/", include("apps.tickets.urls")),
     path("kb/", include("apps.kb.urls")),
     path("assets/", include("apps.assets.urls")),
+    path("notifications/", include("apps.notifications.urls")),
     path("", include("apps.core.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

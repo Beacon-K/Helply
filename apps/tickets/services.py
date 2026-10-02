@@ -2,6 +2,7 @@
 from django.db import transaction
 from django.utils import timezone
 
+from apps.notifications import events
 from apps.sla import services as sla
 
 from .choices import Channel, Status
@@ -28,6 +29,7 @@ def create_ticket(*, requester, title, description, impact, urgency,
         ticket.save()
         if ticket.status == Status.TRIAGED:
             ai.auto_assign(ticket)
+        events.ticket_created(ticket)
     return ticket
 
 
@@ -42,6 +44,7 @@ def add_comment(ticket, author, body, is_internal=False):
             ticket.save(update_fields=["first_response_at", "updated_at"])
         TicketEvent.objects.create(ticket=ticket, actor=author, kind=TicketEvent.Kind.COMMENT,
                                    note="Internal note" if is_internal else "Public reply")
+        events.comment_added(comment)
     return comment
 
 

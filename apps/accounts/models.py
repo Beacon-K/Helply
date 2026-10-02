@@ -25,6 +25,7 @@ class User(AbstractUser):
         Department, null=True, blank=True, on_delete=models.SET_NULL, related_name="members"
     )
     phone = models.CharField(max_length=30, blank=True)
+    email_notifications = models.BooleanField(default=True, help_text="Send email copies of important notifications.")
 
     @property
     def is_employee(self):

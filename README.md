@@ -28,6 +28,18 @@ Fanshawe College BIA Capstone 项目。基于 **Django 6.1**（作为依赖使�
 .venv\Scripts\python.exe manage.py runserver      # macOS / Linux: .venv/bin/python manage.py runserver
 ```
 
+### 数据库
+
+- **默认使用 SQLite**，不需要任何配置。
+- **开发用 PostgreSQL**（推荐，和正式部署一致）：
+  1. 启动 Docker Desktop
+  2. 复制 `.env.example` 为 `.env`，并改掉里面的 `POSTGRES_PASSWORD`（`.env` 不会提交到 git）
+  3. `docker compose up -d db` 启动数据库容器，端口只对本机开放
+  4. `python manage.py migrate`，然后 `python manage.py seed_demo --reset`
+
+  `start-demo.bat` 检测到 `.env` 里配置了 PostgreSQL 时，会自动启动数据库容器。
+- 删掉 `.env` 里的 `POSTGRES_*` 这几行，就会切换回 SQLite。
+
 ### Docker（PostgreSQL）
 
 ```bash
