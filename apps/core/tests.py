@@ -1,3 +1,4 @@
+import os
 from io import StringIO
 
 from django.core.management import call_command
@@ -8,6 +9,8 @@ from apps.core.demo.tickets import SCENARIOS
 from apps.sla.services import SLAState, sla_state
 from apps.tickets.choices import Status
 from apps.tickets.models import Ticket, TicketEvent
+
+os.environ.setdefault("HELPLY_DEMO_PASSWORD", "test-demo-password")
 
 
 class DemoSeedTests(TestCase):
@@ -73,3 +76,35 @@ class DashboardTests(TestCase):
         self.assertContains(response, "Please confirm these are fixed")
         steps = response.context["my_open"][0][1]
         self.assertEqual([s for _, s in steps], ["current", "todo", "todo", "todo"])
+
+
+class DemoPasswordTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command("seed_demo", stdout=StringIO())
+
+    def test_shared_password_comes_from_environment_not_code(self):
+        from django.contrib.auth import authenticate
+
+        self.assertTrue(authenticate(username="alice", password=os.environ["HELPLY_DEMO_PASSWORD"]))
+        self.assertIsNone(authenticate(username="alice", password="helply-demo-2026"))
+
+    def test_public_mode_gives_each_account_its_own_password(self):
+        from django.contrib.auth import authenticate
+
+        from apps.core.demo import passwords
+
+        with self.settings(BASE_DIR=self._tmp_dir()):
+            rows = passwords.randomize()
+        self.assertEqual(len({pw for _, pw in rows}), len(rows))
+        user, pw = rows[0]
+        self.assertTrue(authenticate(username=user.username, password=pw))
+        self.assertIsNone(authenticate(username=user.username, password=os.environ["HELPLY_DEMO_PASSWORD"]))
+        passwords.reset_to_shared()
+        self.assertTrue(authenticate(username=user.username, password=os.environ["HELPLY_DEMO_PASSWORD"]))
+
+    def _tmp_dir(self):
+        import tempfile
+        from pathlib import Path
+
+        return Path(tempfile.mkdtemp())

@@ -3,7 +3,7 @@
     python manage.py seed_demo            # safe to re-run; tickets only created if none exist
     python manage.py seed_demo --reset    # regenerate all demo tickets
 
-Demo accounts share the password in apps/core/demo/people.py. Never run on production.
+Demo accounts share HELPLY_DEMO_PASSWORD from the local .env file. Never run on production.
 """
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -28,5 +28,5 @@ class Command(BaseCommand):
         call_command("seed_tickets", replace=True, stdout=self.stdout)
         self.stdout.write(self.style.SUCCESS(
             "Demo data loaded. Log in as alice (supervisor), tom/tina/sam (technicians) or any employee; "
-            "the shared demo password is in apps/core/demo/people.py."
+            "the shared password is HELPLY_DEMO_PASSWORD in the .env file."
         ))

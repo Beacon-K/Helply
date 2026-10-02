@@ -17,6 +17,7 @@ from apps.tickets import services, workflow
 from apps.tickets.models import Category, Ticket
 
 from . import people
+from .passwords import demo_password
 from .tickets import SCENARIOS
 
 
@@ -38,7 +39,7 @@ def ensure_organisation():
         if role == User.Role.SUPERVISOR:
             user.is_staff = user.is_superuser = True
         if created:
-            user.set_password(people.DEMO_PASSWORD)
+            user.set_password(demo_password())
         user.save()
         users[username] = user
 

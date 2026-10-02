@@ -4,9 +4,11 @@ __pycache__/
 .venv-*/
 venv/
 .env
+demo-passwords.txt
 db.sqlite3
 staticfiles/
 media/
 .idea/
 .vscode/
 .DS_Store
+tools/cloudflared.exe

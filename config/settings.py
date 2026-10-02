@@ -32,6 +32,21 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-insecure-change-me")
 DEBUG = env_bool("DJANGO_DEBUG", True)
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
+# Public demo behind Cloudflare Tunnel (see start-online.bat). The tunnel terminates HTTPS
+# and forwards to this computer on 127.0.0.1 only, so its X-Forwarded-Proto header can be trusted.
+HELPLY_PUBLIC_HOST = os.environ.get("HELPLY_PUBLIC_HOST", "").strip()
+if HELPLY_PUBLIC_HOST:
+    ALLOWED_HOSTS += [HELPLY_PUBLIC_HOST, f"www.{HELPLY_PUBLIC_HOST}"]
+    CSRF_TRUSTED_ORIGINS = [f"https://{HELPLY_PUBLIC_HOST}", f"https://www.{HELPLY_PUBLIC_HOST}"]
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    SECURE_SSL_REDIRECT = True
+    # Short HSTS window and no subdomains, so the domain is not locked to this setup for long.
+    SECURE_HSTS_SECONDS = 3600
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -52,6 +67,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # serves CSS/JS/images when DEBUG is off
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

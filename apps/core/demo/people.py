@@ -1,11 +1,9 @@
 """Demo organisation: a ~15-person small business with a 3-person IT team.
 
-Fictional people and company. All demo accounts share DEMO_PASSWORD.
-Never load this on a production database.
+Fictional people and company. Passwords are not stored here: see passwords.py
+(HELPLY_DEMO_PASSWORD in the local .env file). Never load this on a production database.
 """
 from datetime import date
-
-DEMO_PASSWORD = "helply-demo-2026"
 
 # username, first, last, role, department, job title
 USERS = [

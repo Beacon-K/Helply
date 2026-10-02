@@ -23,6 +23,9 @@ if errorlevel 1 (
   exit /b 1
 )
 
+"%HELPLY_PY%" manage.py demo_passwords --shared
+for /f "usebackq tokens=1,* delims==" %%a in (".env") do if /i "%%a"=="HELPLY_DEMO_PASSWORD" echo Demo password: %%b
+
 echo.
 echo Starting Helply at http://127.0.0.1:8000  (close this window to stop)
 start "" http://127.0.0.1:8000

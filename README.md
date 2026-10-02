@@ -32,6 +32,28 @@ Fanshawe College BIA Capstone 项目。基于 **Django 6.1**（作为依赖使�
 .venv\Scripts\python.exe manage.py runserver      # macOS / Linux: .venv/bin/python manage.py runserver
 ```
 
+### 公网演示（https://helply.work）
+
+用 Cloudflare Tunnel 把本机的 Helply 发布到 `https://helply.work`：电脑主动连接到 Cloudflare，**不需要开放任何端口**，在学校 Wi-Fi、手机热点等任何网络下都能用，HTTPS 证书由 Cloudflare 自动提供。
+
+**一次性设置（在 Cloudflare 后台完成）：**
+
+1. 登录 Cloudflare → **Zero Trust** → **Networks → Tunnels** → **Create a tunnel**，类型选 **Cloudflared**，名字填 `helply`。
+2. 安装连接器那一页会显示一条命令，复制其中 `--token` 后面的那一长串字符。
+3. 打开本项目的 `.env` 文件，粘贴到 `CLOUDFLARE_TUNNEL_TOKEN=` 后面并保存。**这个令牌相当于隧道的钥匙，不要发给别人，也不要提交到 git。**
+4. 回到 Cloudflare，添加 **Public Hostname**：Subdomain 留空，Domain 选 `helply.work`，Service 选 **HTTP**，URL 填 `localhost:8000`，保存。
+
+（Cloudflare 后台的菜单名称可能会随版本调整，以实际界面为准。）
+
+**每次演示：** 双击 `start-online.bat`。它会：
+
+- 刷新演示数据（**会删除全部工单并重新生成**）；
+- 用正式的 Web 服务器 Waitress 运行，关闭调试页面，只监听本机 `127.0.0.1`；
+- **给每个演示账号生成一个新的随机密码**，显示在窗口里，同时保存到 `demo-passwords.txt`（不会提交到 git）；
+- 连接隧道，然后就可以通过 `https://helply.work` 访问。
+
+关掉窗口即下线。下次用 `start-demo.bat` 在本机演示时，账号会恢复成 `.env` 里的共享密码。
+
 ### 数据库
 
 - **默认使用 SQLite**，不需要任何配置。
@@ -55,7 +77,7 @@ Docker 使用 `requirements-docker.txt`，其中额外包含 PostgreSQL 驱动�
 
 ### 演示账号
 
-演示账号的统一密码写在 `apps/core/management/commands/seed_demo.py` 的 `DEMO_PASSWORD` 里，**仅限开发和演示使用**。
+演示账号的统一密码保存在本地的 `.env` 文件里（`HELPLY_DEMO_PASSWORD`），**不在代码里，也不会提交到 git**。第一次导入演示数据时如果还没有设置，会自动生成一个随机密码写进 `.env`。所有密码在数据库里都是加密存储的。
 
 | 用户名 | 角色 | 说明 |
 |---|---|---|
