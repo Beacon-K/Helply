@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<div class="login card">
+  <img src="{% static 'img/brand/app-icon-256.png' %}" alt="Helply" class="login-logo">
+  <h1>Helply</h1>
+  <p class="muted">IT help desk for small teams</p>
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn primary wide">Sign in</button>
+  </form>
+</div>
+{% endblock %}

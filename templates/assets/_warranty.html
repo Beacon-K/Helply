@@ -1,0 +1,4 @@
+{% if a.warranty_state == "expired" %}<span class="chip chip-danger">Expired {{ a.warranty_expiry|date:"M Y" }}</span>
+{% elif a.warranty_state == "expiring" %}<span class="chip chip-warn">{{ a.warranty_days_left }} days left</span>
+{% elif a.warranty_state == "ok" %}<span class="muted small">Until {{ a.warranty_expiry|date:"M Y" }}</span>
+{% else %}<span class="muted">–</span>{% endif %}

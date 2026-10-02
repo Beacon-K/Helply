@@ -1,0 +1,64 @@
+{% extends "base.html" %}{% load helply %}
+{% block title %}{{ asset.asset_tag }}{% endblock %}
+{% block content %}
+{% with a=asset %}
+<p><a href="{% url 'assets:list' %}">← {% if user.is_agent %}Asset register{% else %}My devices{% endif %}</a></p>
+<div class="dash-head">
+  <div class="asset-title">
+    <span class="asset-icon big">{{ a.icon }}</span>
+    <div>
+      <h1>{{ a.name }}</h1>
+      <p class="muted">{{ a.asset_tag }} · {{ a.get_type_display }} · <span class="badge as-{{ a.status }}">{{ a.get_status_display }}</span></p>
+    </div>
+  </div>
+  <div class="head-actions">
+    <a class="btn primary" href="{% url 'tickets:create' %}?asset={{ a.pk }}">Report a problem</a>
+    {% if user.is_staff %}<a class="btn" href="{% url 'admin:assets_asset_change' a.pk %}">Edit</a>{% endif %}
+  </div>
+</div>
+
+{% if a.recent_tickets >= repeat_threshold %}
+<div class="callout">↻ <b>{{ a.recent_tickets }} tickets in the last {{ repeat_window }} days.</b> Repeated problems may mean this device should be repaired properly or replaced.</div>
+{% endif %}
+
+<div class="grid-detail">
+  <section class="card">
+    <div class="panel-head">
+      <h2>Ticket history</h2>
+      <span class="muted small">{{ tickets|length }} ticket{{ tickets|length|pluralize }}{% if a.open_tickets %} · {{ a.open_tickets }} open{% endif %}</span>
+    </div>
+    {% for t, state in tickets %}
+      <a class="attn-row" href="{{ t.get_absolute_url }}">
+        <span class="badge p-{{ t.priority }}">{{ t.priority }}</span>
+        <span class="attn-main">
+          <span class="attn-title">{{ t.title }}</span>
+          <span class="attn-meta">{{ t.reference }} · {{ t.created_at|ago }} · {{ t.assignee|default:"Unassigned" }}</span>
+        </span>
+        <span class="badge st-{{ t.status }}">{{ t.get_status_display }}</span>
+      </a>
+    {% empty %}
+      <p class="empty">No tickets have been raised for this {{ a.get_type_display|lower }}.</p>
+    {% endfor %}
+  </section>
+
+  <aside>
+    <section class="card">
+      <h2>Details</h2>
+      <dl>
+        <dt>Assigned to</dt><dd>{{ a.owner|default:"Shared" }}</dd>
+        <dt>Department</dt><dd>{{ a.department|default:"–" }}</dd>
+        <dt>Serial number</dt><dd>{{ a.serial_number|default:"–" }}</dd>
+        <dt>Purchased</dt><dd>{{ a.purchase_date|date:"M j, Y"|default:"–" }}</dd>
+        <dt>Warranty</dt><dd>{{ a.warranty_expiry|date:"M j, Y"|default:"–" }}{% if a.warranty_state == "expired" or a.warranty_state == "expiring" %}<br>{% include "assets/_warranty.html" %}{% endif %}</dd>
+      </dl>
+    </section>
+    {% if a.notes and user.is_agent %}
+    <section class="card">
+      <h2>IT notes</h2>
+      <p class="pre small">{{ a.notes }}</p>
+    </section>
+    {% endif %}
+  </aside>
+</div>
+{% endwith %}
+{% endblock %}

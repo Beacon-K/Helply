@@ -1,0 +1,77 @@
+{% load helply %}
+<section class="kpis">
+  <a class="kpi" href="{% url 'tickets:list' %}?status=open">
+    <span class="kpi-label">Open tickets</span>
+    <span class="kpi-value">{{ kpi.open }}</span>
+    <span class="kpi-sub">{{ kpi.not_started }} not started · {{ kpi.on_hold }} on hold</span>
+  </a>
+  <div class="kpi {% if kpi.breached %}kpi-danger{% elif kpi.at_risk %}kpi-warn{% endif %}">
+    <span class="kpi-label">SLA risk</span>
+    <span class="kpi-value">{{ kpi.breached|add:kpi.at_risk }}</span>
+    <span class="kpi-sub"><b class="t-danger">{{ kpi.breached }} breached</b> · <b class="t-warn">{{ kpi.at_risk }} at risk</b></span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-label">SLA met · 30 days</span>
+    <span class="kpi-value">{% if kpi.sla_met_pct is not None %}{{ kpi.sla_met_pct }}%{% else %}–{% endif %}</span>
+    <span class="kpi-sub">{{ kpi.sla_met }} of {{ kpi.resolved_30d }} resolved on time</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-label">Satisfaction</span>
+    <span class="kpi-value">{% if kpi.csat %}{{ kpi.csat|floatformat:1 }}<small>/5</small>{% else %}–{% endif %}</span>
+    <span class="kpi-sub">{{ kpi.csat_n }} rating{{ kpi.csat_n|pluralize }}</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-label">AI category accuracy</span>
+    <span class="kpi-value">{% if kpi.ai_accuracy is not None %}{{ kpi.ai_accuracy }}%{% else %}–{% endif %}</span>
+    <span class="kpi-sub">{{ kpi.ai_auto }} auto-triaged · {{ kpi.ai_reviewed }} reviewed</span>
+  </div>
+</section>
+
+<div class="dash-grid">
+  <section class="card">
+    <div class="panel-head">
+      <h2>Needs attention</h2>
+      <a class="small" href="{% url 'tickets:list' %}?status=open">All open tickets →</a>
+    </div>
+    {% for t, reason in attention %}
+      <a class="attn-row" href="{{ t.get_absolute_url }}">
+        <span class="badge p-{{ t.priority }}">{{ t.priority }}</span>
+        <span class="attn-main">
+          <span class="attn-title">{{ t.title }}</span>
+          <span class="attn-meta">{{ t.reference }} · {{ t.category|default:"Uncategorized" }} · {{ t.assignee|default:"Unassigned" }}</span>
+        </span>
+        {% if reason == "breached" %}<span class="chip chip-danger">Breached · {{ t.resolution_due_at|due_in }}</span>
+        {% elif reason == "at_risk" %}<span class="chip chip-warn">At risk · due {{ t.resolution_due_at|due_in }}</span>
+        {% else %}<span class="chip">Unassigned · {{ t.created_at|ago }}</span>{% endif %}
+      </a>
+    {% empty %}
+      <p class="empty">Nothing needs attention right now. 🎉</p>
+    {% endfor %}
+    {% if attention_more %}<p class="muted small">+ {{ attention_more }} more in the ticket list.</p>{% endif %}
+  </section>
+
+  <div class="dash-side">
+    <section class="card">
+      <h2>Open work by stage</h2>
+      {% for key, label, n in stages %}
+        <a class="bar-row" href="{% url 'tickets:list' %}?status={{ key }}">
+          <span class="bar-label">{{ label }}</span>
+          <span class="bar"><span class="bar-fill stage-{{ key }}" style="width: {{ n|percent_of:stage_max }}%"></span></span>
+          <span class="bar-value">{{ n }}</span>
+        </a>
+      {% endfor %}
+    </section>
+
+    <section class="card">
+      <h2>Team workload</h2>
+      {% for tech, n, risky in workload %}
+        <div class="bar-row">
+          <span class="bar-label">{{ tech.first_name }}</span>
+          <span class="bar"><span class="bar-fill" style="width: {{ n|percent_of:workload_max }}%"></span></span>
+          <span class="bar-value">{{ n }}{% if risky %} <span class="t-danger" title="At risk or breached">· {{ risky }}⚠</span>{% endif %}</span>
+        </div>
+      {% empty %}<p class="empty">No technicians yet.</p>{% endfor %}
+      <p class="muted small">Open tickets per technician · ⚠ at risk or breached</p>
+    </section>
+  </div>
+</div>

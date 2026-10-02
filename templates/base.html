@@ -1,0 +1,39 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Helply{% endblock %} · Helply</title>
+  <link rel="icon" href="{% static 'img/brand/favicon.ico' %}" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/icon-32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/brand/icon-16.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/brand/apple-touch-icon.png' %}">
+  <link rel="manifest" href="{% static 'site.webmanifest' %}">
+  <meta name="theme-color" content="#0b1b2b">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+{% if user.is_authenticated %}
+<header class="topbar">
+  <a class="brand" href="{% url 'core:dashboard' %}"><img src="{% static 'img/brand/logo-glyph.png' %}" alt=""> Helply</a>
+  <nav>
+    <a href="{% url 'core:dashboard' %}">Dashboard</a>
+    <a href="{% url 'tickets:list' %}">Tickets</a>
+    <a href="{% url 'tickets:create' %}">New ticket</a>
+    <a href="{% url 'kb:list' %}">Knowledge base</a>
+    <a href="{% url 'assets:list' %}">{% if user.is_agent %}Assets{% else %}My devices{% endif %}</a>
+    {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin</a>{% endif %}
+  </nav>
+  <div class="who">
+    <span>{{ user }} <small class="role role-{{ user.role }}">{{ user.get_role_display }}</small></span>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">Log out</button></form>
+  </div>
+</header>
+{% endif %}
+<main class="container">
+  {% for message in messages %}<div class="flash flash-{{ message.tags }}">{{ message }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+</main>
+{% block scripts %}{% endblock %}
+</body>
+</html>

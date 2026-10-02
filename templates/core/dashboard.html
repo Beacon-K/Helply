@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="dash-head">
+  <div>
+    <h1>{% now "G" as hour %}{% if hour|add:0 < 12 %}Good morning{% elif hour|add:0 < 18 %}Good afternoon{% else %}Good evening{% endif %}, {{ user.first_name|default:user.username }}</h1>
+    <p class="muted">{% now "l, F j" %}</p>
+  </div>
+  <a class="btn primary" href="{% url 'tickets:create' %}">+ New ticket</a>
+</div>
+
+{% if user.is_supervisor %}{% include "core/_supervisor.html" %}
+{% elif user.is_technician %}{% include "core/_technician.html" %}
+{% else %}{% include "core/_employee.html" %}{% endif %}
+{% endblock %}

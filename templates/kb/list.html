@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Knowledge base{% endblock %}
+{% block content %}
+<div class="row-between">
+  <h1>Knowledge base</h1>
+  <a class="btn" href="{% url 'tickets:create' %}">Can't find an answer? Open a ticket</a>
+</div>
+<form class="search" method="get" action="{% url 'kb:list' %}">
+  <input name="q" value="{{ q }}" placeholder="Describe your problem, e.g. &quot;printer offline&quot; or &quot;outlook keeps asking for password&quot;" autofocus>
+  <button class="btn primary">Search</button>
+</form>
+
+<p class="filters">
+  <a href="{% url 'kb:list' %}" {% if not q and not current_category %}class="on"{% endif %}>All</a>
+  {% for c in categories %}<a href="?category={{ c.pk }}" {% if current_category == c.pk|stringformat:"s" %}class="on"{% endif %}>{{ c.name }} <small class="muted">{{ c.n }}</small></a>{% endfor %}
+</p>
+
+{% if q %}
+  <div class="card">
+    <h2>Results for “{{ q }}”</h2>
+    {% for a in results %}
+      <div class="kb-item">
+        <a href="{{ a.get_absolute_url }}"><b>{{ a.title }}</b></a>
+        {% if a.is_internal %}<span class="badge internal-badge">IT only</span>{% endif %}
+        <small class="muted">· {{ a.category|default:"General" }}</small>
+        <p class="muted">{{ a.summary }}</p>
+      </div>
+    {% empty %}
+      <p class="muted">No matching articles. Try other words, or <a href="{% url 'tickets:create' %}">open a ticket</a>.</p>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="grid-detail">
+    <div>
+    {% for category, articles in groups %}
+      <section class="card">
+        <h2>{{ category|default:"General" }} <small class="muted">({{ articles|length }})</small></h2>
+        {% for a in articles %}
+          <div class="kb-item">
+            <a href="{{ a.get_absolute_url }}"><b>{{ a.title }}</b></a>
+            {% if a.is_internal %}<span class="badge internal-badge">IT only</span>{% endif %}
+            <p class="muted">{{ a.summary }}</p>
+          </div>
+        {% endfor %}
+      </section>
+    {% empty %}<div class="card"><p class="muted">No articles yet.</p></div>{% endfor %}
+    </div>
+    <aside>
+      <section class="card">
+        <h2>🔥 Most viewed</h2>
+        {% for a in popular %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a> <small class="muted">{{ a.views }} views</small></p>
+        {% empty %}<p class="muted">No views yet.</p>{% endfor %}
+      </section>
+      <section class="card">
+        <h2>🚨 Urgent?</h2>
+        <p>If you clicked a suspicious link, lost a device, or the whole office is down, <b>don't wait</b> —
+          <a href="{% url 'tickets:create' %}">open a ticket</a> with Impact and Urgency set to <b>High</b>.</p>
+      </section>
+    </aside>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-helply}
+      POSTGRES_USER: ${POSTGRES_USER:-helply}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-helply}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      retries: 10
+
+  web:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-helply}
+      POSTGRES_USER: ${POSTGRES_USER:-helply}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-helply}
+      POSTGRES_HOST: db
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

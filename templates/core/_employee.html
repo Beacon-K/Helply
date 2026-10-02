@@ -1,0 +1,59 @@
+{% load helply %}
+<section class="card self-help">
+  <h2>What do you need help with?</h2>
+  <form method="get" action="{% url 'kb:list' %}" class="search">
+    <input name="q" placeholder="Describe the problem, e.g. &quot;printer offline&quot; or &quot;forgot my password&quot;">
+    <button class="btn">Search answers</button>
+  </form>
+  <p class="muted small">Most common problems have a step-by-step fix in the knowledge base. Can't find one?
+    <a href="{% url 'tickets:create' %}">Open a ticket</a>.</p>
+</section>
+
+{% if to_confirm %}
+<section class="card confirm-card">
+  <h2>✅ Please confirm these are fixed</h2>
+  {% for t in to_confirm %}
+    <a class="attn-row" href="{{ t.get_absolute_url }}">
+      <span class="attn-main"><span class="attn-title">{{ t.title }}</span>
+        <span class="attn-meta">{{ t.reference }} · resolved {{ t.resolved_at|ago }} by {{ t.assignee|default:"IT" }}</span></span>
+      <span class="chip">Review →</span>
+    </a>
+  {% endfor %}
+</section>
+{% endif %}
+
+<div class="dash-grid">
+  <section class="card">
+    <div class="panel-head">
+      <h2>My open tickets</h2>
+      <a class="small" href="{% url 'tickets:list' %}?status=all">All my tickets →</a>
+    </div>
+    {% for t, steps in my_open %}
+      <a class="ticket-progress" href="{{ t.get_absolute_url }}">
+        <span class="attn-title">{{ t.title }}</span>
+        <span class="attn-meta">{{ t.reference }} · opened {{ t.created_at|ago }}{% if t.assignee %} · with {{ t.assignee.first_name }}{% endif %}</span>
+        <ol class="stepper">
+          {% for label, state in steps %}<li class="step-{{ state }}">{{ label }}</li>{% endfor %}
+        </ol>
+      </a>
+    {% empty %}
+      <p class="empty">You have no open tickets.</p>
+    {% endfor %}
+    {% if recent_closed %}
+      <h3 class="muted small upper">Recently closed</h3>
+      {% for t in recent_closed %}<p class="small"><a href="{{ t.get_absolute_url }}">{{ t.title }}</a> <span class="muted">· {{ t.closed_at|ago }}</span></p>{% endfor %}
+    {% endif %}
+  </section>
+
+  <div class="dash-side">
+    <section class="card">
+      <h2>📚 Popular answers</h2>
+      {% for a in popular %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></p>{% endfor %}
+      <a class="small" href="{% url 'kb:list' %}">Browse the knowledge base →</a>
+    </section>
+    <section class="card">
+      <h2>🚨 Urgent?</h2>
+      <p class="small">Clicked a suspicious link, lost a device, or the whole office is down? Open a ticket with Impact and Urgency set to <b>High</b> — don't wait.</p>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Tickets{% endblock %}
+{% block content %}
+<div class="row-between">
+  <h1>Tickets</h1>
+  <a class="btn primary" href="{% url 'tickets:create' %}">+ New ticket</a>
+</div>
+<p class="filters">
+  {% for key, label, count in filters %}<a href="?status={{ key }}" {% if current == key %}class="on"{% endif %}>{{ label }} <span class="filter-count">{{ count }}</span></a>{% endfor %}
+</p>
+<div class="card table-wrap">
+<table>
+  <tr><th>Ref</th><th>Title</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>SLA</th><th>Created</th></tr>
+  {% for t, state in rows %}
+  <tr>
+    <td><a href="{{ t.get_absolute_url }}">{{ t.reference }}</a></td>
+    <td>{{ t.title }}</td>
+    <td>{{ t.category|default:"–" }}{% if t.ai_classified %} <span title="Classified by AI">🤖</span>{% endif %}</td>
+    <td><span class="badge p-{{ t.priority }}">{{ t.priority }}</span></td>
+    <td><span class="badge st-{{ t.status }}">{{ t.get_status_display }}</span></td>
+    <td>{{ t.assignee|default:"–" }}</td>
+    <td><span class="badge sla-{{ state }}">{{ state }}</span></td>
+    <td>{{ t.created_at|date:"M j, H:i" }}</td>
+  </tr>
+  {% empty %}<tr><td colspan="8" class="muted">No tickets.</td></tr>{% endfor %}
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}{% load kb_tags static %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'kb:list' %}">← Knowledge base</a>{% if article.category %} / <a href="{% url 'kb:list' %}?category={{ article.category_id }}">{{ article.category }}</a>{% endif %}</p>
+<div class="grid-detail">
+  <article class="card kb-article">
+    <h1>{{ article.title }}</h1>
+    <p class="muted small">
+      {% if article.is_internal %}<span class="badge internal-badge">IT staff only</span> · {% endif %}
+      Updated {{ article.updated_at|date:"M j, Y" }} · {{ article.views }} views
+    </p>
+    {% if article.summary %}<p class="lead">{{ article.summary }}</p>{% endif %}
+    {{ article.body|kb_render }}
+
+    <hr>
+    <form method="post" action="{% url 'kb:vote' article.slug %}" class="feedback" id="feedback" data-vote-form>{% csrf_token %}
+      <span>Did this article solve your problem?</span>
+      <button class="btn vote vote-up{% if my_vote == 1 %} active{% endif %}" name="vote" value="up"
+              aria-pressed="{% if my_vote == 1 %}true{% else %}false{% endif %}" title="Helpful (click again to undo)">
+        👍 <span class="count" data-count="up">{{ article.helpful_yes }}</span>
+      </button>
+      <button class="btn vote vote-down{% if my_vote == -1 %} active{% endif %}" name="vote" value="down"
+              aria-pressed="{% if my_vote == -1 %}true{% else %}false{% endif %}" title="Not helpful (click again to undo)">
+        👎 <span class="count" data-count="down">{{ article.helpful_no }}</span>
+      </button>
+    </form>
+
+    <div class="suggest" data-suggest hidden>
+      <form method="post" action="{% url 'kb:suggest' article.slug %}" data-suggest-form>{% csrf_token %}
+        <label for="suggest-text"><b>Sorry this didn't help.</b> Would you like to suggest an improvement?</label>
+        <textarea id="suggest-text" name="text" rows="3" maxlength="2000" required
+                  placeholder="What was missing, unclear, or wrong? e.g. &quot;Step 3 doesn't match what I see on Windows 11&quot;"></textarea>
+        <div class="suggest-actions">
+          <button class="btn primary">Send suggestion</button>
+          <button type="button" class="btn" data-suggest-dismiss>No thanks</button>
+          <a class="small" href="{% url 'tickets:create' %}?category={{ article.category_id|default:'' }}&from_kb={{ article.slug }}">Still need help? Open a ticket</a>
+        </div>
+      </form>
+      <p class="muted" data-suggest-done hidden>Your suggestion was sent to IT.</p>
+    </div>
+  </article>
+  <aside>
+    <section class="card">
+      <h2>Still stuck?</h2>
+      <p>Open a ticket and tell us which steps you already tried — it saves time for everyone.</p>
+      <a class="btn primary" href="{% url 'tickets:create' %}?category={{ article.category_id|default:'' }}&from_kb={{ article.slug }}">Open a ticket</a>
+    </section>
+    {% if related %}
+    <section class="card">
+      <h2>Related articles</h2>
+      {% for a in related %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></p>{% endfor %}
+    </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}
+
+{% block scripts %}<script src="{% static 'js/kb-vote.js' %}" defer></script>{% endblock %}
