@@ -1,11 +1,19 @@
 """
 Helply settings.
 
-Configuration is read from environment variables so the same code runs
-locally (SQLite, no setup) and in Docker (PostgreSQL). See .env.example.
+Configuration is read from environment variables (or the local .env file) so the
+same code runs in development, for demos and in production. See .env.example.
+
+HELPLY_ENVIRONMENT selects the mode:
+  development  (default) debug pages on, demo data allowed
+  demo         debug off, demo data allowed (start-demo.bat / start-online.bat)
+  production   debug off, a fixed DJANGO_SECRET_KEY is required, and every command
+               that loads or wipes demo data refuses to run
 """
 import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,8 +36,18 @@ def env_bool(name, default=False):
     return os.environ.get(name, str(default)).lower() in ("1", "true", "yes", "on")
 
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-insecure-change-me")
-DEBUG = env_bool("DJANGO_DEBUG", True)
+HELPLY_ENVIRONMENT = os.environ.get("HELPLY_ENVIRONMENT", "development").strip().lower()
+if HELPLY_ENVIRONMENT not in ("development", "demo", "production"):
+    raise ImproperlyConfigured("HELPLY_ENVIRONMENT must be development, demo or production.")
+IS_PRODUCTION = HELPLY_ENVIRONMENT == "production"
+
+DEV_SECRET_KEY = "dev-insecure-change-me"
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", DEV_SECRET_KEY)
+if IS_PRODUCTION and (SECRET_KEY == DEV_SECRET_KEY or len(SECRET_KEY) < 40):
+    # A fixed, private key keeps people signed in across restarts and makes password-reset links valid.
+    raise ImproperlyConfigured("Production needs a private DJANGO_SECRET_KEY of at least 40 characters in .env "
+                               "(setup.bat generates one).")
+DEBUG = env_bool("DJANGO_DEBUG", HELPLY_ENVIRONMENT == "development")
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 # Public demo behind Cloudflare Tunnel (see start-online.bat). The tunnel terminates HTTPS
@@ -169,3 +187,32 @@ HELPLY_EMAIL_THROTTLE_MINUTES = int(os.environ.get("HELPLY_EMAIL_THROTTLE_MINUTE
 # Resolved tickets: remind the requester after N days, close automatically after M days.
 HELPLY_CONFIRM_REMINDER_DAYS = int(os.environ.get("HELPLY_CONFIRM_REMINDER_DAYS", "2"))
 HELPLY_AUTO_CLOSE_DAYS = int(os.environ.get("HELPLY_AUTO_CLOSE_DAYS", "5"))
+
+# --- Logging --------------------------------------------------------------------
+# Warnings and errors go to logs/helply.log (rotated), so problems can be investigated
+# when debug pages are off.
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {"plain": {"format": "{asctime} {levelname} {name}: {message}", "style": "{"}},
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "helply.log",
+            "maxBytes": 5 * 1024 * 1024,
+            "backupCount": 5,
+            "encoding": "utf-8",
+            "formatter": "plain",
+            "level": "WARNING",
+        },
+    },
+    "root": {"handlers": ["console", "file"], "level": "INFO"},
+    "loggers": {"django.server": {"level": "WARNING"}},
+}
+
+# --- Backups ----------------------------------------------------------------------
+HELPLY_BACKUP_DIR = Path(os.environ.get("HELPLY_BACKUP_DIR", BASE_DIR / "backups"))
+HELPLY_BACKUP_KEEP = int(os.environ.get("HELPLY_BACKUP_KEEP", "14"))

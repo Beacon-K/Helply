@@ -12,3 +12,5 @@ media/
 .vscode/
 .DS_Store
 tools/cloudflared.exe
+logs/
+backups/

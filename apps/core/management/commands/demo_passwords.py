@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from apps.core.demo import passwords
+from apps.core.demo.guard import require_demo_allowed
 
 
 class Command(BaseCommand):
@@ -14,6 +15,7 @@ class Command(BaseCommand):
         mode.add_argument("--public", action="store_true")
 
     def handle(self, *args, shared=False, public=False, **options):
+        require_demo_allowed("Changing demo passwords")
         if shared:
             passwords.reset_to_shared()
             self.stdout.write("Demo accounts use the shared password HELPLY_DEMO_PASSWORD from the .env file.")

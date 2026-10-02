@@ -32,6 +32,29 @@ Fanshawe College BIA Capstone 项目。基于 **Django 6.1**（作为依赖使�
 .venv\Scripts\python.exe manage.py runserver      # macOS / Linux: .venv/bin/python manage.py runserver
 ```
 
+### 生产环境（真实使用）
+
+演示和生产严格分开：
+
+| | 演示 | 生产 |
+|---|---|---|
+| `.env` 设置 | 不设置，或 `HELPLY_ENVIRONMENT=demo` | `HELPLY_ENVIRONMENT=production` |
+| 安装 | `setup.bat` 导入演示数据 | `setup.bat` 生成私有密钥、初始化分类/SLA/知识库，并创建第一个主管账号，**不导入任何演示数据** |
+| 启动 | `start-demo.bat` / `start-online.bat`，会重置演示数据 | `start-production.bat`，**从不删除或修改业务数据** |
+| 演示命令 | 可用 | `seed_demo`、`seed_tickets`、`demo_passwords` 全部**拒绝执行**；另外只要数据库里有非演示账号，也会拒绝清空数据 |
+
+**部署步骤：**
+
+1. 准备一台 24 小时开机的电脑或服务器，建议使用 PostgreSQL（见上方"数据库"）。
+2. 复制 `.env.example` 为 `.env`，设置 `HELPLY_ENVIRONMENT=production`，并填写邮件服务器（`DJANGO_EMAIL_BACKEND`、`EMAIL_*`）和 `HELPLY_SITE_URL`。
+3. 运行 `setup.bat`：生成私有的 `DJANGO_SECRET_KEY`，建表，运行 `init_helply` 创建第一个主管账号。
+4. 运行 `start-production.bat`：自动检查配置、应用数据库更新，启动定时任务和 Web 服务器；如果 `.env` 里有 `CLOUDFLARE_TUNNEL_TOKEN`，同时连接隧道。
+5. 主管登录后，在 **Admin → Users** 里添加员工和技术员。
+
+**自动运行的内容：** 每 5 分钟检查 SLA 并发出预警、跟进已解决但未确认的工单；**每天自动备份数据库**到 `backups/`，保留最近 14 份。错误日志写入 `logs/helply.log`。
+
+**常用命令：** `python manage.py backup_db`（立即备份）、`python manage.py seed_kb --overwrite`（用原稿覆盖知识库文章，慎用）、`python manage.py check --deploy`（检查生产配置）。
+
 ### 公网演示（https://helply.work）
 
 用 Cloudflare Tunnel 把本机的 Helply 发布到 `https://helply.work`：电脑主动连接到 Cloudflare，**不需要开放任何端口**，在学校 Wi-Fi、手机热点等任何网络下都能用，HTTPS 证书由 Cloudflare 自动提供。

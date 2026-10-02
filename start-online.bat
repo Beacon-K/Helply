@@ -39,6 +39,7 @@ echo Preparing the demo...
 "%HELPLY_PY%" manage.py collectstatic --noinput --verbosity 0 || goto :failed
 
 rem Production-style settings for this session only.
+set "HELPLY_ENVIRONMENT=demo"
 set "DJANGO_DEBUG=false"
 set "HELPLY_SITE_URL=https://%HELPLY_PUBLIC_HOST%"
 for /f "delims=" %%k in ('"%HELPLY_PY%" -c "import secrets; print(secrets.token_urlsafe(50))"') do set "DJANGO_SECRET_KEY=%%k"

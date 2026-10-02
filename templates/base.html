@@ -31,6 +31,7 @@
       <span class="bell-count" data-unread {% if not unread_notifications %}hidden{% endif %}>{% if unread_notifications > 99 %}99+{% else %}{{ unread_notifications }}{% endif %}</span>
     </a>
     <span>{{ user }} <small class="role role-{{ user.role }}">{{ user.get_role_display }}</small></span>
+    <a class="small" href="{% url 'password_change' %}">Change password</a>
     <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">Log out</button></form>
   </div>
 </header>
