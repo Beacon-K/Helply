@@ -81,7 +81,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 # PostgreSQL when POSTGRES_DB is set (Docker), otherwise SQLite for quick local dev.
-if os.environ.get("POSTGRES_DB"):
+# HELPLY_USE_SQLITE=1 forces SQLite, e.g. when this drive is plugged into a computer without Docker.
+if os.environ.get("POSTGRES_DB") and not env_bool("HELPLY_USE_SQLITE"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

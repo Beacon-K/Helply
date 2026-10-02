@@ -1,7 +1,8 @@
 @echo off
-rem One-time setup for Helply on a new Windows computer.
+rem One-time setup of Helply on THIS computer. Run it once on each computer that will use this drive.
 rem Requires Python 3.12 or newer (https://www.python.org/downloads/) and an internet connection.
 cd /d "%~dp0"
+call tools\helply-env.bat
 
 set "PY="
 where py >nul 2>nul && set "PY=py -3"
@@ -21,20 +22,22 @@ if errorlevel 1 (
   exit /b 1
 )
 
-if exist ".venv\Scripts\python.exe" (
+echo Setting up Helply for computer %COMPUTERNAME%
+if exist "%HELPLY_PY%" (
   echo Virtual environment already exists - reusing it.
 ) else (
-  echo Creating virtual environment...
-  %PY% -m venv .venv || goto :failed
+  echo Creating virtual environment in .venv-%COMPUTERNAME% ...
+  %PY% -m venv "%HELPLY_VENV%" || goto :failed
 )
 
 echo Installing dependencies...
-".venv\Scripts\python.exe" -m pip install --quiet --upgrade pip
-".venv\Scripts\python.exe" -m pip install --quiet -r requirements.txt || goto :failed
+"%HELPLY_PY%" -m pip install --quiet --upgrade pip
+"%HELPLY_PY%" -m pip install --quiet -r requirements.txt || goto :failed
 
-echo Creating the database and loading demo data...
-".venv\Scripts\python.exe" manage.py migrate --verbosity 0 || goto :failed
-".venv\Scripts\python.exe" manage.py seed_demo --reset || goto :failed
+call tools\start-db.bat
+echo Creating the database tables and loading demo data...
+"%HELPLY_PY%" manage.py migrate --verbosity 0 || goto :failed
+"%HELPLY_PY%" manage.py seed_demo --reset || goto :failed
 
 echo.
 echo Setup complete. Double-click start-demo.bat to run Helply.
