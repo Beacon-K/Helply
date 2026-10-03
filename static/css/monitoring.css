@@ -480,3 +480,14 @@
 @media (prefers-reduced-motion: reduce) {
   .fx *, .fx *::before, .fx *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Country flag + location ---------- */
+.fx-place { display: inline-flex; align-items: center; gap: .45rem; min-width: 0; }
+.fx-table td.fx-place { display: table-cell; white-space: nowrap; color: var(--ink-2); }
+.fx-table td.fx-place > * { vertical-align: middle; }
+.fx-flag { width: 20px; height: 15px; flex-shrink: 0; border-radius: 3px; object-fit: cover; display: inline-block; vertical-align: middle;
+           box-shadow: 0 0 0 1px rgba(var(--shadow-rgb), .14), 0 1px 2px rgba(var(--shadow-rgb), .12); }
+svg.fx-flag-none { width: 16px; height: 16px; box-shadow: none; color: var(--faint); border-radius: 0; object-fit: initial; }
+.fx-region { color: var(--mute); }
+.fx-attrib { margin: 1.4rem 0 0; font-size: .74rem; color: var(--faint); }
+.fx-attrib a { text-decoration: underline; text-underline-offset: 2px; }

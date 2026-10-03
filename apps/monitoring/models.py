@@ -47,6 +47,10 @@ class Server(models.Model):
     purpose = models.CharField(max_length=160, blank=True, help_text="What runs on it, e.g. Company website")
     provider = models.CharField(max_length=20, choices=Provider.choices, default=Provider.OTHER)
     region = models.CharField(max_length=60, blank=True, help_text="e.g. Toronto (tor1)")
+    country_code = models.CharField(max_length=2, blank=True, help_text="ISO country code, e.g. CA")
+    # True while Helply works the country out from the server's IP address; set to False when a person
+    # picks one, so a later detection never overwrites it.
+    country_auto = models.BooleanField(default=True, editable=False)
     public_ip = models.GenericIPAddressField(null=True, blank=True)
     plan = models.CharField(max_length=80, blank=True, help_text="e.g. 2 vCPU / 4 GB / 80 GB SSD")
     monthly_cost = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True, help_text="CAD per month")
@@ -166,6 +170,17 @@ class Server(models.Model):
     @property
     def disk_percent(self):
         return self._pct(self.disk_used, self.disk_total)
+
+    @property
+    def country_name(self):
+        from .countries import COUNTRIES
+        return COUNTRIES.get(self.country_code, "")
+
+    @property
+    def flag_url(self):
+        """URL of the flag image, or "" when the country is unknown (templates then show a globe)."""
+        from django.templatetags.static import static
+        return static(f"img/flags/{self.country_code.lower()}.svg") if self.country_name else ""
 
     @property
     def renewal_days_left(self):

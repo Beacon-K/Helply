@@ -112,6 +112,7 @@
         <div data-f="disk"><dt>Disk</dt><dd>{% if s.last_seen_at %}{{ i.disk_total|bytes_h }}{% endif %}</dd></div>
         <div data-f="ip"><dt>Public IP</dt><dd>{% if s.last_seen_at %}{{ i.ip|default:"–" }}{% endif %}</dd></div>
         <div data-f="provider"><dt>Provider</dt><dd>{% if s.last_seen_at %}{{ i.provider }}{% endif %}</dd></div>
+        <div data-f="country"><dt>Country</dt><dd>{% if s.last_seen_at %}{% if s.country_name %}<img class="fx-flag" src="{{ s.flag_url }}" alt="" width="20" height="15"> {{ s.country_name }}{% else %}–{% endif %}{% endif %}</dd></div>
         <div data-f="region"><dt>Region</dt><dd>{% if s.last_seen_at %}{{ i.region|default:"–" }}{% endif %}</dd></div>
         <div data-f="type"><dt>Machine type</dt><dd>{% if s.last_seen_at %}{{ i.instance_type|default:"–" }}{% endif %}</dd></div>
       </dl>
@@ -156,11 +157,20 @@
     const values = {
       name: info.name, os: info.os, cpu: info.cores ? `${info.cores} vCPU${info.cpu_model ? " · " + info.cpu_model : ""}` : "",
       mem: bytes(info.mem_total), disk: bytes(info.disk_total), ip: info.ip || "–", provider: info.provider,
-      region: info.region || "–", type: info.instance_type || "–",
+      country: info.country || "–", region: info.region || "–", type: info.instance_type || "–",
     };
     Object.keys(values).forEach((key, i) => {
       const row = root.querySelector(`[data-f="${key}"]`);
-      setTimeout(() => { row.querySelector("dd").textContent = values[key] || "–"; row.classList.add("is-filled"); }, i * 110);
+      setTimeout(() => {
+        const dd = row.querySelector("dd");
+        dd.textContent = values[key] || "–";
+        if (key === "country" && info.flag) {  // the flag sits in front of the country name
+          const flag = Object.assign(document.createElement("img"), { src: info.flag, alt: "", width: 20, height: 15 });
+          flag.className = "fx-flag";
+          dd.prepend(flag, " ");
+        }
+        row.classList.add("is-filled");
+      }, i * 110);
     });
   }
   const timer = setInterval(async () => {

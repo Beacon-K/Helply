@@ -141,7 +141,7 @@
   <section class="fx-grid" aria-label="Servers">
     {% for row in rows %}{% with s=row.s d=row.d %}
     <article class="fx-card is-{{ d.state }}{% if d.alerts %} is-critical{% endif %}" data-server="{{ s.pk }}" data-state="{{ d.state }}"
-             data-search="{{ s.name }} {{ s.purpose }} {{ s.get_provider_display }} {{ s.region }} {{ s.public_ip|default:'' }} {{ s.reported_ip|default:'' }} {{ s.hostname }} {{ s.os_name }} {{ s.owner|default:'' }}">
+             data-search="{{ s.name }} {{ s.purpose }} {{ s.get_provider_display }} {{ s.region }} {{ s.country_name }} {{ s.public_ip|default:'' }} {{ s.reported_ip|default:'' }} {{ s.hostname }} {{ s.os_name }} {{ s.owner|default:'' }}">
       <a class="fx-card-link" href="{{ s.get_absolute_url }}" aria-label="Open {{ s.name }}"></a>
       <div>
         <div class="fx-card-head">
@@ -150,8 +150,9 @@
           {% with ip=s.public_ip|default:s.reported_ip %}{% if ip %}<span class="fx-card-ip">{{ ip }}</span>{% endif %}{% endwith %}
         </div>
         <p class="fx-card-meta">
-          {% include "monitoring/_os.html" %}{% if s.os_family %}<span class="sep">·</span>{% endif %}<span>{{ s.get_provider_display }}{% if s.region %} · {{ s.region }}{% endif %}</span>
+          {% include "monitoring/_os.html" %}{% if s.os_family %}<span class="sep">·</span>{% endif %}<span>{{ s.get_provider_display }}</span>
         </p>
+        {% if s.country_name or s.region %}<p class="fx-card-meta fx-place">{% include "monitoring/_place.html" %}</p>{% endif %}
       </div>
 
       {% for a in d.alerts|slice:":1" %}
@@ -204,12 +205,13 @@
   {# ------------------------------------------------------------------ Table #}
   <div class="fx-table-wrap">
     <table class="fx-table">
-      <thead><tr><th>Server</th><th>Status</th><th>CPU · 30 min</th><th>Memory</th><th>Disk</th><th class="r">Network in</th><th class="r">Uptime</th></tr></thead>
+      <thead><tr><th>Server</th><th>Location</th><th>Status</th><th>CPU · 30 min</th><th>Memory</th><th>Disk</th><th class="r">Network in</th><th class="r">Uptime</th></tr></thead>
       <tbody>
       {% for row in rows %}{% with s=row.s d=row.d %}
         <tr data-server="{{ s.pk }}" data-state="{{ d.state }}" data-href="{{ s.get_absolute_url }}"
-            data-search="{{ s.name }} {{ s.purpose }} {{ s.get_provider_display }} {{ s.region }} {{ s.public_ip|default:'' }} {{ s.reported_ip|default:'' }} {{ s.hostname }} {{ s.os_name }} {{ s.owner|default:'' }}">
-          <td><a class="srv" href="{{ s.get_absolute_url }}"><span class="fx-dot is-{% if d.alerts %}critical{% else %}{{ d.state }}{% endif %}"></span><span><b>{{ s.name }}</b><small>{{ s.get_provider_display }}{% if s.region %} · {{ s.region }}{% endif %}</small></span></a></td>
+            data-search="{{ s.name }} {{ s.purpose }} {{ s.get_provider_display }} {{ s.region }} {{ s.country_name }} {{ s.public_ip|default:'' }} {{ s.reported_ip|default:'' }} {{ s.hostname }} {{ s.os_name }} {{ s.owner|default:'' }}">
+          <td><a class="srv" href="{{ s.get_absolute_url }}"><span class="fx-dot is-{% if d.alerts %}critical{% else %}{{ d.state }}{% endif %}"></span><span><b>{{ s.name }}</b><small>{{ s.get_provider_display }}</small></span></a></td>
+          <td class="fx-place">{% include "monitoring/_place.html" %}</td>
           <td>{% include "monitoring/_badge.html" %}</td>
           <td><div class="mini"><svg viewBox="0 0 64 22" preserveAspectRatio="none" data-spark aria-hidden="true"></svg><b class="num"><span data-k="cpu">{% if d.status == "online" %}{{ d.cpu|floatformat:0 }}{% else %}–{% endif %}</span>%</b></div></td>
           <td><div class="bar-cell"><div class="fx-bar"><i class="lv-{{ d.mem|level }}" style="width:{{ d.mem|default:0 }}%" data-bar="mem"></i></div><span class="num"><span data-k="mem">{{ d.mem|floatformat:0|default:"–" }}</span>%</span></div></td>
@@ -223,6 +225,7 @@
   </div>
   <div class="fx-noresult fx-hidden" data-fx-noresult>No servers match your search. <button type="button" class="fx-btn fx-btn-ghost" data-fx-reset>Clear filters</button></div>
   {% endif %}
+  <p class="fx-attrib">IP geolocation by <a href="https://db-ip.com" rel="noopener" target="_blank">DB-IP.com</a> (CC BY 4.0) · flags by <a href="https://github.com/lipis/flag-icons" rel="noopener" target="_blank">flag-icons</a></p>
 </div>
 {{ fleet|json_script:"fx-fleet" }}
 {% endblock %}

@@ -21,7 +21,8 @@
       </div>
       <div class="fx-facts-row">
         {% if s.purpose %}<span>{{ s.purpose }}</span>{% endif %}
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.3 12 3.5 3.5 0 0 0 6.5 19Z"/></svg>{{ s.get_provider_display }}{% if s.region %} · {{ s.region }}{% endif %}</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.3 12 3.5 3.5 0 0 0 6.5 19Z"/></svg>{{ s.get_provider_display }}</span>
+        {% if s.country_name or s.region %}<span class="fx-place">{% include "monitoring/_place.html" %}</span>{% endif %}
         {% with ip=s.public_ip|default:s.reported_ip %}{% if ip %}
         <span><button type="button" class="fx-copy" data-fx-copy="{{ ip }}" title="Copy IP address"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><code>{{ ip }}</code></button></span>
         {% endif %}{% endwith %}

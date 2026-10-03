@@ -9,7 +9,7 @@ from django.db.models import Avg, Count, Max
 from django.db.models.functions import TruncHour
 from django.utils import timezone
 
-from . import alerts
+from . import alerts, geo
 from .models import Metric, MetricHourly, Server
 
 AGENT_VERSION_MAX = 20
@@ -99,6 +99,7 @@ def ingest(server, report, remote_ip=None, now=None):
     if remote_ip:
         server.reported_ip = remote_ip
     details_changed = _apply_detection(server, host, remote_ip) if host else False
+    details_changed = _detect_country(server, remote_ip) or details_changed
 
     with transaction.atomic():
         server.save()
@@ -123,6 +124,18 @@ def _unique_name(wanted, server):
 
 def _gb(value):
     return f"{value / 1024**3:.0f} GB" if value and value >= 1024**3 * 2 else f"{(value or 0) / 1024**3:.1f} GB"
+
+
+def _detect_country(server, remote_ip):
+    """Set the country from the server's public IP unless a person chose one. True when it changed."""
+    if not server.country_auto:
+        return False
+    ip = server.public_ip or remote_ip
+    code = geo.country_for_ip(ip) if ip else ""
+    if not code or code == server.country_code:  # unknown address: keep what we had
+        return False
+    server.country_code = code
+    return True
 
 
 def _apply_detection(server, host, remote_ip):
@@ -189,7 +202,7 @@ def sync_asset(server):
                       status=Asset.Status.IN_USE, department=Department.objects.filter(name="IT").first())
     asset.name = f"{server.name}" + (f" - {server.purpose}" if server.purpose else "")
     asset.name = asset.name[:Asset._meta.get_field("name").max_length]
-    asset.location = " · ".join(x for x in [server.get_provider_display(), server.region] if x)[:100]
+    asset.location = " · ".join(x for x in [server.get_provider_display(), server.country_name, server.region] if x)[:100]
     asset.supplier = server.get_provider_display()[:100]
     asset.purchase_cost = server.monthly_cost * 12 if server.monthly_cost is not None else None
     asset.warranty_expiry = server.expires_on

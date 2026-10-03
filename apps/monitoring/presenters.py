@@ -57,6 +57,7 @@ def snapshot(server, open_alerts=None, spark=None):
             "mem_total": server.mem_total, "disk_total": server.disk_total,
             "ip": server.public_ip or server.reported_ip, "provider": server.get_provider_display(),
             "provider_key": server.provider, "region": server.region, "instance_type": server.instance_type,
+            "country": server.country_name, "country_code": server.country_code, "flag": server.flag_url,
             "agent": server.agent_version,
         },
         "alerts": [{"rule": a.rule, "label": a.get_rule_display(), "message": a.message,

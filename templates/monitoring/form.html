@@ -49,6 +49,7 @@
       <div><h2>Hosting</h2><p>Filled in automatically from the agent. Change only if the detection is wrong.</p></div>
       <div class="fx-fields">
         {% include "monitoring/_field.html" with f=form.provider %}
+        {% include "monitoring/_field.html" with f=form.country_code %}
         {% include "monitoring/_field.html" with f=form.region %}
         {% include "monitoring/_field.html" with f=form.public_ip %}
         {% include "monitoring/_field.html" with f=form.plan %}

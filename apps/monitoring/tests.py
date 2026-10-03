@@ -360,6 +360,69 @@ class ViewTests(MonitoringBase):
         self.assertEqual(self.client.get(reverse("monitoring:agent_file", args=[".env"])).status_code, 404)
 
 
+class CountryTests(MonitoringBase):
+    """The country (and its flag) comes from the public IP, unless a person picked one."""
+
+    def test_lookup_knows_public_addresses_only(self):
+        from . import geo
+        self.assertEqual(geo.country_for_ip("8.8.8.8"), "US")
+        self.assertEqual(geo.country_for_ip("2a09:bac1:14c0:d8::2ac:69"), "CA")  # IPv6 works too
+        for unusable in ("192.168.1.5", "10.0.0.1", "127.0.0.1", "", "not-an-ip", None):
+            self.assertEqual(geo.country_for_ip(unusable), "")
+
+    def test_first_report_sets_country_from_the_ip(self):
+        server = Server.objects.get(pk=self.server.pk)
+        services.ingest(server, report(), remote_ip="8.8.8.8")
+        server.refresh_from_db()
+        self.assertEqual((server.country_code, server.country_name), ("US", "United States"))
+        self.assertTrue(server.country_auto)
+        self.assertTrue(server.flag_url.endswith("img/flags/us.svg"))
+        self.assertIn("United States", server.asset.location)
+
+    def test_private_address_leaves_country_unknown_and_shows_no_flag(self):
+        server = Server.objects.get(pk=self.server.pk)
+        services.ingest(server, report(), remote_ip="192.168.1.20")
+        server.refresh_from_db()
+        self.assertEqual((server.country_code, server.flag_url), ("", ""))
+
+    def test_a_manual_choice_is_never_overwritten(self):
+        self.client.force_login(self.admin)
+        response = self.client.post(reverse("monitoring:edit", args=[self.server.pk]), {
+            "name": "web-prod-01", "provider": "aws", "country_code": "DE", "criticality": 1, "alerts_enabled": "on"})
+        self.assertEqual(response.status_code, 302)
+        server = Server.objects.get(pk=self.server.pk)
+        self.assertEqual((server.country_code, server.country_auto), ("DE", False))
+        services.ingest(server, report(), remote_ip="8.8.8.8")
+        server.refresh_from_db()
+        self.assertEqual(server.country_code, "DE")
+        # Back to "Detect automatically": the next report fills it in again.
+        self.client.post(reverse("monitoring:edit", args=[self.server.pk]), {
+            "name": "web-prod-01", "provider": "aws", "country_code": "", "criticality": 1, "alerts_enabled": "on"})
+        server.refresh_from_db()
+        self.assertTrue(server.country_auto)
+        server.last_seen_at = None  # reports closer together than the minimum interval are ignored
+        services.ingest(server, report(), remote_ip="8.8.8.8")
+        server.refresh_from_db()
+        self.assertEqual(server.country_code, "US")
+
+    def test_pages_show_flag_country_and_search_text(self):
+        server = Server.objects.get(pk=self.server.pk)
+        services.ingest(server, report(), remote_ip="2a09:bac1:14c0:d8::2ac:69")
+        self.client.force_login(self.tech)
+        page = self.client.get(reverse("monitoring:list"))
+        self.assertContains(page, "img/flags/ca.svg")
+        self.assertContains(page, "Canada")
+        self.assertContains(self.client.get(reverse("monitoring:detail", args=[server.pk])), "Canada")
+        info = self.client.get(reverse("monitoring:data")).json()["servers"][0]["info"]
+        self.assertEqual((info["country"], info["country_code"]), ("Canada", "CA"))
+        self.assertTrue(info["flag"].endswith("img/flags/ca.svg"))
+
+    def test_every_country_has_a_flag_file(self):
+        from pathlib import Path
+        from .countries import COUNTRIES
+        flags = Path(settings.BASE_DIR) / "static" / "img" / "flags"
+        self.assertEqual([c for c in COUNTRIES if not (flags / f"{c.lower()}.svg").exists()], [])
+
 class AgentTests(TestCase):
     def test_agent_builds_a_report_the_server_accepts(self):
         if importlib.util.find_spec("psutil") is None:
