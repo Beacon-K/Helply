@@ -10,16 +10,20 @@
   <link rel="apple-touch-icon" href="{% static 'img/brand/apple-touch-icon.png' %}">
   <link rel="manifest" href="{% static 'site.webmanifest' %}">
   <meta name="theme-color" content="#0b1b2b">
+  <script>/* Set the theme before the first paint so a dark-mode visitor never sees a white flash. */(function(){var t=null;try{t=localStorage.getItem("helply-theme")}catch(e){}if(t!=="light"&&t!=="dark"){t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)})();</script>
   <link rel="stylesheet" href="{% static 'css/app.css' %}?v={{ asset_version }}">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}?v={{ asset_version }}">
   {% block head %}{% endblock %}
 </head>
 <body>
+{% if not user.is_authenticated %}{% include "partials/theme_toggle.html" with floating=True %}{% endif %}
 {% if user.is_authenticated %}
 <div class="app-shell">
 {% include "partials/sidebar.html" %}
 <div class="app-main">
 <header class="topbar">
   <div class="who">
+    {% include "partials/theme_toggle.html" %}
     <a class="bell" href="{% url 'notifications:list' %}" data-bell data-url="{% url 'notifications:unread' %}"
        aria-label="Notifications{% if unread_notifications %}, {{ unread_notifications }} unread{% endif %}">
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg>
@@ -39,6 +43,7 @@
 </div>
 </div>
 {% endif %}
+<script src="{% static 'js/theme.js' %}?v={{ asset_version }}" defer></script>
 {% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}?v={{ asset_version }}" defer></script>{% endif %}
 {% block scripts %}{% endblock %}
 </body>

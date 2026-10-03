@@ -1,6 +1,6 @@
 from django.conf import settings
 
-ASSET_FILES = ("css/app.css", "css/monitoring.css", "js/notifications.js", "js/kb-vote.js", "js/live.js",
+ASSET_FILES = ("css/app.css", "css/monitoring.css", "css/theme.css", "js/theme.js", "js/notifications.js", "js/kb-vote.js", "js/live.js",
                "js/fleet.js", "js/fleet-detail.js")
 
 

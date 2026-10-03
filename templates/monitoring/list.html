@@ -76,7 +76,7 @@
       <path class="wire" d="M278 170 H296"/>
       <g transform="translate(296 118)">
         <rect class="rack" width="116" height="104" rx="12"/>
-        <text x="12" y="22">CPU</text><text x="80" y="22" style="fill:#0c1424;font-size:11px">18%</text>
+        <text x="12" y="22">CPU</text><text x="80" y="22" style="fill:var(--ink);font-size:11px">18%</text>
         <path class="chart-area" d="M12 84 L12 70 L26 62 L40 66 L54 50 L68 56 L82 44 L96 48 L104 40 L104 84 Z"/>
         <path class="chart" d="M12 70 L26 62 L40 66 L54 50 L68 56 L82 44 L96 48 L104 40"/>
         <circle cx="104" cy="40" r="3" fill="#fff" stroke="#12b76a" stroke-width="2"/>
@@ -97,7 +97,7 @@
       <ul class="fx-legend">
         <li><i style="background:var(--ok)"></i>Healthy <b>{{ c.healthy }}</b></li>
         <li><i style="background:var(--warn)"></i>Attention <b>{{ c.warning }}</b></li>
-        <li><i style="background:#c4cad4"></i>Offline <b>{{ c.offline }}</b></li>
+        <li><i style="background:var(--off-bar)"></i>Offline <b>{{ c.offline }}</b></li>
         {% if c.pending %}<li><i style="background:var(--pend)"></i>Waiting <b>{{ c.pending }}</b></li>{% endif %}
       </ul>
     </div>

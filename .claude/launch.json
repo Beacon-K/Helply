@@ -6,6 +6,12 @@
       "runtimeExecutable": "D:\\6.Capston Project\\helply\\.venv\\Scripts\\python.exe",
       "runtimeArgs": ["D:\\6.Capston Project\\helply\\manage.py", "runserver", "8000", "--noreload"],
       "port": 8000
+    },
+    {
+      "name": "helply-win-server",
+      "runtimeExecutable": "C:\\helply\\.venv-WIN-L7KB2NSK5Q1\\Scripts\\python.exe",
+      "runtimeArgs": ["C:\\helply\\manage.py", "runserver", "8001", "--noreload"],
+      "port": 8001
     }
   ]
 }

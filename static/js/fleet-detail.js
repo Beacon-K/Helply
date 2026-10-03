@@ -41,7 +41,7 @@
     mem: { max: 100, f: fmt.pct, threshold: thresholds.mem,
            series: [{ key: "mem", label: "Memory", tip: "Memory", color: "#7a5af8", area: true }, { key: "disk", label: "Disk", tip: "Disk", color: "#f79009" }] },
     net: { f: fmt.rate, series: [{ key: "rx", label: "In", tip: "Network in", color: "#12b76a", area: true }, { key: "tx", label: "Out", tip: "Network out", color: "#9e77ed" }] },
-    load: { f: fmt.load, series: [{ key: "load", label: "1 min", tip: "Load (1 min)", color: "#344054", area: true }] },
+    load: { f: fmt.load, series: [{ key: "load", label: "1 min", tip: "Load (1 min)", color: "#64748b", area: true }] },
   };
 
   let payload;

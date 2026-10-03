@@ -1,0 +1,154 @@
+/* Helply · light / dark theme
+   Light is the default defined in app.css and monitoring.css. This file adds the toggle button and the
+   dark "night console" palette: ink-blue surfaces, cyan as the single accent, violet as its counterpart,
+   hairline borders that glow slightly on interaction. Everything keys off the colour tokens, so
+   components need no dark-specific rules apart from the few decorative ones at the bottom. */
+
+/* ---------- Toggle button ---------- */
+.theme-toggle { display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0; border-radius: 9px;
+                border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer;
+                transition: color .15s, border-color .15s, background .15s, box-shadow .15s; }
+.theme-toggle:hover { color: var(--text); border-color: var(--primary); background: var(--hover); }
+.theme-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.theme-toggle svg { grid-area: 1 / 1; transition: transform .35s cubic-bezier(.2, .7, .2, 1), opacity .25s; }
+.theme-toggle .i-sun { opacity: 0; transform: rotate(-90deg) scale(.6); }
+:root[data-theme="dark"] .theme-toggle .i-moon { opacity: 0; transform: rotate(90deg) scale(.6); }
+:root[data-theme="dark"] .theme-toggle .i-sun { opacity: 1; transform: none; }
+.theme-toggle.floating { position: fixed; top: 14px; right: 14px; z-index: 50; background: var(--card); }
+html.theme-anim body, html.theme-anim body * { transition: background-color .3s, border-color .3s, color .3s, fill .3s, stroke .3s !important; }
+@media (prefers-reduced-motion: reduce) { html.theme-anim body, html.theme-anim body * { transition: none !important; } }
+
+/* ---------- Dark palette: app.css tokens ---------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #060a13; --card: #0d1424; --text: #dbe6f5; --muted: #8392ad; --line: #1c2740;
+  --brand-navy: #22d3ee; --brand-orange: #f5a623;
+  --primary: #38bdf8; --primary-ink: #04121f;
+  --ok: #34d399; --warn: #fbbf24; --danger: #f87171; --info: #a5b4fc;
+  --hover: rgba(56, 189, 248, .08); --hover-2: rgba(56, 189, 248, .06); --soft: rgba(148, 163, 184, .13);
+  --sunken: #0a1020; --warm-bg: rgba(34, 211, 238, .10); --navy-hover: #67e8f9; --on-navy: #04121f;
+  --blue-bg: rgba(56, 189, 248, .14); --blue-ink: #7dd3fc; --green-bg: rgba(52, 211, 153, .14);
+  --red-bg: rgba(248, 113, 113, .15); --red-ink: #fca5a5; --amber-bg: rgba(251, 191, 36, .14); --amber-ink: #fcd34d;
+  --orange-bg: rgba(251, 146, 60, .15); --orange-ink: #fdba74; --violet-bg: rgba(139, 92, 246, .20);
+  --note-bg: rgba(251, 191, 36, .07); --callout-bg: rgba(34, 211, 238, .07); --track: #22304d; --stage-idle: #475a7d;
+  --ring: rgba(56, 189, 248, .30); --flash-from: rgba(56, 189, 248, .28); --flash-bg: rgba(56, 189, 248, .10);
+}
+
+/* ---------- Dark palette: cloud-server (.fx) tokens ---------- */
+:root[data-theme="dark"] .fx {
+  --ink: #e6eefc; --ink-2: #b6c4dc; --mute: #8392ad; --faint: #64748f;
+  --line: #1c2740; --line-2: #141d33; --line-3: #2a3a5c; --surface: #0d1424; --sunken: #0a1020;
+  --navy: #22d3ee; --navy-hover: #67e8f9; --on-navy: #04121f;
+  --ok: #34d399; --ok-soft: rgba(52, 211, 153, .12); --ok-ink: #6ee7b7;
+  --warn: #fbbf24; --warn-soft: rgba(251, 191, 36, .12); --warn-ink: #fcd34d;
+  --crit: #f87171; --crit-soft: rgba(248, 113, 113, .12); --crit-ink: #fca5a5;
+  --off: #64748f; --off-soft: rgba(148, 163, 184, .12); --off-ink: #a3b2c8;
+  --pend: #38bdf8; --pend-soft: rgba(56, 189, 248, .12); --pend-ink: #7dd3fc;
+  --shadow-rgb: 0, 0, 0;
+  --crit-line: rgba(248, 113, 113, .35); --crit-line-2: rgba(248, 113, 113, .55);
+  --ok-line: rgba(52, 211, 153, .35); --warn-line: rgba(251, 191, 36, .35); --warn-ink2: #fcd34d;
+  --pend-line-1: rgba(56, 189, 248, .25); --pend-line-2: rgba(56, 189, 248, .38); --pend-line-3: rgba(56, 189, 248, .6);
+  --pend-ink2: #bae6fd; --focus-line: #38bdf8; --focus-ring: rgba(56, 189, 248, .22);
+  --off-bar: #3a4a68; --bar-ok: #38bdf8; --row-hover: rgba(56, 189, 248, .05); --shimmer: #1b2744; --violet: #a78bfa;
+}
+
+/* ---------- Dark: the console look ---------- */
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(900px 520px at 88% -8%, rgba(34, 211, 238, .11), transparent 62%),
+    radial-gradient(760px 520px at -6% 108%, rgba(139, 92, 246, .11), transparent 62%),
+    var(--bg);
+  background-attachment: fixed;
+}
+/* A faint engineering grid behind the app that fades out toward the bottom; it never receives clicks. */
+:root[data-theme="dark"] body::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(125, 211, 252, .045) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(125, 211, 252, .045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 78%); mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+}
+:root[data-theme="dark"] .app-shell, :root[data-theme="dark"] main.container { position: relative; z-index: 1; }
+
+:root[data-theme="dark"] .sidebar { background: rgba(10, 16, 32, .82); backdrop-filter: blur(10px); border-right-color: var(--line); }
+:root[data-theme="dark"] .topbar { background: rgba(10, 16, 32, .72); backdrop-filter: blur(10px); }
+:root[data-theme="dark"] .brand { color: var(--text); border-bottom-color: var(--brand-navy); box-shadow: 0 8px 18px -14px var(--brand-navy); }
+:root[data-theme="dark"] .side-nav a.active { box-shadow: inset 0 0 22px -12px var(--brand-navy); border-left-color: var(--brand-navy); color: var(--brand-navy); }
+:root[data-theme="dark"] .side-nav a.active svg { color: var(--brand-navy); filter: drop-shadow(0 0 6px rgba(34, 211, 238, .55)); }
+:root[data-theme="dark"] .side-nav a:hover { color: var(--text); }
+:root[data-theme="dark"] .brand img { filter: drop-shadow(0 0 8px rgba(34, 211, 238, .35)); }
+
+:root[data-theme="dark"] .card, :root[data-theme="dark"] .kpi {
+  background: linear-gradient(180deg, rgba(20, 30, 52, .72), rgba(13, 20, 36, .92));
+  border-color: var(--line); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04), 0 18px 40px -28px rgba(0, 0, 0, .8);
+}
+:root[data-theme="dark"] .btn.primary { background: linear-gradient(135deg, #22d3ee, #38bdf8 55%, #818cf8); border-color: transparent;
+  color: var(--on-navy); font-weight: 600; box-shadow: 0 0 0 1px rgba(34, 211, 238, .35), 0 8px 22px -10px rgba(34, 211, 238, .7); }
+:root[data-theme="dark"] .btn.primary:hover { filter: brightness(1.1); background: linear-gradient(135deg, #22d3ee, #38bdf8 55%, #818cf8); }
+:root[data-theme="dark"] .btn:hover { box-shadow: 0 0 0 3px rgba(56, 189, 248, .12); }
+:root[data-theme="dark"] .fx-btn-primary { background: linear-gradient(135deg, #22d3ee, #38bdf8 60%, #818cf8); border-color: transparent;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, .3), 0 8px 22px -10px rgba(34, 211, 238, .7); }
+:root[data-theme="dark"] .fx-btn-primary:hover { filter: brightness(1.1); background: linear-gradient(135deg, #22d3ee, #38bdf8 60%, #818cf8); }
+:root[data-theme="dark"] .fx-btn:hover { background: var(--hover); }
+:root[data-theme="dark"] .fx-card:hover { border-color: rgba(34, 211, 238, .4);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, .12), 0 18px 40px -16px rgba(34, 211, 238, .25); }
+
+:root[data-theme="dark"] input, :root[data-theme="dark"] select, :root[data-theme="dark"] textarea { color: var(--text); background: #0a1020; border-color: #263556; }
+:root[data-theme="dark"] input::placeholder, :root[data-theme="dark"] textarea::placeholder { color: #5b6b88; }
+:root[data-theme="dark"] input:focus, :root[data-theme="dark"] select:focus, :root[data-theme="dark"] textarea:focus {
+  outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 189, 248, .2); }
+:root[data-theme="dark"] .fx-field input:not([type=checkbox]), :root[data-theme="dark"] .fx-field select,
+:root[data-theme="dark"] .fx-field textarea { background: #0a1020; color: var(--ink); }
+:root[data-theme="dark"] option { background: #0d1424; color: var(--text); }
+:root[data-theme="dark"] th { color: #7587a6; }
+:root[data-theme="dark"] .fx-tip { border: 1px solid rgba(56, 189, 248, .25); background: rgba(6, 10, 19, .96); }
+:root[data-theme="dark"] .fx-chart .grid line { stroke: rgba(125, 211, 252, .08); }
+:root[data-theme="dark"] .fx-art-wrap, :root[data-theme="dark"] .fx-hero { background-blend-mode: screen; }
+:root[data-theme="dark"] ::selection { background: rgba(34, 211, 238, .3); }
+:root[data-theme="dark"] .login-logo { filter: drop-shadow(0 0 18px rgba(34, 211, 238, .35)); }
+:root[data-theme="dark"] * { scrollbar-color: #2a3a5c transparent; }
+
+@media (max-width: 900px) {
+  :root[data-theme="dark"] .sidebar { border-bottom: 3px solid var(--brand-navy); }
+  :root[data-theme="dark"] .side-nav a.active { border-bottom-color: var(--brand-navy); }
+}
+/* ---------- Hover sweep ----------
+   Options (nav items, rows, filters, buttons, cards) fill with a two-colour gradient that sweeps in from
+   the left when the pointer arrives, plus a thin accent edge. Light: blue into violet. Dark: cyan into
+   violet. The sweep animates background-size, so it needs no extra markup. */
+:root { --hl-a: rgba(31, 95, 209, .12); --hl-b: rgba(139, 92, 246, .11); --hl-edge: #1f5fd1; }
+:root[data-theme="dark"] { --hl-a: rgba(34, 211, 238, .20); --hl-b: rgba(139, 92, 246, .22); --hl-edge: #22d3ee; }
+
+.side-nav a, .attn-row, .note-row, .ticket-progress, .filters a, .kb-item, .fx-seg button, .fx-seg a,
+.btn:not(.primary), .fx-btn:not(.fx-btn-primary):not(.fx-btn-ghost), .theme-toggle, .bell, tbody tr {
+  background-image: linear-gradient(90deg, var(--hl-a), var(--hl-b));
+  background-repeat: no-repeat; background-position: left center; background-size: 0% 100%;
+  transition: background-size .38s cubic-bezier(.2, .7, .2, 1), box-shadow .25s, color .2s, border-color .2s;
+}
+.side-nav a:hover, .attn-row:hover, .note-row:hover, .ticket-progress:hover, .filters a:hover, .kb-item:hover,
+.fx-seg button:hover, .fx-seg a:hover, .btn:not(.primary):hover, .fx-btn:not(.fx-btn-primary):not(.fx-btn-ghost):hover,
+.theme-toggle:hover, .bell:hover, tbody tr:hover {
+  background-size: 100% 100%; box-shadow: inset 3px 0 0 var(--hl-edge);
+}
+/* Rows inside lists and tables keep their own colour while the gradient paints over it. */
+.side-nav a:hover, .attn-row:hover, .note-row:hover, .ticket-progress:hover, tbody tr:hover,
+.fx-table tbody tr:hover { background-color: transparent; }
+.filters a, .kb-item { border-radius: 8px; }
+.kb-item { padding-left: .5rem; padding-right: .5rem; margin-left: -.5rem; margin-right: -.5rem; }
+.btn:not(.primary):hover, .fx-btn:not(.fx-btn-primary):hover { box-shadow: inset 3px 0 0 var(--hl-edge); }
+tr[data-href] { cursor: pointer; }
+/* The active nav item keeps its own solid tint; hovering it still sweeps over it. */
+.side-nav a.active:hover { background-color: var(--warm-bg); }
+
+/* Cards: a soft diagonal wash, no edge. */
+.fx-card, a.kpi { background-image: linear-gradient(135deg, var(--hl-a), var(--hl-b)); background-repeat: no-repeat;
+                  background-size: 0% 100%; transition: background-size .45s cubic-bezier(.2, .7, .2, 1), border-color .2s, box-shadow .25s, transform .2s; }
+.fx-card:hover, a.kpi:hover { background-size: 100% 100%; }
+
+/* Icon-only nav along the top on narrow screens: the accent edge goes underneath instead. */
+@media (max-width: 900px) { .side-nav a:hover { box-shadow: inset 0 -3px 0 var(--hl-edge); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .side-nav a, .attn-row, .note-row, .ticket-progress, .filters a, .kb-item, .fx-seg button, .fx-seg a, .btn, .fx-btn,
+  .theme-toggle, .bell, tbody tr, .fx-card, a.kpi { transition: none; }
+}
