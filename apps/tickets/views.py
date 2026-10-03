@@ -66,7 +66,7 @@ def ticket_detail(request, pk):
         context["similar"] = ai.similar_tickets(ticket)
     if workflow.can_recategorize(ticket, user):
         context["category_form"] = CategoryForm(initial={"category": ticket.category})
-    if user.is_supervisor and ticket.is_open:
+    if user.is_administrator and ticket.is_open:
         context["assign_form"] = AssignForm(initial={"assignee": ticket.assignee or ai.suggest_assignee(ticket)})
     if ticket.requester_id == user.pk and ticket.status in (Status.RESOLVED, Status.CLOSED) \
             and not hasattr(ticket, "satisfaction"):

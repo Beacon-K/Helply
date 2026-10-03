@@ -1,0 +1,228 @@
+{% extends "base.html" %}{% load static helply monitoring %}
+{% block title %}Cloud servers{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/fleet.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="fx" id="fx-root" data-view="grid" data-url="{% url 'monitoring:data' %}" data-signature="{{ fleet.signature }}">
+
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">Infrastructure</p>
+      <h1 class="fx-title">Cloud servers</h1>
+      {% if summary.total %}
+      <p class="fx-lede" aria-live="polite">
+        {% with c=summary.counts %}
+        {% if c.offline or c.warning or summary.alerts %}
+          <span class="fx-dot {% if c.offline or summary.alerts %}is-critical{% else %}is-warning{% endif %}"></span>
+          <span>{% if c.offline %}{{ c.offline }} offline{% endif %}{% if c.offline and c.warning %} · {% endif %}{% if c.warning %}{{ c.warning }} need{{ c.warning|pluralize:"s," }} attention{% endif %}{% if not c.offline and not c.warning %}{{ summary.alerts }} open alert{{ summary.alerts|pluralize }}{% endif %}</span>
+        {% elif c.pending == summary.total %}
+          <span class="fx-dot is-pending"></span><span>Waiting for the first agent to report</span>
+        {% else %}
+          <span class="fx-dot is-healthy"></span><span>All systems operational</span>
+        {% endif %}
+        {% endwith %}
+        <span class="sep">·</span><time data-fx-updated>live</time>
+      </p>
+      {% endif %}
+    </div>
+    {% if user.is_administrator and summary.total %}
+    <div class="fx-actions">
+      <form method="post" action="{% url 'monitoring:create' %}">{% csrf_token %}
+        <button class="fx-btn fx-btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add server</button>
+      </form>
+    </div>
+    {% endif %}
+  </header>
+
+  {% if not summary.total %}
+  {# ------------------------------------------------------------------ Empty state #}
+  <section class="fx-empty" aria-labelledby="fx-empty-title">
+    <div>
+      <p class="fx-eyebrow">Server monitoring</p>
+      <h2 id="fx-empty-title">See every server you run,<br>live, in one place.</h2>
+      <p class="lead">Connect your cloud servers and Helply shows their CPU, memory, disk and network every ten seconds.
+        When one goes down or fills up, a ticket is raised and assigned automatically - before anyone has to report it.</p>
+      <ol class="fx-steps">
+        <li><div><b>Click Add server</b><span>Nothing to fill in. You get a one-line install command.</span></div></li>
+        <li><div><b>Run it on your server</b><span>Linux or Windows. Installs a small read-only agent.</span></div></li>
+        <li><div><b>Helply detects everything</b><span>Name, system, CPU, memory, disk, IP, provider and region - live within seconds.</span></div></li>
+      </ol>
+      {% if user.is_administrator %}
+        <form method="post" action="{% url 'monitoring:create' %}">{% csrf_token %}
+          <button class="fx-btn fx-btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first server</button>
+        </form>
+      {% else %}
+        <p class="fx-note">Ask an administrator to add your servers.</p>
+      {% endif %}
+      <ul class="fx-assure">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>Read-only - accepts no commands</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>No open ports on your servers</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>One readable Python file</li>
+      </ul>
+    </div>
+    <svg class="fx-art" viewBox="0 0 420 340" role="img" aria-label="Servers reporting their health to Helply">
+      <defs>
+        <linearGradient id="fxArtGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12b76a" stop-opacity=".22"/><stop offset="1" stop-color="#12b76a" stop-opacity="0"/></linearGradient>
+      </defs>
+      <path class="wire" d="M96 70 C 180 70, 170 170, 246 170"/><path class="wire" d="M96 170 H246"/><path class="wire" d="M96 270 C 180 270, 170 170, 246 170"/>
+      <path class="pulse" d="M96 70 C 180 70, 170 170, 246 170"/><path class="pulse p2" d="M96 170 H246"/><path class="pulse p3" d="M96 270 C 180 270, 170 170, 246 170"/>
+      <g transform="translate(16 38)"><rect class="rack" width="80" height="64" rx="10"/><rect class="slot" x="10" y="12" width="60" height="14" rx="4"/><rect class="slot" x="10" y="34" width="60" height="14" rx="4"/><circle class="led" cx="62" cy="19" r="2.5"/><circle class="led" cx="62" cy="41" r="2.5"/><text x="0" y="82">web-01</text></g>
+      <g transform="translate(16 138)"><rect class="rack" width="80" height="64" rx="10"/><rect class="slot" x="10" y="12" width="60" height="14" rx="4"/><rect class="slot" x="10" y="34" width="60" height="14" rx="4"/><circle class="led b" cx="62" cy="19" r="2.5"/><circle class="led" cx="62" cy="41" r="2.5"/><text x="0" y="82">db-01</text></g>
+      <g transform="translate(16 238)"><rect class="rack" width="80" height="64" rx="10"/><rect class="slot" x="10" y="12" width="60" height="14" rx="4"/><rect class="slot" x="10" y="34" width="60" height="14" rx="4"/><circle class="led w" cx="62" cy="19" r="2.5"/><circle class="led" cx="62" cy="41" r="2.5"/><text x="0" y="82">win-01</text></g>
+      <circle class="hub-ring" cx="262" cy="170" r="30"/>
+      <circle class="hub" cx="262" cy="170" r="16"/>
+      <path d="M255 170h4l2-5 3 10 2-5h4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path class="wire" d="M278 170 H296"/>
+      <g transform="translate(296 118)">
+        <rect class="rack" width="116" height="104" rx="12"/>
+        <text x="12" y="22">CPU</text><text x="80" y="22" style="fill:#0c1424;font-size:11px">18%</text>
+        <path class="chart-area" d="M12 84 L12 70 L26 62 L40 66 L54 50 L68 56 L82 44 L96 48 L104 40 L104 84 Z"/>
+        <path class="chart" d="M12 70 L26 62 L40 66 L54 50 L68 56 L82 44 L96 48 L104 40"/>
+        <circle cx="104" cy="40" r="3" fill="#fff" stroke="#12b76a" stroke-width="2"/>
+      </g>
+    </svg>
+  </section>
+
+  {% else %}
+  {# ------------------------------------------------------------------ Overview #}
+  {% with c=summary.counts %}
+  <section class="fx-band" aria-label="Fleet overview">
+    <div class="fx-cell">
+      <p class="fx-label">Fleet health</p>
+      <p class="fx-big"><span>{{ summary.online }}</span><small>/ {{ summary.total }} online</small></p>
+      <div class="fx-health" role="img" aria-label="{{ c.healthy }} healthy, {{ c.warning }} need attention, {{ c.offline }} offline, {{ c.pending }} waiting">
+        <span class="h-healthy" style="flex-grow:{{ c.healthy }}"></span><span class="h-warning" style="flex-grow:{{ c.warning }}"></span><span class="h-offline" style="flex-grow:{{ c.offline }}"></span><span class="h-pending" style="flex-grow:{{ c.pending }}"></span>
+      </div>
+      <ul class="fx-legend">
+        <li><i style="background:var(--ok)"></i>Healthy <b>{{ c.healthy }}</b></li>
+        <li><i style="background:var(--warn)"></i>Attention <b>{{ c.warning }}</b></li>
+        <li><i style="background:#c4cad4"></i>Offline <b>{{ c.offline }}</b></li>
+        {% if c.pending %}<li><i style="background:var(--pend)"></i>Waiting <b>{{ c.pending }}</b></li>{% endif %}
+      </ul>
+    </div>
+    <div class="fx-cell">
+      <p class="fx-label">Average CPU</p>
+      <p class="fx-big"><span data-fx-sum="avg_cpu">{% if summary.avg_cpu is not None %}{{ summary.avg_cpu|floatformat:0 }}{% else %}–{% endif %}</span><small>%</small></p>
+      <p class="fx-sub">across online servers</p>
+    </div>
+    <div class="fx-cell">
+      <p class="fx-label">Open alerts</p>
+      <p class="fx-big {% if summary.alerts %}is-crit-text{% endif %}"><span>{{ summary.alerts }}</span></p>
+      <p class="fx-sub">{% if summary.alerts %}each tracked by a ticket{% else %}nothing needs action{% endif %}</p>
+    </div>
+    <div class="fx-cell">
+      <p class="fx-label">Cloud spend</p>
+      <p class="fx-big">${{ summary.monthly|money }}<small>/ month</small></p>
+      <p class="fx-sub">{% with r=summary.next_renewal %}{% if r %}{% if r.days < 0 %}<span class="is-crit-text">{{ r.name }} expired</span>{% else %}Next renewal: {{ r.name }} in {{ r.days }} day{{ r.days|pluralize }}{% endif %}{% else %}No renewal dates recorded{% endif %}{% endwith %}</p>
+    </div>
+  </section>
+
+  {# ------------------------------------------------------------------ Toolbar #}
+  <div class="fx-toolbar">
+    <label class="fx-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" data-fx-search placeholder="Search name, provider, region, IP…" aria-label="Search servers">
+    </label>
+    <div class="fx-seg fx-seg-filter" role="group" aria-label="Filter by status">
+      <button type="button" data-fx-filter="all" aria-pressed="true">All <span class="count">{{ summary.total }}</span></button>
+      <button type="button" data-fx-filter="healthy" aria-pressed="false">Healthy <span class="count">{{ c.healthy }}</span></button>
+      <button type="button" data-fx-filter="warning" aria-pressed="false">Attention <span class="count">{{ c.warning }}</span></button>
+      <button type="button" data-fx-filter="offline" aria-pressed="false">Offline <span class="count">{{ c.offline|add:c.pending }}</span></button>
+    </div>
+    <div class="fx-seg fx-seg-view" role="group" aria-label="Layout">
+      <button type="button" data-fx-view="grid" aria-pressed="true" title="Cards" aria-label="Cards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></button>
+      <button type="button" data-fx-view="list" aria-pressed="false" title="Table" aria-label="Table"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </div>
+  </div>
+  {% endwith %}
+
+  {# ------------------------------------------------------------------ Cards #}
+  <section class="fx-grid" aria-label="Servers">
+    {% for row in rows %}{% with s=row.s d=row.d %}
+    <article class="fx-card is-{{ d.state }}{% if d.alerts %} is-critical{% endif %}" data-server="{{ s.pk }}" data-state="{{ d.state }}"
+             data-search="{{ s.name }} {{ s.purpose }} {{ s.get_provider_display }} {{ s.region }} {{ s.public_ip|default:'' }} {{ s.reported_ip|default:'' }} {{ s.hostname }} {{ s.os_name }} {{ s.owner|default:'' }}">
+      <a class="fx-card-link" href="{{ s.get_absolute_url }}" aria-label="Open {{ s.name }}"></a>
+      <div>
+        <div class="fx-card-head">
+          <span class="fx-dot is-{% if d.alerts %}critical{% else %}{{ d.state }}{% endif %}"></span>
+          <h2 class="fx-card-name">{{ s.name }}</h2>
+          {% with ip=s.public_ip|default:s.reported_ip %}{% if ip %}<span class="fx-card-ip">{{ ip }}</span>{% endif %}{% endwith %}
+        </div>
+        <p class="fx-card-meta">
+          {% include "monitoring/_os.html" %}{% if s.os_family %}<span class="sep">·</span>{% endif %}<span>{{ s.get_provider_display }}{% if s.region %} · {{ s.region }}{% endif %}</span>
+        </p>
+      </div>
+
+      {% for a in d.alerts|slice:":1" %}
+      <p class="fx-alert-line">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <span>{{ a.label }}{% if d.alerts|length > 1 %} +{{ d.alerts|length|add:"-1" }}{% endif %}</span>{% if a.ticket %}<a href="{{ a.ticket_url }}">{{ a.ticket }}</a>{% endif %}
+      </p>
+      {% endfor %}
+
+      {% if d.status == "pending" %}
+        <div class="fx-pending">
+          <div class="fx-pending-head"><span class="fx-spinner" aria-hidden="true"></span><div><b>Listening for the first report</b><span>Added {{ s.created_at|timesince }} ago</span></div></div>
+          <ol class="fx-pending-steps">
+            <li class="done">Server added to Helply</li>
+            <li>Agent installed on {{ s.name }}</li>
+            <li>First reading received</li>
+          </ol>
+        </div>
+        {% if user.is_administrator %}<a class="fx-btn fx-card-bottom fx-pending-cta" href="{% url 'monitoring:install' s.pk %}">Continue setup</a>{% endif %}
+      {% else %}
+        {% if d.status == "offline" %}
+        <div class="fx-spark-empty">No reports for {{ s.last_seen_at|since }}</div>
+        {% else %}
+        <div class="fx-spark">
+          <div class="fx-spark-head">
+            <p class="fx-label">CPU · last 30 min</p>
+            <span class="fx-spark-value num"><span data-k="cpu">{% if d.status == "online" %}{{ d.cpu|floatformat:0 }}{% else %}–{% endif %}</span><small>%</small></span>
+          </div>
+          <svg viewBox="0 0 300 56" preserveAspectRatio="none" data-spark aria-hidden="true"></svg>
+        </div>
+        {% endif %}
+        <dl class="fx-meters">
+          <div class="fx-meter"><dt>Memory</dt><div class="fx-bar"><i class="lv-{{ d.mem|level }}" style="width:{{ d.mem|default:0 }}%" data-bar="mem"></i></div><dd class="num"><span data-k="mem">{{ d.mem|floatformat:0 }}</span>%</dd></div>
+          <div class="fx-meter"><dt>Disk</dt><div class="fx-bar"><i class="lv-{{ d.disk|level }}" style="width:{{ d.disk|default:0 }}%" data-bar="disk"></i></div><dd class="num"><span data-k="disk">{{ d.disk|floatformat:0 }}</span>%</dd></div>
+        </dl>
+        <div class="fx-card-foot fx-card-bottom">
+          {% if d.status == "offline" %}
+          <div class="fx-stat" style="grid-column: 1 / -1"><span>Last report</span><b>{{ s.last_seen_at|since }} ago · {{ s.last_seen_at|date:"M j, H:i" }}</b></div>
+          {% else %}
+          <div class="fx-stat"><span>Network in</span><b class="num" data-k="rx" data-fmt="rate">{{ d.rx|rate }}</b></div>
+          <div class="fx-stat"><span>Load</span><b class="num" data-k="load1" data-fmt="load">{{ s.load1|floatformat:2|default:"–" }}</b></div>
+          <div class="fx-stat"><span>Uptime</span><b class="num" data-k="uptime" data-fmt="uptime">{{ d.uptime|uptime }}</b></div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </article>
+    {% endwith %}{% endfor %}
+  </section>
+
+  {# ------------------------------------------------------------------ Table #}
+  <div class="fx-table-wrap">
+    <table class="fx-table">
+      <thead><tr><th>Server</th><th>Status</th><th>CPU · 30 min</th><th>Memory</th><th>Disk</th><th class="r">Network in</th><th class="r">Uptime</th></tr></thead>
+      <tbody>
+      {% for row in rows %}{% with s=row.s d=row.d %}
+        <tr data-server="{{ s.pk }}" data-state="{{ d.state }}" data-href="{{ s.get_absolute_url }}"
+            data-search="{{ s.name }} {{ s.purpose }} {{ s.get_provider_display }} {{ s.region }} {{ s.public_ip|default:'' }} {{ s.reported_ip|default:'' }} {{ s.hostname }} {{ s.os_name }} {{ s.owner|default:'' }}">
+          <td><a class="srv" href="{{ s.get_absolute_url }}"><span class="fx-dot is-{% if d.alerts %}critical{% else %}{{ d.state }}{% endif %}"></span><span><b>{{ s.name }}</b><small>{{ s.get_provider_display }}{% if s.region %} · {{ s.region }}{% endif %}</small></span></a></td>
+          <td>{% include "monitoring/_badge.html" %}</td>
+          <td><div class="mini"><svg viewBox="0 0 64 22" preserveAspectRatio="none" data-spark aria-hidden="true"></svg><b class="num"><span data-k="cpu">{% if d.status == "online" %}{{ d.cpu|floatformat:0 }}{% else %}–{% endif %}</span>%</b></div></td>
+          <td><div class="bar-cell"><div class="fx-bar"><i class="lv-{{ d.mem|level }}" style="width:{{ d.mem|default:0 }}%" data-bar="mem"></i></div><span class="num"><span data-k="mem">{{ d.mem|floatformat:0|default:"–" }}</span>%</span></div></td>
+          <td><div class="bar-cell"><div class="fx-bar"><i class="lv-{{ d.disk|level }}" style="width:{{ d.disk|default:0 }}%" data-bar="disk"></i></div><span class="num"><span data-k="disk">{{ d.disk|floatformat:0|default:"–" }}</span>%</span></div></td>
+          <td class="r num" data-k="rx" data-fmt="rate">{% if d.status == "online" %}{{ d.rx|rate }}{% else %}–{% endif %}</td>
+          <td class="r num" data-k="uptime" data-fmt="uptime">{% if d.status == "online" %}{{ d.uptime|uptime }}{% else %}–{% endif %}</td>
+        </tr>
+      {% endwith %}{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="fx-noresult fx-hidden" data-fx-noresult>No servers match your search. <button type="button" class="fx-btn fx-btn-ghost" data-fx-reset>Clear filters</button></div>
+  {% endif %}
+</div>
+{{ fleet|json_script:"fx-fleet" }}
+{% endblock %}

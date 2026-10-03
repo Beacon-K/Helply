@@ -1,4 +1,4 @@
-"""Scheduled jobs: SLA checks, ticket follow-ups and a daily database backup.
+"""Scheduled jobs: SLA checks, ticket follow-ups, server monitoring checks and a daily database backup.
 
     python manage.py run_jobs              # run once (e.g. from Task Scheduler or cron)
     python manage.py run_jobs --every 5    # keep running, every 5 minutes (start-production.bat does this)
@@ -28,7 +28,7 @@ class Command(BaseCommand):
             time.sleep(every * 60)
 
     def run_once(self):
-        for name in ("check_sla", "ticket_followups"):
+        for name in ("check_sla", "ticket_followups", "monitor_check"):
             try:
                 call_command(name, stdout=self.stdout)
             except Exception:  # one failing job must not stop the others or the loop

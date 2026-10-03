@@ -7,9 +7,9 @@ timers, breaches, AI triage and the audit trail all come from the real
 business code rather than hand-written rows.
 
 Step actions
-    ("assign", tech)            supervisor assigns, unless the AI already did
-    ("reassign", tech)          supervisor reassigns
-    ("category", name)          supervisor sets / corrects the category
+    ("assign", tech)            administrator assigns, unless the AI already did
+    ("reassign", tech)          administrator reassigns
+    ("category", name)          administrator sets / corrects the category
     ("start",) ("hold", note) ("resume", note) ("resolve", note)   by the assignee
     ("reopen", note)            by the requester
     ("close",) / ("close", who) requester confirms, or e.g. "alice" closes

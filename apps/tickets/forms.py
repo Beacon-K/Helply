@@ -31,7 +31,7 @@ class CommentForm(forms.Form):
 
 class AssignForm(forms.Form):
     assignee = forms.ModelChoiceField(
-        queryset=User.objects.filter(role__in=[User.Role.TECHNICIAN, User.Role.SUPERVISOR], is_active=True)
+        queryset=User.objects.filter(role__in=[User.Role.TECHNICIAN, User.Role.ADMINISTRATOR], is_active=True)
     )
 
 

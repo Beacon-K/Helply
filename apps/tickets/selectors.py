@@ -6,7 +6,7 @@ from .models import Ticket
 def visible_tickets(user):
     """Row-level scoping: who can see which tickets."""
     qs = Ticket.objects.select_related("requester", "assignee", "category")
-    if user.is_supervisor:
+    if user.is_administrator:
         return qs
     if user.is_technician:
         return qs.filter(

@@ -9,22 +9,22 @@ from .services import notify
 K = Notification.Kind
 
 
-def _supervisors():
+def _administrators():
     from apps.accounts.models import User
 
-    return list(User.objects.filter(role=User.Role.SUPERVISOR, is_active=True))
+    return list(User.objects.filter(role=User.Role.ADMINISTRATOR, is_active=True))
 
 
 def _handler(ticket):
-    """Whoever is responsible for the ticket right now: its assignee, or the supervisors."""
-    return [ticket.assignee] if ticket.assignee_id else _supervisors()
+    """Whoever is responsible for the ticket right now: its assignee, or the administrators."""
+    return [ticket.assignee] if ticket.assignee_id else _administrators()
 
 
 def ticket_created(ticket):
     notify([ticket.requester], K.RECEIVED, "We received your ticket", ticket=ticket, email=True,
            body="IT will review it shortly. You'll be notified when someone replies or the status changes.")
     if ticket.assignee_id is None:
-        notify(_supervisors(), K.NEEDS_TRIAGE, f"New {ticket.priority} ticket needs triage", ticket=ticket,
+        notify(_administrators(), K.NEEDS_TRIAGE, f"New {ticket.priority} ticket needs triage", ticket=ticket,
                actor=ticket.requester, body=ticket.title)
 
 
@@ -76,7 +76,7 @@ def sla_at_risk(ticket):
 
 
 def sla_breached(ticket, reasons):
-    notify(_handler(ticket) + _supervisors(), K.SLA_BREACH, f"SLA breached: {', '.join(reasons)}",
+    notify(_handler(ticket) + _administrators(), K.SLA_BREACH, f"SLA breached: {', '.join(reasons)}",
            ticket=ticket, email=True, body=ticket.title)
 
 

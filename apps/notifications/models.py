@@ -17,6 +17,7 @@ class Notification(models.Model):
         SLA_RISK = "sla_risk", "SLA at risk"
         SLA_BREACH = "sla_breach", "SLA breached"
         REMINDER = "reminder", "Reminder"
+        MONITOR = "monitor", "Server monitoring"
 
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
     ticket = models.ForeignKey(

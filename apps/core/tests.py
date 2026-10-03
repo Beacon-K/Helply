@@ -57,7 +57,7 @@ class DashboardTests(TestCase):
         self.client.force_login(User.objects.get(username=username))
         return self.client.get("/")
 
-    def test_supervisor_sees_attention_list_and_workload(self):
+    def test_administrator_sees_attention_list_and_workload(self):
         response = self.login("alice")
         self.assertContains(response, "Needs attention")
         self.assertContains(response, "Team workload")

@@ -1,0 +1,72 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}{% if s %}Edit {{ s.name }}{% else %}Add server{% endif %}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}">{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <nav class="fx-crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'monitoring:list' %}">Cloud servers</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    {% if s %}<a href="{{ s.get_absolute_url }}">{{ s.name }}</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    <span aria-current="page">Edit</span>{% else %}<span aria-current="page">Add server</span>{% endif %}
+  </nav>
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">Server settings</p>
+      <h1 class="fx-title">{{ s.name }}</h1>
+      <p class="fx-lede">System, size, IP, provider and region were detected by the agent. Add what it can't know - cost, renewal and who looks after it.</p>
+    </div>
+  </header>
+
+  <form method="post" class="fx-form" novalidate>{% csrf_token %}
+    {% if form.non_field_errors %}<div class="fx-callout">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+    <section class="fx-fieldset">
+      <div><h2>Cost &amp; renewal</h2><p>Rolls up into cloud spend and the asset register. Renewals within 30 days are flagged.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.monthly_cost %}
+        {% include "monitoring/_field.html" with f=form.expires_on %}
+      </div>
+    </section>
+    <section class="fx-fieldset">
+      <div><h2>Response</h2><p>Criticality sets the priority of alert tickets; they go to the person who looks after the server.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.criticality %}
+        {% include "monitoring/_field.html" with f=form.owner %}
+        <label class="fx-check full" for="{{ form.alerts_enabled.id_for_label }}">{{ form.alerts_enabled }}
+          <span><b>Raise tickets for alerts</b><span>Offline over {{ offline_minutes|default:2 }} minutes, sustained CPU or memory over 90%, disk over 90%.</span></span></label>
+        {% include "monitoring/_field.html" with f=form.notes full=True %}
+      </div>
+    </section>
+    <section class="fx-fieldset">
+      <div><h2>Identity</h2><p>How the server appears on the dashboard and in tickets.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.name %}
+        {% include "monitoring/_field.html" with f=form.purpose %}
+      </div>
+    </section>
+    <section class="fx-fieldset">
+      <div><h2>Hosting</h2><p>Filled in automatically from the agent. Change only if the detection is wrong.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.provider %}
+        {% include "monitoring/_field.html" with f=form.region %}
+        {% include "monitoring/_field.html" with f=form.public_ip %}
+        {% include "monitoring/_field.html" with f=form.plan %}
+      </div>
+    </section>
+    <div class="fx-form-actions">
+      <a class="fx-btn fx-btn-ghost" href="{% if s %}{{ s.get_absolute_url }}{% else %}{% url 'monitoring:list' %}{% endif %}">Cancel</a>
+      <button class="fx-btn fx-btn-primary">Save changes</button>
+    </div>
+  </form>
+
+  {% if s %}
+  <section class="fx-danger">
+    <div><h2>Remove from monitoring</h2><p>Deletes its metric history and alerts. Tickets are kept and the asset record is marked retired.</p></div>
+    <form method="post" action="{% url 'monitoring:delete' s.pk %}" onsubmit="return confirm('Remove {{ s.name|escapejs }} from monitoring? Its history will be deleted.')">{% csrf_token %}
+      <button class="fx-btn fx-btn-danger">Remove {{ s.name }}</button>
+    </form>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

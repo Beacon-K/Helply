@@ -18,7 +18,7 @@ class User(AbstractUser):
     class Role(models.TextChoices):
         EMPLOYEE = "employee", "Employee"
         TECHNICIAN = "technician", "Technician"
-        SUPERVISOR = "supervisor", "Supervisor"
+        ADMINISTRATOR = "administrator", "Administrator"
 
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.EMPLOYEE)
     department = models.ForeignKey(
@@ -36,13 +36,13 @@ class User(AbstractUser):
         return self.role == self.Role.TECHNICIAN
 
     @property
-    def is_supervisor(self):
-        return self.role == self.Role.SUPERVISOR
+    def is_administrator(self):
+        return self.role == self.Role.ADMINISTRATOR
 
     @property
     def is_agent(self):
-        """Technicians and supervisors work tickets; employees only raise them."""
-        return self.role in (self.Role.TECHNICIAN, self.Role.SUPERVISOR)
+        """Technicians and administrators work tickets; employees only raise them."""
+        return self.role in (self.Role.TECHNICIAN, self.Role.ADMINISTRATOR)
 
     def __str__(self):
         return self.get_full_name() or self.username
@@ -57,7 +57,7 @@ class SupportGroup(models.Model):
         User,
         blank=True,
         related_name="support_groups",
-        limit_choices_to={"role__in": [User.Role.TECHNICIAN, User.Role.SUPERVISOR]},
+        limit_choices_to={"role__in": [User.Role.TECHNICIAN, User.Role.ADMINISTRATOR]},
     )
 
     class Meta:

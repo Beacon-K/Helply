@@ -76,13 +76,13 @@ class InitHelplyTests(TestCase):
         run("init_helply", "--no-input")
         self.assertEqual(SLAPolicy.objects.get(priority="P1").resolution_minutes, 120)
 
-    def test_creates_first_supervisor(self):
+    def test_creates_first_administrator(self):
         answers = iter(["Jordan", "Lee"])
         with mock.patch("builtins.input", lambda prompt: next(answers)), \
                 mock.patch("getpass.getpass", return_value="Correct-Horse-Battery-9"):
             run("init_helply", "--username", "jlee", "--email", "it@example.com")
         boss = User.objects.get(username="jlee")
-        self.assertEqual((boss.role, boss.is_superuser, boss.email), ("supervisor", True, "it@example.com"))
+        self.assertEqual((boss.role, boss.is_superuser, boss.email), ("administrator", True, "it@example.com"))
         self.assertTrue(boss.check_password("Correct-Horse-Battery-9"))
 
 

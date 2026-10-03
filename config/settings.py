@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "apps.kb",
     "apps.ai",
     "apps.notifications",
+    "apps.monitoring",
 ]
 
 MIDDLEWARE = [
@@ -107,6 +108,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.notifications.context_processors.notifications",
+                "apps.core.context_processors.asset_version",
             ],
         },
     },
@@ -132,6 +134,13 @@ else:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": os.environ.get("SQLITE_PATH", BASE_DIR / "db.sqlite3"),
+            # The web server, scheduled jobs and monitoring agents write at the same time: WAL lets readers
+            # and one writer work together, and IMMEDIATE + timeout make writers queue instead of failing.
+            "OPTIONS": {
+                "timeout": 20,
+                "transaction_mode": "IMMEDIATE",
+                "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
+            },
         }
     }
 
@@ -163,7 +172,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Pluggable AI backend. The keyword backend is a deterministic baseline;
 # swap in an LLM / embedding backend later without touching business code.
 HELPLY_AI_BACKEND = os.environ.get("HELPLY_AI_BACKEND", "apps.ai.backends.keyword.KeywordBackend")
-# Minimum classifier confidence for a ticket to be auto-triaged without a supervisor.
+# Minimum classifier confidence for a ticket to be auto-triaged without a administrator.
 HELPLY_AI_AUTO_TRIAGE_THRESHOLD = float(os.environ.get("HELPLY_AI_AUTO_TRIAGE_THRESHOLD", "0.6"))
 # Auto-assign auto-triaged tickets to the least-loaded technician of the group.
 HELPLY_AI_AUTO_ASSIGN = env_bool("HELPLY_AI_AUTO_ASSIGN", True)
@@ -216,3 +225,14 @@ LOGGING = {
 # --- Backups ----------------------------------------------------------------------
 HELPLY_BACKUP_DIR = Path(os.environ.get("HELPLY_BACKUP_DIR", BASE_DIR / "backups"))
 HELPLY_BACKUP_KEEP = int(os.environ.get("HELPLY_BACKUP_KEEP", "14"))
+
+# Cloud server monitoring (apps.monitoring). The agent reports about every 10 seconds.
+HELPLY_MONITOR_OFFLINE_SECONDS = int(os.environ.get("HELPLY_MONITOR_OFFLINE_SECONDS", "60"))  # card turns grey
+HELPLY_MONITOR_ALERT_OFFLINE_SECONDS = int(os.environ.get("HELPLY_MONITOR_ALERT_OFFLINE_SECONDS", "120"))  # ticket
+HELPLY_MONITOR_CPU_PERCENT = float(os.environ.get("HELPLY_MONITOR_CPU_PERCENT", "90"))
+HELPLY_MONITOR_MEM_PERCENT = float(os.environ.get("HELPLY_MONITOR_MEM_PERCENT", "90"))
+HELPLY_MONITOR_DISK_PERCENT = float(os.environ.get("HELPLY_MONITOR_DISK_PERCENT", "90"))
+HELPLY_MONITOR_SUSTAIN_MINUTES = int(os.environ.get("HELPLY_MONITOR_SUSTAIN_MINUTES", "5"))
+HELPLY_MONITOR_MIN_INTERVAL = float(os.environ.get("HELPLY_MONITOR_MIN_INTERVAL", "3"))  # ignore faster reports
+HELPLY_MONITOR_RAW_HOURS = int(os.environ.get("HELPLY_MONITOR_RAW_HOURS", "48"))
+HELPLY_MONITOR_HOURLY_DAYS = int(os.environ.get("HELPLY_MONITOR_HOURLY_DAYS", "90"))

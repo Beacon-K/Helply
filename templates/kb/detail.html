@@ -55,4 +55,4 @@
 </div>
 {% endblock %}
 
-{% block scripts %}<script src="{% static 'js/kb-vote.js' %}" defer></script>{% endblock %}
+{% block scripts %}<script src="{% static 'js/kb-vote.js' %}?v={{ asset_version }}" defer></script>{% endblock %}

@@ -50,6 +50,8 @@ echo.
 
 echo Connecting the Cloudflare tunnel...
 start "" /b "tools\cloudflared.exe" tunnel --no-autoupdate --loglevel warn run
+rem Offline detection for real monitored servers (stops when this window closes).
+start "" /b "%HELPLY_PY%" manage.py monitor_check --every 30
 
 echo.
 echo ================================================================

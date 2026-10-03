@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load static %}
 {% block title %}My devices{% endblock %}
 {% block content %}
+<div hidden data-live data-live-url="{% url 'assets:live' %}" data-live-version="{{ live_version }}" data-live-interval="15"></div>
 <div class="dash-head">
   <div>
     <h1>My devices</h1>
@@ -8,7 +9,7 @@
   </div>
 </div>
 
-<div class="device-grid">
+<div class="device-grid" id="device-grid" data-live-region>
   {% for a in assets %}
     <section class="card device-card">
       <a class="device-top" href="{{ a.get_absolute_url }}">
@@ -20,6 +21,7 @@
       </a>
       <dl>
         <dt>Status</dt><dd><span class="badge as-{{ a.status }}">{{ a.get_status_display }}</span></dd>
+        <dt>Location</dt><dd>{{ a.location|default:"–" }}</dd>
         <dt>Serial</dt><dd>{{ a.serial_number|default:"–" }}</dd>
         <dt>Warranty</dt><dd>{% include "assets/_warranty.html" %}</dd>
         {% if a.open_tickets %}<dt>Tickets</dt><dd><a href="{{ a.get_absolute_url }}">{{ a.open_tickets }} open</a></dd>{% endif %}
@@ -32,3 +34,5 @@
 </div>
 <p class="muted small">The asset tag is the sticker on the device (e.g. LT-0001). Mention it when you call IT.</p>
 {% endblock %}
+
+{% block scripts %}<script src="{% static 'js/live.js' %}?v={{ asset_version }}" defer></script>{% endblock %}

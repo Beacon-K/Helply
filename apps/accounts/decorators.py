@@ -23,4 +23,4 @@ def role_required(*roles):
 def agent_required(view):
     from .models import User
 
-    return role_required(User.Role.TECHNICIAN, User.Role.SUPERVISOR)(view)
+    return role_required(User.Role.TECHNICIAN, User.Role.ADMINISTRATOR)(view)

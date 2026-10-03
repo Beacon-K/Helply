@@ -44,3 +44,21 @@ def percent_of(value, total):
         return round(100 * value / total) if total else 0
     except (TypeError, ZeroDivisionError):
         return 0
+
+
+@register.filter
+def money(value):
+    """Whole dollars with comma separators, e.g. 85090 -> 85,090 (independent of the locale)."""
+    try:
+        return f"{round(float(value)):,}"
+    except (TypeError, ValueError):
+        return "–"
+
+
+@register.filter
+def money2(value):
+    """Dollars and cents with comma separators, e.g. 1234.5 -> 1,234.50."""
+    try:
+        return f"{float(value):,.2f}"
+    except (TypeError, ValueError):
+        return "–"

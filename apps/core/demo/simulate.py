@@ -17,6 +17,7 @@ from apps.tickets import services, workflow
 from apps.tickets.models import Category, Ticket
 
 from . import people
+from .assets import ASSETS as DEMO_ASSETS
 from .passwords import demo_password
 from .tickets import SCENARIOS
 
@@ -36,7 +37,7 @@ def ensure_organisation():
         user, created = User.objects.get_or_create(username=username)
         user.first_name, user.last_name, user.role = first, last, role
         user.department, user.email = depts[dept], f"{username}@example.com"
-        if role == User.Role.SUPERVISOR:
+        if role == User.Role.ADMINISTRATOR:
             user.is_staff = user.is_superuser = True
         if created:
             user.set_password(demo_password())
@@ -52,11 +53,12 @@ def ensure_organisation():
             priority=priority, defaults={"name": name, "response_minutes": response, "resolution_minutes": resolution}
         )
 
-    for tag, name, kind, status, owner, dept, serial, warranty in people.ASSETS:
-        Asset.objects.update_or_create(asset_tag=tag, defaults={
-            "name": name, "type": kind, "status": status, "owner": users.get(owner),
-            "department": depts.get(dept) or Department.objects.get_or_create(name=dept)[0],
-            "serial_number": serial, "warranty_expiry": warranty, "notes": people.ASSET_NOTES.get(tag, ""),
+    for a in DEMO_ASSETS:
+        Asset.objects.update_or_create(asset_tag=a.tag, defaults={
+            "name": a.name, "type": a.type, "status": a.status, "owner": users.get(a.owner),
+            "department": depts.get(a.department) or Department.objects.get_or_create(name=a.department)[0],
+            "serial_number": a.serial_number, "location": a.location, "supplier": a.supplier,
+            "purchase_date": a.purchased, "purchase_cost": a.cost, "warranty_expiry": a.warranty, "notes": a.notes,
         })
     return users, categories
 
@@ -93,7 +95,7 @@ def run(stdout=None):
     real_now = timezone.now()
     users, categories = ensure_organisation()
     assets = {a.asset_tag: a for a in Asset.objects.all()}
-    supervisor = users["alice"]
+    administrator = users["alice"]
     tickets, refs = {}, {}
 
     def who(ticket, name):
@@ -122,7 +124,7 @@ def run(stdout=None):
                 ticket.refresh_from_db()
                 action, *args = step
                 try:
-                    _apply(ticket, action, args, who, fmt, users, categories, supervisor)
+                    _apply(ticket, action, args, who, fmt, users, categories, administrator)
                 except (workflow.TransitionError, ValueError, PermissionError) as e:
                     raise ValueError(f"'{scenario.title}': step {step} failed: {e}") from e
 
@@ -135,14 +137,14 @@ def run(stdout=None):
     return list(tickets.values())
 
 
-def _apply(ticket, action, args, who, fmt, users, categories, supervisor):
+def _apply(ticket, action, args, who, fmt, users, categories, administrator):
     if action == "assign":
         if ticket.assignee_id is None:  # keep the AI's choice if it already assigned someone
-            workflow.assign(ticket, users[args[0]], actor=supervisor)
+            workflow.assign(ticket, users[args[0]], actor=administrator)
     elif action == "reassign":
-        workflow.assign(ticket, users[args[0]], actor=supervisor)
+        workflow.assign(ticket, users[args[0]], actor=administrator)
     elif action == "category":
-        workflow.recategorize(ticket, categories[args[0]], supervisor)
+        workflow.recategorize(ticket, categories[args[0]], administrator)
     elif action in ("start", "hold", "resume", "resolve"):
         workflow.perform(ticket, action, ticket.assignee, note=fmt(args[0]) if args else "")
     elif action == "reopen":

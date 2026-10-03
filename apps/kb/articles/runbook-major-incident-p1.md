@@ -15,7 +15,7 @@ Any **P1** in Helply (Impact High + Urgency High), for example:
 
 ## First 15 minutes
 
-1. **One ticket, one owner.** Pick the first/best P1 ticket as the master; the supervisor assigns an **incident owner** (coordinates) — separate from the technician(s) fixing it if staff allow.
+1. **One ticket, one owner.** Pick the first/best P1 ticket as the master; the administrator assigns an **incident owner** (coordinates) — separate from the technician(s) fixing it if staff allow.
 2. **Link duplicates:** comment on duplicate tickets with the master ticket number and resolve them as duplicates, so the queue stays clean.
 3. **Acknowledge publicly:** post a short message to staff (email/Teams): what's affected, that IT is working on it, when the next update will be. This stops a flood of new tickets.
 4. **Confirm scope:** who/what is affected, since when, what changed recently (updates, config changes, provider notices).

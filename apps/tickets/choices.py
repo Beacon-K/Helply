@@ -37,6 +37,7 @@ class Channel(models.TextChoices):
     PORTAL = "portal", "Self-service portal"
     EMAIL = "email", "Email"
     PHONE = "phone", "Phone"
+    MONITORING = "monitoring", "Monitoring alert"
 
 
 # ITIL-style matrix: rows = impact, columns = urgency (1 = high).

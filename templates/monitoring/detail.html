@@ -1,0 +1,195 @@
+{% extends "base.html" %}{% load static helply monitoring %}
+{% block title %}{{ s.name }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/fleet-detail.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="fx" id="fx-detail" data-url="{% url 'monitoring:detail_data' s.pk %}" data-range="{{ range_key }}"
+     data-thresholds='{"cpu": {{ thresholds.cpu }}, "mem": {{ thresholds.mem }}, "disk": {{ thresholds.disk }}}'>
+
+  <nav class="fx-crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'monitoring:list' %}">Cloud servers</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    <span aria-current="page">{{ s.name }}</span>
+  </nav>
+
+  <header class="fx-hero">
+    <div>
+      <div class="fx-hero-title">
+        <h1 class="fx-title">{{ s.name }}</h1>
+        <span data-fx-badge>{% include "monitoring/_badge.html" %}</span>
+      </div>
+      <div class="fx-facts-row">
+        {% if s.purpose %}<span>{{ s.purpose }}</span>{% endif %}
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.3 12 3.5 3.5 0 0 0 6.5 19Z"/></svg>{{ s.get_provider_display }}{% if s.region %} · {{ s.region }}{% endif %}</span>
+        {% with ip=s.public_ip|default:s.reported_ip %}{% if ip %}
+        <span><button type="button" class="fx-copy" data-fx-copy="{{ ip }}" title="Copy IP address"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><code>{{ ip }}</code></button></span>
+        {% endif %}{% endwith %}
+        {% if s.os_name %}<span>{% include "monitoring/_os.html" %}</span>{% endif %}
+      </div>
+    </div>
+    {% if user.is_administrator %}
+    <div class="fx-actions">
+      <a class="fx-btn" href="{% url 'monitoring:install' s.pk %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="m7 10 3 2.5L7 15M12.5 15H17"/></svg>Agent setup</a>
+      <details class="fx-menu">
+        <summary class="fx-btn">{% if s.in_maintenance %}<span class="fx-dot is-pending"></span>Maintenance{% else %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H6v16h4zM18 4h-4v16h4z"/></svg>Pause alerts{% endif %}</summary>
+        <form class="fx-menu-pop" method="post" action="{% url 'monitoring:maintenance' s.pk %}">{% csrf_token %}
+          {% if s.in_maintenance %}
+            <p>Paused until {{ s.maintenance_until|date:"M j, H:i" }}</p>
+            <button name="hours" value="0">Resume alerts now</button>
+          {% else %}
+            <p>Pause alerts while you work</p>
+            <button name="hours" value="1">For 1 hour</button>
+            <button name="hours" value="4">For 4 hours</button>
+            <button name="hours" value="24">For 24 hours</button>
+          {% endif %}
+        </form>
+      </details>
+      <a class="fx-btn" href="{% url 'monitoring:edit' s.pk %}">Edit</a>
+    </div>
+    {% endif %}
+  </header>
+
+  <div class="fx-banners" data-fx-region="banners">
+    {% for a in open_alerts %}
+    <div class="fx-banner" role="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      <div><b>{{ a.message }}</b><span>{{ a.get_rule_display }} · open for {{ a.duration|duration }}, since {{ a.started_at|date:"M j, H:i" }}</span></div>
+      {% if a.ticket %}<a href="{{ a.ticket.get_absolute_url }}">Ticket {{ a.ticket.reference }} →</a>{% endif %}
+    </div>
+    {% endfor %}
+    {% if s.in_maintenance %}
+    <div class="fx-banner is-muted">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H6v16h4zM18 4h-4v16h4z"/></svg>
+      <div><b>Alerts are paused until {{ s.maintenance_until|date:"M j, H:i" }}</b><span>Problems are still recorded, but no tickets are raised.</span></div>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if d.status == "pending" %}
+  <section class="fx-panel">
+    <div class="fx-wait"><span class="fx-spinner" aria-hidden="true"></span>
+      <div><b>Waiting for the agent's first report</b><span>Install the agent on {{ s.name }}; this page updates by itself when it connects.</span></div></div>
+    {% if user.is_administrator %}<p style="margin:.9rem 0 0"><a class="fx-btn fx-btn-primary" href="{% url 'monitoring:install' s.pk %}">Show install command</a></p>{% endif %}
+  </section>
+  {% else %}
+
+  <div class="{% if d.status == 'offline' %}is-stale{% endif %}" data-fx-now>
+    {% if d.status == "offline" %}<p class="fx-stale-note">Offline - last readings from {{ s.last_seen_at|date:"M j, H:i:s" }} ({{ s.last_seen_at|since }} ago).</p>{% endif %}
+    <section class="fx-tiles" aria-label="Current readings">
+      <div class="fx-tile">
+        <p class="fx-label">CPU</p>
+        <p class="fx-big num"><span data-k="cpu">{{ d.cpu|floatformat:0|default:"–" }}</span><small>%</small></p>
+        <div class="fx-bar"><i class="lv-{{ d.cpu|level }}" style="width:{{ d.cpu|default:0 }}%" data-bar="cpu"></i></div>
+        <p class="fx-sub">{{ s.cpu_cores|default:"?" }} vCPU{{ s.cpu_cores|pluralize }}{% if s.cpu_model %} · {{ s.cpu_model|truncatechars:34 }}{% endif %}</p>
+      </div>
+      <div class="fx-tile">
+        <p class="fx-label">Memory</p>
+        <p class="fx-big num"><span data-k="mem">{{ d.mem|floatformat:0|default:"–" }}</span><small>%</small></p>
+        <div class="fx-bar"><i class="lv-{{ d.mem|level }}" style="width:{{ d.mem|default:0 }}%" data-bar="mem"></i></div>
+        <p class="fx-sub num"><span data-k="mem_used" data-fmt="bytes">{{ s.mem_used|bytes_h }}</span> of {{ s.mem_total|bytes_h }}{% if s.swap_total %} · swap {{ s.swap_percent|floatformat:0 }}%{% endif %}</p>
+      </div>
+      <div class="fx-tile">
+        <p class="fx-label">Disk</p>
+        <p class="fx-big num"><span data-k="disk">{{ d.disk|floatformat:0|default:"–" }}</span><small>%</small></p>
+        <div class="fx-bar"><i class="lv-{{ d.disk|level }}" style="width:{{ d.disk|default:0 }}%" data-bar="disk"></i></div>
+        <p class="fx-sub num"><span data-k="disk_used" data-fmt="bytes">{{ s.disk_used|bytes_h }}</span> of {{ s.disk_total|bytes_h }}</p>
+      </div>
+      <div class="fx-tile">
+        <p class="fx-label">Network</p>
+        <div class="fx-net num">
+          <div class="in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg><b data-k="rx" data-fmt="rate">{{ d.rx|rate }}</b></div>
+          <div class="out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg><b data-k="tx" data-fmt="rate">{{ d.tx|rate }}</b></div>
+        </div>
+        <p class="fx-sub num">Since boot ↓ <span data-k="rx_total" data-fmt="bytes">{{ s.net_rx_total|bytes_h }}</span> · ↑ <span data-k="tx_total" data-fmt="bytes">{{ s.net_tx_total|bytes_h }}</span></p>
+      </div>
+    </section>
+    <section class="fx-strip" aria-label="System">
+      <div><span>Load average</span><b class="num"><span data-k="load" data-fmt="loadavg">{{ s.load1|floatformat:2|default:"–" }} · {{ s.load5|floatformat:2|default:"–" }} · {{ s.load15|floatformat:2|default:"–" }}</span></b></div>
+      <div><span>Uptime</span><b class="num" data-k="uptime" data-fmt="uptime">{{ d.uptime|uptime }}</b></div>
+      <div><span>Processes</span><b class="num" data-k="processes" data-fmt="int">{{ s.processes|default:"–" }}</b></div>
+      <div><span>Last report</span><b class="num" data-fx-seen data-seen="{{ d.last_seen|default:'' }}">{{ s.last_seen_at|since }} ago</b></div>
+    </section>
+  </div>
+  {% endif %}
+
+  <div class="fx-layout">
+    <div>
+      <section class="fx-panel" aria-labelledby="fx-perf">
+        <div class="fx-panel-head">
+          <h2 id="fx-perf">Performance</h2>
+          <div class="fx-seg" role="group" aria-label="Time range">
+            {% for r in ranges %}<button type="button" data-fx-range="{{ r }}" aria-pressed="{% if r == range_key %}true{% else %}false{% endif %}">{{ r }}</button>{% endfor %}
+          </div>
+        </div>
+        <div class="fx-charts">
+          <figure class="fx-chart" data-chart="cpu"><div class="fx-chart-head"><h3>CPU</h3><div class="fx-chart-legend" data-legend></div></div><div class="fx-chart-canvas" data-canvas></div></figure>
+          <figure class="fx-chart" data-chart="mem"><div class="fx-chart-head"><h3>Memory &amp; disk</h3><div class="fx-chart-legend" data-legend></div></div><div class="fx-chart-canvas" data-canvas></div></figure>
+          <figure class="fx-chart" data-chart="net"><div class="fx-chart-head"><h3>Network</h3><div class="fx-chart-legend" data-legend></div></div><div class="fx-chart-canvas" data-canvas></div></figure>
+          <figure class="fx-chart" data-chart="load"><div class="fx-chart-head"><h3>Load average</h3><div class="fx-chart-legend" data-legend></div></div><div class="fx-chart-canvas" data-canvas></div></figure>
+        </div>
+        <p class="fx-chart-foot" data-fx-chart-foot>Hover a chart to compare all four at the same moment. Dashed red lines mark alert thresholds.</p>
+      </section>
+
+      <section class="fx-panel" aria-labelledby="fx-alerts">
+        <div class="fx-panel-head"><h2 id="fx-alerts">Alert history</h2><span class="hint">Tickets are raised automatically</span></div>
+        {% if alerts %}
+        <ol class="fx-timeline">
+          {% for a in alerts %}
+          <li>
+            <span class="fx-dot {% if a.is_open %}is-critical{% else %}is-healthy{% endif %}" style="animation:none"></span>
+            <div>
+              <b>{{ a.message }}</b>
+              <small>{{ a.started_at|date:"M j, H:i" }} · {% if a.is_open %}open for {{ a.duration|duration }}{% else %}recovered after {{ a.duration|duration }}{% endif %}{% if a.peak is not None %} · peak {{ a.peak|floatformat:0 }}%{% endif %}
+                {% if a.ticket %} · <a href="{{ a.ticket.get_absolute_url }}">{{ a.ticket.reference }}</a>{% elif not a.is_open %}{% else %} · no ticket (alerts paused){% endif %}</small>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+        {% else %}
+        <p class="fx-muted">No alerts yet. Helply raises a ticket when the server is offline for {{ thresholds.offline }} minutes,
+          CPU or memory stays above {{ thresholds.cpu|floatformat:0 }}% for {{ thresholds.minutes }} minutes, or the disk passes {{ thresholds.disk|floatformat:0 }}%.</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <aside>
+      <section class="fx-panel" aria-labelledby="fx-about">
+        <div class="fx-panel-head"><h2 id="fx-about">Details</h2></div>
+        <dl class="fx-dl">
+          <dt>Plan</dt><dd>{{ s.plan|default:"–" }}</dd>
+          <dt>System</dt><dd>{{ s.os_name|default:"–" }}{% if s.arch %}<small>{{ s.arch }}</small>{% endif %}</dd>
+          <dt>Hostname</dt><dd><code>{{ s.hostname|default:"–" }}</code></dd>
+          <dt>Criticality</dt><dd>{{ s.get_criticality_display }}</dd>
+          <dt>Looked after by</dt><dd>{{ s.owner|default:"Service desk (auto-assign)" }}</dd>
+          <dt>Agent</dt><dd>{% if s.agent_version %}v{{ s.agent_version }}{% else %}Not connected{% endif %}</dd>
+          <dt>Monitoring since</dt><dd>{{ s.created_at|date:"M j, Y" }}</dd>
+        </dl>
+      </section>
+      <section class="fx-panel" aria-labelledby="fx-cost">
+        <div class="fx-panel-head"><h2 id="fx-cost">Cost &amp; renewal</h2></div>
+        <dl class="fx-dl">
+          <dt>Monthly</dt><dd class="num">{% if s.monthly_cost %}${{ s.monthly_cost|money2 }} CAD{% else %}–{% endif %}</dd>
+          <dt>Yearly</dt><dd class="num">{% if s.asset.purchase_cost %}${{ s.asset.purchase_cost|money2 }} CAD{% else %}–{% endif %}</dd>
+          <dt>Renews</dt><dd>{{ s.expires_on|date:"M j, Y"|default:"–" }}{% with r=s.renewal_days_left %}{% if r is not None %}<small>{% if r < 0 %}<span class="is-crit-text">Expired {{ r|stringformat:"d"|cut:"-" }} day{{ r|pluralize }} ago</span>{% elif r == 0 %}Today{% else %}In {{ r }} day{{ r|pluralize }}{% endif %}</small>{% endif %}{% endwith %}</dd>
+          <dt>Asset record</dt><dd>{% if s.asset %}<a href="{{ s.asset.get_absolute_url }}">{{ s.asset.asset_tag }}</a>{% else %}–{% endif %}</dd>
+        </dl>
+        {% if user.is_administrator and not s.monthly_cost %}<p class="fx-muted" style="margin-top:.9rem"><a href="{% url 'monitoring:edit' s.pk %}">Add cost, renewal &amp; owner →</a></p>{% endif %}
+      </section>
+      <section class="fx-panel" aria-labelledby="fx-tickets">
+        <div class="fx-panel-head"><h2 id="fx-tickets">Tickets</h2></div>
+        <div class="fx-tickets">
+          {% for t in tickets %}
+          <a href="{{ t.get_absolute_url }}"><span class="badge p-{{ t.priority }}">{{ t.priority }}</span><b>{{ t.title }}</b>
+            <small>{{ t.reference }} · {{ t.get_status_display }} · {{ t.created_at|ago }}</small></a>
+          {% empty %}<p class="fx-muted">No tickets for this server.</p>{% endfor %}
+        </div>
+      </section>
+      {% if s.notes %}<section class="fx-panel"><div class="fx-panel-head"><h2>Notes</h2></div><p class="fx-muted pre">{{ s.notes }}</p></section>{% endif %}
+    </aside>
+  </div>
+</div>
+{{ payload|json_script:"fx-payload" }}
+{% endblock %}

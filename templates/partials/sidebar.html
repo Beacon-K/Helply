@@ -1,0 +1,39 @@
+{% load static %}{% with app=request.resolver_match.app_name page=request.resolver_match.url_name %}
+<aside class="sidebar" aria-label="Main navigation">
+  <a class="brand" href="{% url 'core:dashboard' %}"><img src="{% static 'img/brand/logo-glyph.png' %}" alt=""> <span>Helply</span></a>
+  <nav class="side-nav">
+    <a href="{% url 'core:dashboard' %}" {% if app == "core" %}class="active" aria-current="page"{% endif %} title="Dashboard">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      <span>Dashboard</span>
+    </a>
+    <a href="{% url 'tickets:list' %}" {% if app == "tickets" and page != "create" %}class="active" aria-current="page"{% endif %} title="Tickets">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4Z"/><path d="M14 6v2.5M14 10.75v2.5M14 15.5V18"/></svg>
+      <span>Tickets</span>
+    </a>
+    <a href="{% url 'tickets:create' %}" {% if app == "tickets" and page == "create" %}class="active" aria-current="page"{% endif %} title="New ticket">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+      <span>New ticket</span>
+    </a>
+    <a href="{% url 'kb:list' %}" {% if app == "kb" %}class="active" aria-current="page"{% endif %} title="Knowledge base">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H20v15H6.5A1.5 1.5 0 0 0 5 19.5Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H20"/><path d="M9 7.5h7M9 11h5"/></svg>
+      <span>Knowledge base</span>
+    </a>
+    <a href="{% url 'assets:list' %}" {% if app == "assets" %}class="active" aria-current="page"{% endif %} title="{% if user.is_agent %}Assets{% else %}My devices{% endif %}">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg>
+      <span>{% if user.is_agent %}Assets{% else %}My devices{% endif %}</span>
+    </a>
+    {% if user.is_agent %}
+    <a href="{% url 'monitoring:list' %}" {% if app == "monitoring" %}class="active" aria-current="page"{% endif %} title="Cloud servers">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01M11 7.5h6M11 16.5h6"/></svg>
+      <span>Cloud servers</span>
+    </a>
+    {% endif %}
+    {% if user.is_staff %}
+    <a href="{% url 'admin:index' %}" title="Admin">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+      <span>Admin</span>
+    </a>
+    {% endif %}
+  </nav>
+</aside>
+{% endwith %}

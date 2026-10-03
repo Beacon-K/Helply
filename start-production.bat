@@ -44,6 +44,8 @@ echo Checking the production configuration...
 
 echo Starting scheduled jobs (SLA checks, follow-ups, daily backup)...
 start "" /b "%HELPLY_PY%" manage.py run_jobs --every 5
+rem Server monitoring: offline detection every 30 seconds and metric roll-up.
+start "" /b "%HELPLY_PY%" manage.py monitor_check --every 30
 
 if defined TUNNEL_TOKEN (
   if not exist "tools\cloudflared.exe" (

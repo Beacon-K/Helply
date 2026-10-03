@@ -23,6 +23,8 @@ CATEGORIES = [
      "phishing,phish,suspicious,scam,virus,malware,ransomware,hacked,compromised,stolen,lost,popup,pop-up"),
     ("Files & Storage", "Service Desk",
      "file,folder,onedrive,sharepoint,shared drive,network drive,deleted,recover,restore,sync,disk space,storage"),
+    ("Servers & Cloud", "Network & Infrastructure",
+     "server,vps,cloud server,virtual machine,vm,website down,site down,aws,azure,hosting,cpu,uptime,rdp,ssh"),
 ]
 
 SLA = [  # priority, name, response minutes, resolution minutes

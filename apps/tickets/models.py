@@ -132,6 +132,7 @@ class TicketEvent(models.Model):
         COMMENT = "comment", "Comment"
         SLA = "sla", "SLA"
         AI = "ai", "AI action"
+        MONITOR = "monitor", "Monitoring"
 
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="events")
     actor = models.ForeignKey(

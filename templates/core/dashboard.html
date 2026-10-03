@@ -9,7 +9,7 @@
   <a class="btn primary" href="{% url 'tickets:create' %}">+ New ticket</a>
 </div>
 
-{% if user.is_supervisor %}{% include "core/_supervisor.html" %}
+{% if user.is_administrator %}{% include "core/_administrator.html" %}
 {% elif user.is_technician %}{% include "core/_technician.html" %}
 {% else %}{% include "core/_employee.html" %}{% endif %}
 {% endblock %}

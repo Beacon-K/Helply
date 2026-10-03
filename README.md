@@ -104,7 +104,7 @@ Docker 使用 `requirements-docker.txt`，其中额外包含 PostgreSQL 驱动�
 
 | 用户名 | 角色 | 说明 |
 |---|---|---|
-| alice | Supervisor 主管 | 同时拥有 /admin 权限 |
+| alice | Administrator 管理员 | IT 负责人，同时拥有 /admin 后台权限 |
 | tom | Technician 技术员 | Service Desk、Applications 组 |
 | tina | Technician 技术员 | Service Desk、Network 组 |
 | emma / eric | Employee 员工 | 提交工单 |
@@ -173,6 +173,24 @@ python manage.py check_sla      # 建议每 5 分钟跑一次（cron / 任务调
 
 > ⚠️ `seed_demo` 里的 SLA 时长（P1 15 分钟/4 小时 … P4 8 小时/72 小时）是占位值，需要和客户确认。
 > 目前按 24×7 自然时间计算，尚未支持工作时间日历。
+
+### 云服务器监控
+
+左侧栏 **Cloud servers**（仅 IT 人员可见）。每台 VPS 安装一个轻量 agent（`agent/helply_agent.py`，Python + psutil），每 10 秒通过 HTTPS 上报 CPU、内存、磁盘、网络、负载和运行时长。
+
+| 要点 | 说明 |
+|---|---|
+| 只读 | agent 只上报数据，不开端口、不接受命令；令牌泄露最多只能伪造这一台的读数 |
+| 令牌 | 每台服务器一个，数据库只存 SHA-256 哈希；只在创建时显示一次，可随时重新生成 |
+| 接入 | 点 **Add server**（不用填任何信息）→ 在服务器上运行页面给出的一行命令 → agent 首次上报时自动识别主机名、系统、CPU/内存/磁盘、公网 IP、云服务商、地区和机型，并填好服务器信息。费用、续费、负责人在接入后可选填。Linux 装成 systemd 服务（低权限用户），Windows 装成计划任务（LOCAL SERVICE），卸载用 `--uninstall` / `-Uninstall`；超过 24 小时未接入的占位服务器会被自动清理 |
+| 告警转工单 | 离线 > 2 分钟、CPU/内存持续 5 分钟 ≥ 90%、磁盘 ≥ 90% → 自动建工单（分类 Servers & Cloud）、分派给负责人、启动 SLA；恢复后在工单里留记录，由技术员确认原因后再解决 |
+| 维护模式 | 暂停告警 1/4/24 小时：告警照常记录，但不建工单 |
+| 资产联动 | 每台服务器自动在资产台账生成一条 `VPS-xxxx` 记录（年费、续费日期） |
+| 数据保留 | 原始读数 48 小时，每小时汇总保留 90 天（`HELPLY_MONITOR_*` 环境变量可调） |
+| 定时任务 | 生产环境：`start-production.bat` 会运行 `monitor_check --every 30`（离线检测和数据汇总）；`run_jobs` 也会顺带执行一次 |
+| 只显示真实服务器 | 页面只显示管理员添加并接入 agent 的服务器，演示数据不会生成任何服务器；没有服务器时显示接入引导。`start-demo.bat` / `start-online.bat` 也会运行 `monitor_check` 做离线检测 |
+
+服务器必须能访问 Helply 的公网地址（例如 https://helply.work），在 `127.0.0.1` 上打开 Helply 时生成的安装命令用不了。
 
 ## 测试
 

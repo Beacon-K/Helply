@@ -19,7 +19,7 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, overwrite=False, **options):
         _, categories = ensure_categories()
-        author = User.objects.filter(role=User.Role.SUPERVISOR).order_by("pk").first()
+        author = User.objects.filter(role=User.Role.ADMINISTRATOR).order_by("pk").first()
         created = updated = kept = 0
         for f in load_all():
             if f.category and f.category not in categories:

@@ -1,0 +1,5 @@
+{% if d.status == "pending" %}<span class="fx-badge is-pending">Waiting for agent</span>
+{% elif d.status == "offline" %}<span class="fx-badge">Offline</span>
+{% elif d.alerts %}<span class="fx-badge is-critical">{{ d.alerts|length }} alert{{ d.alerts|length|pluralize }}</span>
+{% elif d.state == "warning" %}<span class="fx-badge is-warning">High usage</span>
+{% else %}<span class="fx-badge is-healthy">Healthy</span>{% endif %}{% if d.maintenance %} <span class="fx-tag">Maintenance</span>{% endif %}

@@ -10,20 +10,15 @@
   <link rel="apple-touch-icon" href="{% static 'img/brand/apple-touch-icon.png' %}">
   <link rel="manifest" href="{% static 'site.webmanifest' %}">
   <meta name="theme-color" content="#0b1b2b">
-  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v={{ asset_version }}">
+  {% block head %}{% endblock %}
 </head>
 <body>
 {% if user.is_authenticated %}
+<div class="app-shell">
+{% include "partials/sidebar.html" %}
+<div class="app-main">
 <header class="topbar">
-  <a class="brand" href="{% url 'core:dashboard' %}"><img src="{% static 'img/brand/logo-glyph.png' %}" alt=""> Helply</a>
-  <nav>
-    <a href="{% url 'core:dashboard' %}">Dashboard</a>
-    <a href="{% url 'tickets:list' %}">Tickets</a>
-    <a href="{% url 'tickets:create' %}">New ticket</a>
-    <a href="{% url 'kb:list' %}">Knowledge base</a>
-    <a href="{% url 'assets:list' %}">{% if user.is_agent %}Assets{% else %}My devices{% endif %}</a>
-    {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin</a>{% endif %}
-  </nav>
   <div class="who">
     <a class="bell" href="{% url 'notifications:list' %}" data-bell data-url="{% url 'notifications:unread' %}"
        aria-label="Notifications{% if unread_notifications %}, {{ unread_notifications }} unread{% endif %}">
@@ -40,7 +35,11 @@
   {% for message in messages %}<div class="flash flash-{{ message.tags }}">{{ message }}</div>{% endfor %}
   {% block content %}{% endblock %}
 </main>
-{% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}" defer></script>{% endif %}
+{% if user.is_authenticated %}
+</div>
+</div>
+{% endif %}
+{% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}?v={{ asset_version }}" defer></script>{% endif %}
 {% block scripts %}{% endblock %}
 </body>
 </html>

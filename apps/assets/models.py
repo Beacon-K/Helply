@@ -9,12 +9,19 @@ class Asset(models.Model):
 
     class Type(models.TextChoices):
         LAPTOP = "laptop", "Laptop"
-        DESKTOP = "desktop", "Desktop"
+        DESKTOP = "desktop", "Desktop / workstation"
         MONITOR = "monitor", "Monitor"
-        PRINTER = "printer", "Printer"
+        PERIPHERAL = "peripheral", "Peripheral / accessory"
         PHONE = "phone", "Mobile phone"
+        TABLET = "tablet", "Tablet"
+        PRINTER = "printer", "Printer / scanner"
+        SERVER = "server", "Server"
+        CLOUD = "cloud", "Cloud server / VPS"
+        STORAGE = "storage", "Storage / NAS"
         NETWORK = "network", "Network device"
-        LICENSE = "license", "Software licence"
+        POWER = "power", "Power / UPS"
+        AV = "av", "Meeting room / AV"
+        LICENSE = "license", "Software licence / subscription"
         OTHER = "other", "Other"
 
     class Status(models.TextChoices):
@@ -34,9 +41,16 @@ class Asset(models.Model):
     department = models.ForeignKey(
         "accounts.Department", null=True, blank=True, on_delete=models.SET_NULL, related_name="assets"
     )
+    location = models.CharField(max_length=100, blank=True, help_text='Where it is, e.g. "Server room" or "Remote".')
+    supplier = models.CharField(max_length=100, blank=True)
     purchase_date = models.DateField(null=True, blank=True)
-    warranty_expiry = models.DateField(null=True, blank=True)
+    purchase_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+                                        help_text="Purchase price (CAD). For subscriptions: cost per year.")
+    warranty_expiry = models.DateField(null=True, blank=True,
+                                       help_text="Warranty end, or renewal date for licences and subscriptions.")
     notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, db_index=True)
 
     class Meta:
         ordering = ["asset_tag"]
@@ -45,8 +59,9 @@ class Asset(models.Model):
     WARRANTY_WARNING_DAYS = 90
 
     ICONS = {
-        "laptop": "💻", "desktop": "🖥️", "monitor": "🖥️", "printer": "🖨️",
-        "phone": "📱", "network": "📡", "license": "🔑", "other": "📦",
+        "laptop": "💻", "desktop": "🖥️", "monitor": "🖥️", "peripheral": "🖱️", "phone": "📱", "tablet": "📲",
+        "printer": "🖨️", "server": "🗄️", "cloud": "☁️", "storage": "💾", "network": "📡", "power": "🔋", "av": "🎥",
+        "license": "🔑", "other": "📦",
     }
 
     def __str__(self):
@@ -72,3 +87,15 @@ class Asset(models.Model):
         if days < 0:
             return "expired"
         return "expiring" if days <= self.WARRANTY_WARNING_DAYS else "ok"
+
+    @property
+    def age_years(self):
+        """Age in years (one decimal), or None if the purchase date is unknown."""
+        if not self.purchase_date:
+            return None
+        return round((timezone.localdate() - self.purchase_date).days / 365.25, 1)
+
+    @property
+    def is_subscription(self):
+        """Paid per period and renewed (software, cloud servers) rather than bought once."""
+        return self.type in (self.Type.LICENSE, self.Type.CLOUD)

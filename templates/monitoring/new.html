@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}Add server{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}">{% endblock %}
+{% block content %}
+<div class="fx">
+  <nav class="fx-crumbs" aria-label="Breadcrumb"><a href="{% url 'monitoring:list' %}">Cloud servers</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span aria-current="page">Add server</span></nav>
+  <header class="fx-head"><div><p class="fx-eyebrow">Connect a server</p><h1 class="fx-title">Add a server in one step</h1>
+    <p class="fx-lede">Generate an install command, run it on the server, and Helply detects everything else.</p></div></header>
+  <form method="post">{% csrf_token %}<button class="fx-btn fx-btn-primary">Generate install command</button></form>
+</div>
+{% endblock %}

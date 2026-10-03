@@ -21,7 +21,7 @@ from apps.sla import services as sla
 from .choices import OPEN_STATUSES, Status
 from .models import TicketEvent
 
-TECH, SUP = User.Role.TECHNICIAN, User.Role.SUPERVISOR
+TECH, ADMIN = User.Role.TECHNICIAN, User.Role.ADMINISTRATOR
 
 
 class TransitionError(Exception):
@@ -43,21 +43,21 @@ class Transition:
 TRANSITIONS = {
     t.name: t
     for t in [
-        Transition("triage", "Mark triaged", frozenset({Status.NEW}), Status.TRIAGED, frozenset({SUP})),
+        Transition("triage", "Mark triaged", frozenset({Status.NEW}), Status.TRIAGED, frozenset({ADMIN})),
         Transition("start", "Start work", frozenset({Status.ASSIGNED}), Status.IN_PROGRESS,
-                   frozenset({TECH, SUP}), assignee_only=True),
+                   frozenset({TECH, ADMIN}), assignee_only=True),
         Transition("hold", "Put on hold", frozenset({Status.IN_PROGRESS}), Status.ON_HOLD,
-                   frozenset({TECH, SUP}), assignee_only=True, note_required=True),
+                   frozenset({TECH, ADMIN}), assignee_only=True, note_required=True),
         Transition("resume", "Resume", frozenset({Status.ON_HOLD}), Status.IN_PROGRESS,
-                   frozenset({TECH, SUP}), assignee_only=True),
+                   frozenset({TECH, ADMIN}), assignee_only=True),
         Transition("resolve", "Resolve", frozenset({Status.IN_PROGRESS}), Status.RESOLVED,
-                   frozenset({TECH, SUP}), assignee_only=True, note_required=True),
+                   frozenset({TECH, ADMIN}), assignee_only=True, note_required=True),
         Transition("reopen", "Reopen", frozenset({Status.RESOLVED}), Status.IN_PROGRESS,
                    requester_allowed=True, note_required=True),
         Transition("close", "Confirm & close", frozenset({Status.RESOLVED}), Status.CLOSED,
-                   frozenset({SUP}), requester_allowed=True),
+                   frozenset({ADMIN}), requester_allowed=True),
         Transition("cancel", "Cancel", frozenset({Status.NEW, Status.TRIAGED, Status.ASSIGNED}),
-                   Status.CANCELLED, frozenset({SUP}), requester_allowed=True),
+                   Status.CANCELLED, frozenset({ADMIN}), requester_allowed=True),
     ]
 }
 
@@ -137,12 +137,12 @@ def auto_close(ticket, days):
 
 def assign(ticket, assignee, actor=None):
     """Assign (or reassign) a ticket. actor=None means the system/AI did it."""
-    if actor is not None and not actor.is_supervisor:
-        raise TransitionError("Only supervisors can assign tickets.")
+    if actor is not None and not actor.is_administrator:
+        raise TransitionError("Only administrators can assign tickets.")
     if ticket.status not in OPEN_STATUSES:
         raise TransitionError("Only open tickets can be assigned.")
     if not assignee.is_agent:
-        raise TransitionError("Tickets can only be assigned to technicians or supervisors.")
+        raise TransitionError("Tickets can only be assigned to technicians or administrators.")
 
     with transaction.atomic():
         from_status = ticket.status
@@ -159,13 +159,13 @@ def assign(ticket, assignee, actor=None):
 
 
 def can_recategorize(ticket, user):
-    return ticket.is_open and (user.is_supervisor or (user.is_technician and ticket.assignee_id == user.pk))
+    return ticket.is_open and (user.is_administrator or (user.is_technician and ticket.assignee_id == user.pk))
 
 
 def recategorize(ticket, category, actor):
     """Change a ticket's category (e.g. correcting the AI) and route it to that category's group."""
     if not can_recategorize(ticket, actor):
-        raise TransitionError("Only a supervisor or the assigned technician can change the category.")
+        raise TransitionError("Only a administrator or the assigned technician can change the category.")
     if ticket.category_id == category.pk:
         return ticket
     with transaction.atomic():

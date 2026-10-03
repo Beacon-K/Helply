@@ -4,7 +4,7 @@ from django.core.management.base import CommandError
 
 from .people import USERS
 
-DEMO_USERNAMES = {u[0] for u in USERS}
+DEMO_USERNAMES = {u[0] for u in USERS} | {"helply-monitor"}  # + the monitoring system account
 
 
 def require_demo_allowed(action):

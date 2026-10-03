@@ -22,7 +22,7 @@ class WorkflowTests(TestCase):
         self.emp = User.objects.create_user("emp", password="x", role=User.Role.EMPLOYEE)
         self.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
         self.other_tech = User.objects.create_user("tech2", password="x", role=User.Role.TECHNICIAN)
-        self.sup = User.objects.create_user("sup", password="x", role=User.Role.SUPERVISOR)
+        self.sup = User.objects.create_user("sup", password="x", role=User.Role.ADMINISTRATOR)
         group = SupportGroup.objects.create(name="Desk")
         group.members.add(self.tech)
         self.cat = Category.objects.create(name="Hardware", default_group=group, keywords="laptop,printer")
@@ -71,7 +71,7 @@ class WorkflowTests(TestCase):
         with self.assertRaises(workflow.TransitionError):
             workflow.perform(t, "resolve", self.sup, note="skip ahead")
 
-    def test_only_supervisor_assigns(self):
+    def test_only_administrator_assigns(self):
         t = self.make(category=self.cat)
         with self.assertRaises(workflow.TransitionError):
             workflow.assign(t, self.tech, actor=self.tech)
@@ -104,7 +104,7 @@ class RecategorizeTests(TestCase):
     def setUp(self):
         self.emp = User.objects.create_user("emp", password="x")
         self.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
-        self.sup = User.objects.create_user("sup", password="x", role=User.Role.SUPERVISOR)
+        self.sup = User.objects.create_user("sup", password="x", role=User.Role.ADMINISTRATOR)
         self.group = SupportGroup.objects.create(name="Desk")
         self.group.members.add(self.tech)
         self.hw = Category.objects.create(name="Hardware", default_group=self.group, keywords="laptop,printer")
@@ -137,7 +137,7 @@ class RecategorizeTests(TestCase):
 class TicketListFilterTests(TestCase):
     def setUp(self):
         self.emp = User.objects.create_user("emp", password="x")
-        self.sup = User.objects.create_user("sup", password="x", role=User.Role.SUPERVISOR)
+        self.sup = User.objects.create_user("sup", password="x", role=User.Role.ADMINISTRATOR)
         self.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
         make = lambda title: services.create_ticket(requester=self.emp, title=title, description="d", impact=3, urgency=3)
         self.new = make("new one")

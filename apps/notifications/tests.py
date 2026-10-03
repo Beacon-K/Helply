@@ -23,7 +23,7 @@ class NotificationTestBase(TestCase):
     def setUp(self):
         self.emp = User.objects.create_user("emp", password="x", email="emp@example.com")
         self.tech = User.objects.create_user("tech", password="x", email="tech@example.com", role=User.Role.TECHNICIAN)
-        self.sup = User.objects.create_user("sup", password="x", email="sup@example.com", role=User.Role.SUPERVISOR)
+        self.sup = User.objects.create_user("sup", password="x", email="sup@example.com", role=User.Role.ADMINISTRATOR)
         group = SupportGroup.objects.create(name="Desk")
         group.members.add(self.tech)
         self.cat = Category.objects.create(name="Hardware", default_group=group, keywords="laptop,printer")
@@ -76,7 +76,7 @@ class EventRuleTests(NotificationTestBase):
         workflow.perform(t, "reopen", self.emp, note="Jammed again")
         self.assertEqual(self.kinds(self.tech)[-1], "reopened")
 
-    def test_requester_reply_goes_to_supervisors_when_unassigned(self):
+    def test_requester_reply_goes_to_administrators_when_unassigned(self):
         t = self.ticket()
         services.add_comment(t, self.emp, "Any update?")
         self.assertEqual(self.kinds(self.sup)[-1], "reply")

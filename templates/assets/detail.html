@@ -1,28 +1,31 @@
-{% extends "base.html" %}{% load helply %}
+{% extends "base.html" %}{% load helply static %}
 {% block title %}{{ asset.asset_tag }}{% endblock %}
 {% block content %}
 {% with a=asset %}
+<div hidden data-live data-live-url="{% url 'assets:detail_live' a.pk %}" data-live-version="{{ live_version }}" data-live-interval="15"></div>
 <p><a href="{% url 'assets:list' %}">← {% if user.is_agent %}Asset register{% else %}My devices{% endif %}</a></p>
 <div class="dash-head">
   <div class="asset-title">
     <span class="asset-icon big">{{ a.icon }}</span>
     <div>
       <h1>{{ a.name }}</h1>
-      <p class="muted">{{ a.asset_tag }} · {{ a.get_type_display }} · <span class="badge as-{{ a.status }}">{{ a.get_status_display }}</span></p>
+      <p class="muted">{{ a.asset_tag }} · {{ a.get_type_display }} · <span id="asset-status" data-live-region class="badge as-{{ a.status }}">{{ a.get_status_display }}</span>
+        <span class="live-badge" data-live-status aria-live="polite">Live</span></p>
     </div>
   </div>
   <div class="head-actions">
+    {% if a.server and user.is_agent %}<a class="btn" href="{{ a.server.get_absolute_url }}">☁️ Live monitoring</a>{% endif %}
     <a class="btn primary" href="{% url 'tickets:create' %}?asset={{ a.pk }}">Report a problem</a>
     {% if user.is_staff %}<a class="btn" href="{% url 'admin:assets_asset_change' a.pk %}">Edit</a>{% endif %}
   </div>
 </div>
 
-{% if a.recent_tickets >= repeat_threshold %}
+<div id="asset-alert" data-live-region>{% if a.recent_tickets >= repeat_threshold %}
 <div class="callout">↻ <b>{{ a.recent_tickets }} tickets in the last {{ repeat_window }} days.</b> Repeated problems may mean this device should be repaired properly or replaced.</div>
-{% endif %}
+{% endif %}</div>
 
 <div class="grid-detail">
-  <section class="card">
+  <section class="card" id="asset-history" data-live-region>
     <div class="panel-head">
       <h2>Ticket history</h2>
       <span class="muted small">{{ tickets|length }} ticket{{ tickets|length|pluralize }}{% if a.open_tickets %} · {{ a.open_tickets }} open{% endif %}</span>
@@ -42,23 +45,28 @@
   </section>
 
   <aside>
-    <section class="card">
+    <section class="card" id="asset-details" data-live-region>
       <h2>Details</h2>
       <dl>
         <dt>Assigned to</dt><dd>{{ a.owner|default:"Shared" }}</dd>
         <dt>Department</dt><dd>{{ a.department|default:"–" }}</dd>
+        <dt>Location</dt><dd>{{ a.location|default:"–" }}</dd>
         <dt>Serial number</dt><dd>{{ a.serial_number|default:"–" }}</dd>
-        <dt>Purchased</dt><dd>{{ a.purchase_date|date:"M j, Y"|default:"–" }}</dd>
-        <dt>Warranty</dt><dd>{{ a.warranty_expiry|date:"M j, Y"|default:"–" }}{% if a.warranty_state == "expired" or a.warranty_state == "expiring" %}<br>{% include "assets/_warranty.html" %}{% endif %}</dd>
+        <dt>Supplier</dt><dd>{{ a.supplier|default:"–" }}</dd>
+        <dt>{% if a.is_subscription %}Started{% else %}Purchased{% endif %}</dt><dd>{{ a.purchase_date|date:"M j, Y"|default:"–" }}{% if a.age_years is not None and not a.is_subscription %}<br><small class="muted">{{ a.age_years }} years old</small>{% endif %}</dd>
+        <dt>{% if a.is_subscription %}Cost per year{% else %}Purchase price{% endif %}</dt><dd>{% if a.purchase_cost %}${{ a.purchase_cost|money }} CAD{% else %}–{% endif %}</dd>
+        <dt>{% if a.is_subscription %}Renewal{% else %}Warranty{% endif %}</dt><dd>{{ a.warranty_expiry|date:"M j, Y"|default:"–" }}{% if a.warranty_state == "expired" or a.warranty_state == "expiring" %}<br>{% include "assets/_warranty.html" %}{% endif %}</dd>
       </dl>
     </section>
-    {% if a.notes and user.is_agent %}
+    <div id="asset-notes" data-live-region>{% if a.notes and user.is_agent %}
     <section class="card">
       <h2>IT notes</h2>
       <p class="pre small">{{ a.notes }}</p>
     </section>
-    {% endif %}
+    {% endif %}</div>
   </aside>
 </div>
 {% endwith %}
 {% endblock %}
+
+{% block scripts %}<script src="{% static 'js/live.js' %}?v={{ asset_version }}" defer></script>{% endblock %}

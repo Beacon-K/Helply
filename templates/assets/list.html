@@ -1,25 +1,30 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load static helply %}
 {% block title %}Assets{% endblock %}
+
+{% block scripts %}<script src="{% static 'js/live.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
 {% block content %}
+<div hidden data-live data-live-url="{% url 'assets:live' %}" data-live-version="{{ live_version }}" data-live-interval="15"></div>
 <div class="dash-head">
   <div>
     <h1>IT asset register</h1>
-    <p class="muted">{{ total }} assets · devices, network equipment and licences</p>
+    <p class="muted"><span id="asset-total" data-live-region>{{ total }} assets</span> · devices, network equipment and licences
+      <span class="live-badge" data-live-status aria-live="polite">Live</span></p>
   </div>
   {% if user.is_staff %}<a class="btn primary" href="{% url 'admin:assets_asset_add' %}">+ Add asset</a>{% endif %}
 </div>
 
-<section class="kpis">
-  <a class="kpi" href="?status=in_use"><span class="kpi-label">In use</span><span class="kpi-value">{{ kpi.in_use }}</span><span class="kpi-sub">assigned to people or rooms</span></a>
-  <a class="kpi" href="?status=in_stock"><span class="kpi-label">In stock</span><span class="kpi-value">{{ kpi.in_stock }}</span><span class="kpi-sub">available to hand out</span></a>
+<section class="kpis kpis-6" id="asset-kpis" data-live-region>
+  <a class="kpi" href="?status=in_use"><span class="kpi-label">In use</span><span class="kpi-value">{{ kpi.in_use }}</span><span class="kpi-sub">with people, rooms or in the cloud</span></a>
+  <a class="kpi" href="?status=in_stock"><span class="kpi-label">In stock</span><span class="kpi-value">{{ kpi.in_stock }}</span><span class="kpi-sub">spares ready to hand out</span></a>
   <a class="kpi {% if kpi.in_repair %}kpi-warn{% endif %}" href="?status=in_repair"><span class="kpi-label">In repair</span><span class="kpi-value">{{ kpi.in_repair }}</span><span class="kpi-sub">out of service</span></a>
-  <a class="kpi {% if kpi.expired %}kpi-danger{% endif %}" href="?status=warranty"><span class="kpi-label">Warranty expired</span><span class="kpi-value">{{ kpi.expired }}</span><span class="kpi-sub">repairs will be paid</span></a>
-  <a class="kpi {% if kpi.expiring %}kpi-warn{% endif %}" href="?status=warranty"><span class="kpi-label">Expiring ≤ 90 days</span><span class="kpi-value">{{ kpi.expiring }}</span><span class="kpi-sub">plan renewal or replacement</span></a>
+  <a class="kpi {% if kpi.expired %}kpi-danger{% elif kpi.expiring %}kpi-warn{% endif %}" href="?status=warranty"><span class="kpi-label">Warranty &amp; renewals</span><span class="kpi-value">{{ kpi.expired|add:kpi.expiring }}</span><span class="kpi-sub"><b class="t-danger">{{ kpi.expired }} expired</b> · <b class="t-warn">{{ kpi.expiring }} due ≤ 90 days</b></span></a>
+  <div class="kpi"><span class="kpi-label">Hardware value</span><span class="kpi-value">${{ kpi.hardware_value|money }}</span><span class="kpi-sub">purchase price, excl. retired</span></div>
+  <a class="kpi" href="?type=license"><span class="kpi-label">Subscriptions</span><span class="kpi-value">${{ kpi.subscriptions|money }}</span><span class="kpi-sub">per year, software &amp; cloud</span></a>
 </section>
 
 <div class="card">
   <form method="get" class="asset-toolbar">
-    <input type="search" name="q" value="{{ q }}" placeholder="Search tag, name, serial, owner or department">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search by tag, name, type, status, owner, location, supplier or serial">
     <select name="status" onchange="this.form.submit()">
       <option value="">Any status</option>
       {% for value, label in statuses %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
@@ -29,16 +34,16 @@
     <button class="btn">Search</button>
     {% if q or status_filter or type_filter %}<a class="small" href="{% url 'assets:list' %}">Clear filters</a>{% endif %}
   </form>
-  <p class="filters type-filters">
+  <p class="filters type-filters" id="asset-types" data-live-region>
     <a href="?status={{ status_filter }}&q={{ q|urlencode }}" {% if not type_filter %}class="on"{% endif %}>All types <span class="filter-count">{{ total }}</span></a>
     {% for value, label, icon, n in types %}<a href="?type={{ value }}&status={{ status_filter }}&q={{ q|urlencode }}" {% if type_filter == value %}class="on"{% endif %}>{{ icon }} {{ label }} <span class="filter-count">{{ n }}</span></a>{% endfor %}
   </p>
 
-  <div class="table-wrap">
+  <div class="table-wrap" id="asset-table" data-live-region>
   <table class="asset-table">
-    <tr><th>Asset</th><th>Status</th><th>Assigned to</th><th>Warranty</th><th>Tickets</th></tr>
+    <tr><th>Asset</th><th>Status</th><th>Assigned to</th><th>Location</th><th>Warranty / renewal</th><th>Tickets</th></tr>
     {% for a in assets %}
-    <tr>
+    <tr data-row-key="{{ a.pk }}" data-row-stamp="{{ a.updated_at|date:'U' }}-{{ a.open_tickets }}-{{ a.recent_tickets }}">
       <td>
         <a class="asset-cell" href="{{ a.get_absolute_url }}">
           <span class="asset-icon">{{ a.icon }}</span>
@@ -47,6 +52,7 @@
       </td>
       <td><span class="badge as-{{ a.status }}">{{ a.get_status_display }}</span></td>
       <td>{% if a.owner %}{{ a.owner }}<br><small class="muted">{{ a.department|default:"" }}</small>{% else %}<span class="muted">Shared</span><br><small class="muted">{{ a.department|default:"" }}</small>{% endif %}</td>
+      <td><span class="small">{{ a.location|default:"–" }}</span></td>
       <td>{% include "assets/_warranty.html" %}</td>
       <td>
         {% if a.open_tickets %}<span class="chip chip-warn">{{ a.open_tickets }} open</span>{% endif %}
@@ -55,7 +61,7 @@
       </td>
     </tr>
     {% empty %}
-    <tr><td colspan="5" class="empty">No assets match these filters.</td></tr>
+    <tr><td colspan="6" class="empty">No assets match these filters.</td></tr>
     {% endfor %}
   </table>
   </div>

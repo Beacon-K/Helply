@@ -1,6 +1,6 @@
 """Role-based dashboards: each role lands on the questions it cares about.
 
-- Supervisor: where are the problems, and how loaded is the team?
+- Administrator: where are the problems, and how loaded is the team?
 - Technician: what should I work on next?
 - Employee:   where are my tickets, and can I fix it myself?
 """
@@ -34,8 +34,8 @@ PROGRESS_STEPS = [
 @login_required
 def dashboard(request):
     user, now = request.user, timezone.now()
-    if user.is_supervisor:
-        context = supervisor_context(now)
+    if user.is_administrator:
+        context = administrator_context(now)
     elif user.is_technician:
         context = technician_context(user, now)
     else:
@@ -43,7 +43,7 @@ def dashboard(request):
     return render(request, "core/dashboard.html", context)
 
 
-def supervisor_context(now):
+def administrator_context(now):
     open_tickets = list(Ticket.objects.filter(status__in=OPEN_STATUSES).select_related("assignee", "category"))
     state = {t.pk: sla_state(t, now) for t in open_tickets}
     breached = [t for t in open_tickets if state[t.pk] == SLAState.BREACHED or t.sla_breached]

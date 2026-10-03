@@ -1,0 +1,5 @@
+<div class="fx-field{% if full %} full{% endif %}{% if f.errors %} has-error{% endif %}">
+  <label for="{{ f.id_for_label }}">{{ f.label }}{% if not f.field.required %} <span class="help">(optional)</span>{% endif %}</label>
+  {{ f }}
+  {% if f.errors %}<span class="err">{{ f.errors|join:" " }}</span>{% elif f.help_text %}<span class="help">{{ f.help_text }}</span>{% endif %}
+</div>
