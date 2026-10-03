@@ -99,3 +99,19 @@ class Asset(models.Model):
     def is_subscription(self):
         """Paid per period and renewed (software, cloud servers) rather than bought once."""
         return self.type in (self.Type.LICENSE, self.Type.CLOUD)
+
+
+class RenewalReminder(models.Model):
+    """Records that a renewal reminder was sent, so each one goes out exactly once.
+
+    Keyed on the renewal date as well: when the date moves (the subscription was renewed) the
+    next cycle starts fresh and gets its own reminders.
+    """
+
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name="renewal_reminders")
+    renewal_date = models.DateField()
+    milestone = models.PositiveSmallIntegerField(help_text="Days before renewal this reminder was for (0 = due or overdue).")
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["asset", "renewal_date", "milestone"], name="uniq_renewal_reminder")]

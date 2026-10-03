@@ -1,4 +1,4 @@
-from django.conf import settings
+﻿from django.conf import settings
 from django.db import models
 
 
@@ -18,6 +18,7 @@ class Notification(models.Model):
         SLA_BREACH = "sla_breach", "SLA breached"
         REMINDER = "reminder", "Reminder"
         MONITOR = "monitor", "Server monitoring"
+        RENEWAL = "renewal", "Renewal due"
 
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
     ticket = models.ForeignKey(

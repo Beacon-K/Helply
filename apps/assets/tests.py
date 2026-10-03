@@ -157,3 +157,61 @@ class AssetValueTests(TestCase):
         self.client.force_login(tech)
         kpi = self.client.get(reverse("assets:list")).context["kpi"]
         self.assertEqual((kpi["hardware_value"], kpi["subscriptions"]), (6500, 7200))
+
+
+class RenewalReminderTests(TestCase):
+    def setUp(self):
+        self.today = timezone.localdate()
+        self.owner = User.objects.create_user("owner", password="x", email="owner@example.com")
+        self.admin = User.objects.create_user("boss", password="x", email="boss@example.com",
+                                              role=User.Role.ADMINISTRATOR)
+        self.tech = User.objects.create_user("tech2", password="x", role=User.Role.TECHNICIAN)
+
+    def asset(self, days, **kw):
+        data = dict(asset_tag="SUB-1", name="Office 365", type="license", status="in_use", owner=self.owner,
+                    warranty_expiry=self.today + timedelta(days=days))
+        data.update(kw)
+        return Asset.objects.create(**data)
+
+    def test_milestones(self):
+        from .renewals import current_milestone
+        self.assertEqual([current_milestone(d) for d in (45, 30, 20, 14, 10, 7, 3, 0, -5, -14, -15)],
+                         [None, 30, 30, 14, 14, 7, 7, 0, 0, 0, None])
+
+    def test_reminds_owner_and_administrators_once_per_milestone(self):
+        from .renewals import send_renewal_reminders
+        from apps.notifications.models import Notification
+        self.asset(20)
+        self.assertEqual(len(send_renewal_reminders()), 1)
+        self.assertEqual(Notification.objects.filter(kind="renewal").count(), 2)  # owner + administrator
+        self.assertFalse(Notification.objects.filter(recipient=self.tech).exists())
+        self.assertEqual(send_renewal_reminders(), [])  # same day again: nothing new
+        self.assertEqual(Notification.objects.filter(kind="renewal").count(), 2)
+        self.assertEqual(len(send_renewal_reminders(today=self.today + timedelta(days=7))), 1)  # 13 days left
+
+    def test_new_renewal_date_starts_a_new_cycle(self):
+        from .renewals import send_renewal_reminders
+        asset = self.asset(5)
+        send_renewal_reminders()
+        asset.warranty_expiry = self.today + timedelta(days=360)
+        asset.save()
+        self.assertEqual(send_renewal_reminders(), [])
+        asset.warranty_expiry = self.today + timedelta(days=6)
+        asset.save()
+        self.assertEqual(len(send_renewal_reminders()), 1)  # a different date is a different cycle
+
+    def test_ignores_hardware_retired_and_far_away(self):
+        from .renewals import send_renewal_reminders
+        self.asset(5, asset_tag="LT-9", type="laptop")
+        self.asset(5, asset_tag="OLD-1", status="retired")
+        self.asset(90, asset_tag="FAR-1")
+        self.assertEqual(send_renewal_reminders(), [])
+
+    def test_cloud_server_and_email(self):
+        from django.core import mail
+        from django.core.management import call_command
+        self.asset(3, asset_tag="VPS-1", name="web-1", type="cloud")
+        with self.captureOnCommitCallbacks(execute=True):
+            call_command("renewal_reminders", stdout=__import__("io").StringIO())
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("web-1 renews in 3 days", mail.outbox[0].subject)

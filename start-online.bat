@@ -32,6 +32,14 @@ if not defined TUNNEL_TOKEN (
   exit /b 1
 )
 
+netstat -ano | findstr /r /c:"127.0.0.1:8000 .*LISTENING" >nul
+if not errorlevel 1 (
+  echo Port 8000 is already in use - probably the start-demo.bat window is still open.
+  echo Close that window first, then run this file again.
+  pause
+  exit /b 1
+)
+
 call tools\start-db.bat
 echo Preparing the demo...
 "%HELPLY_PY%" manage.py migrate --verbosity 0 || goto :failed
@@ -49,7 +57,7 @@ echo.
 echo.
 
 echo Connecting the Cloudflare tunnel...
-start "" /b "tools\cloudflared.exe" tunnel --no-autoupdate --loglevel warn run
+start "" /b "tools\cloudflared.exe" tunnel --no-autoupdate --protocol http2 --loglevel warn run
 rem Offline detection for real monitored servers (stops when this window closes).
 start "" /b "%HELPLY_PY%" manage.py monitor_check --every 30
 

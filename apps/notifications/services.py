@@ -32,7 +32,7 @@ def email_muted():
         _email_muted.reset(token)
 
 
-def notify(recipients, kind, title, *, body="", ticket=None, actor=None, email=False):
+def notify(recipients, kind, title, *, body="", ticket=None, actor=None, email=False, url=""):
     """Notify each recipient once, never the person who caused the event."""
     created = []
     seen = set()
@@ -42,7 +42,7 @@ def notify(recipients, kind, title, *, body="", ticket=None, actor=None, email=F
         seen.add(user.pk)
         note = Notification.objects.create(
             recipient=user, ticket=ticket, kind=kind, title=title, body=body,
-            url=ticket.get_absolute_url() if ticket else "",
+            url=ticket.get_absolute_url() if ticket else url,
         )
         if email and _should_email(note):
             note.emailed = True
