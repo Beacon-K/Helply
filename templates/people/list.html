@@ -1,0 +1,73 @@
+{% extends "base.html" %}{% load static helply %}
+{% block title %}People{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/people.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">Administration</p>
+      <h1 class="fx-title">People</h1>
+      <p class="fx-lede">{{ active_total }} active · {{ counts.administrator }} administrator{{ counts.administrator|pluralize }}, {{ counts.technician }} technician{{ counts.technician|pluralize }}, {{ counts.employee }} employee{{ counts.employee|pluralize }}</p>
+    </div>
+    <div class="fx-actions">
+      <a class="fx-btn fx-btn-primary" href="{% url 'people:create' %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add person</a>
+    </div>
+  </header>
+
+  {% for message in messages %}<div class="fx-callout{% if message.tags == 'error' %} is-bad{% endif %}" role="status">{{ message }}</div>{% endfor %}
+
+  <form class="fx-toolbar" method="get" role="search">
+    <label class="fx-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" value="{{ q }}" placeholder="Search name, username, email, department…" aria-label="Search people">
+    </label>
+    <input type="hidden" name="status" value="{{ status }}">{% if role %}<input type="hidden" name="role" value="{{ role }}">{% endif %}{% if dept %}<input type="hidden" name="dept" value="{{ dept }}">{% endif %}
+    <div class="fx-seg" role="group" aria-label="Filter by role">
+      <a href="?status={{ status }}&q={{ q|urlencode }}" {% if not role %}aria-current="true"{% endif %}>All</a>
+      {% for m in role_menus %}
+      <div class="fx-pop" data-pop>
+        <button type="button" class="fx-pop-btn" data-pop-btn aria-haspopup="true" aria-expanded="false" {% if role == m.value %}aria-current="true"{% endif %}>
+          {{ m.label }}{% if role == m.value and dept_name %}<span class="fx-pop-dept">· {{ dept_name }}</span>{% endif %}<span class="count">{{ m.total }}</span>
+          <svg class="fx-pop-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="fx-pop-menu" role="menu" aria-label="{{ m.label }} by department" hidden>
+          <p class="fx-pop-title">{{ m.label }} · by department</p>
+          <a role="menuitem" href="?role={{ m.value }}&status={{ status }}&q={{ q|urlencode }}" {% if role == m.value and not dept %}aria-current="true"{% endif %}><span>All departments</span><span class="n">{{ m.total }}</span></a>
+          {% for d in m.depts %}<a role="menuitem" href="?role={{ m.value }}&dept={{ d.key }}&status={{ status }}&q={{ q|urlencode }}" {% if role == m.value and dept == d.key|stringformat:"s" %}aria-current="true"{% endif %}><span>{{ d.name }}</span><span class="n">{{ d.n }}</span></a>{% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="fx-seg" role="group" aria-label="Filter by status">
+      <a href="?role={{ role }}&dept={{ dept }}&status=active&q={{ q|urlencode }}" {% if status == "active" %}aria-current="true"{% endif %}>Active</a>
+      <a href="?role={{ role }}&dept={{ dept }}&status=inactive&q={{ q|urlencode }}" {% if status == "inactive" %}aria-current="true"{% endif %}>Turned off<span class="count">{{ inactive_total }}</span></a>
+      <a href="?role={{ role }}&dept={{ dept }}&status=all&q={{ q|urlencode }}" {% if status == "all" %}aria-current="true"{% endif %}>Everyone</a>
+    </div>
+  </form>
+
+  {% if people %}
+  <div class="fx-table-wrap">
+    <table class="fx-table fx-people">
+      <thead><tr><th>Person</th><th>Role</th><th>Department</th><th>Teams</th><th class="r" title="Open tickets: assigned to them (technicians) or raised by them (employees)">Tickets</th><th>Last sign-in</th></tr></thead>
+      <tbody>
+      {% for p in people %}
+        <tr data-href="{% url 'people:edit' p.pk %}"{% if not p.is_active %} class="is-off"{% endif %}>
+          <td><a class="srv" href="{% url 'people:edit' p.pk %}"><span class="fx-avatar is-{{ p.role }}" aria-hidden="true">{{ p.first_name|slice:":1"|default:p.username|slice:":1"|upper }}{{ p.last_name|slice:":1"|upper }}</span><span><b>{{ p.get_full_name|default:p.username }}{% if not p.is_active %} <i class="fx-off">Turned off</i>{% endif %}</b><small>{{ p.email|default:p.username }}</small></span></a></td>
+          <td><span class="fx-role is-{{ p.role }}">{{ p.get_role_display }}</span></td>
+          <td>{{ p.department|default:"–" }}</td>
+          <td>{% for g in p.support_groups.all %}<span class="fx-tag">{{ g.name }}</span>{% empty %}–{% endfor %}</td>
+          <td class="r num">{% if p.is_agent %}{{ p.open_assigned }}<small class="muted" title="Open tickets assigned to them">assigned</small>{% else %}{{ p.open_requested }}<small class="muted" title="Open tickets they raised">raised</small>{% endif %}</td>
+          <td>{% if p.last_login %}{{ p.last_login|ago }}{% else %}<span class="muted">Never</span>{% endif %}</td>
+
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="fx-noresult">Nobody matches. <a class="fx-btn fx-btn-ghost" href="{% url 'people:list' %}">Clear filters</a></div>
+  {% endif %}
+</div>
+{% endblock %}

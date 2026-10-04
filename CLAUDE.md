@@ -1,6 +1,6 @@
 # Helply — 给 Claude Code 的项目说明
 
-> 每次会话开始先读本文件，再读 `docs/PROGRESS.md`（需求、进度、待办）。
+> 每次会话开始先读本文件，再读根目录的 `PROGRESS.md`（需求、进度、待办）。
 
 ## 项目是什么
 Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）：面向 **10–100 人中小企业** 的 IT 服务台 / ITSM。
@@ -28,21 +28,21 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 ## 代码结构
 | 位置 | 内容 |
 |---|---|
-| `apps/accounts` | User（角色：employee / technician / administrator）、Department、SupportGroup |
+| `apps/accounts` | User（角色：employee / technician / administrator）、Department、SupportGroup；People 页面（`views.py`、`forms.py`，仅管理员；新人用一次性链接设密码，不碰明文密码） |
 | `apps/tickets` | 工单；状态机在 `workflow.py`；ITIL 优先级矩阵在 `choices.py` |
-| `apps/sla` | SLA 策略：暂停/恢复、即将超时、已超时 |
+| `apps/sla` | SLA 策略：暂停/恢复、即将超时、已超时；`/sla/` 设置页（时间写成 `30m`、`4h`、`1d 2h`） |
 | `apps/assets` | 资产台账，`live.py` 提供实时版本号 |
 | `apps/kb` | 知识库（Markdown，数据库为准；`seed_kb` 只新增，`--overwrite` 才覆盖） |
 | `apps/ai` | 关键词基线分类器（可替换后端）、AISuggestion 反馈、准确率 |
 | `apps/notifications` | 站内铃铛 + 邮件，按「工单 + 类型」节流 |
-| `apps/monitoring` | 云服务器监控：模型、上报 API、告警转工单、`presenters.py`（页面和 JSON 数据） |
+| `apps/monitoring` | 云服务器监控：模型、上报 API、告警转工单、`presenters.py`（页面和 JSON 数据）、`geo.py`（按 IP 在本地查国家，数据库在 `data/`）、`countries.py` |
 | `apps/core` | 仪表盘、演示数据（`demo/`）、生产运维命令 |
 | `agent/` | 监控 agent（`helply_agent.py`）和 `install.sh` / `install.ps1` |
-| `templates/`, `static/css`, `static/js` | 模板、样式和脚本；监控模块用 `monitoring.css`、`fleet.js`、`fleet-detail.js` |
+| `templates/`, `static/css`, `static/js` | 模板、样式和脚本；监控模块用 `monitoring.css`、`fleet.js`、`fleet-detail.js`；白天/夜间主题是 `theme.css` + `theme.js`（颜色一律用变量，不要写死）；国旗在 `static/img/flags/` |
 
 ## 常用命令
 ```bash
-python manage.py test                     # 全部测试（目前 123 项）
+python manage.py test                     # 全部测试（目前 150 项）
 python manage.py seed_demo --reset        # 重置演示数据（生产环境下拒绝执行）
 python manage.py run_jobs --every 5       # SLA 检查、跟进、监控检查、每日备份
 python manage.py monitor_check --every 30 # 离线检测 + 指标汇总 + 清理超时未接入的占位服务器

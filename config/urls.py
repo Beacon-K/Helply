@@ -14,5 +14,7 @@ urlpatterns = [
     path("assets/", include("apps.assets.urls")),
     path("monitoring/", include("apps.monitoring.urls")),
     path("notifications/", include("apps.notifications.urls")),
+    path("people/", include("apps.accounts.urls")),
+    path("sla/", include("apps.sla.urls")),
     path("", include("apps.core.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

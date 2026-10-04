@@ -1,0 +1,152 @@
+/* Helply · People and SLA pages
+   Built on the .fx design system from monitoring.css (same tokens, so dark mode works untouched). */
+
+/* ---------- People list ---------- */
+.fx-people { min-width: 720px; }
+.fx-people td.r small { font-weight: 500; }
+.fx-avatar { display: inline-grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; font-size: .78rem; font-weight: 700;
+             letter-spacing: .02em; color: #fff; background: linear-gradient(135deg, #64748b, #94a3b8); }
+.fx-avatar.is-administrator { background: linear-gradient(135deg, #f5a623, #f97316); }
+.fx-avatar.is-technician { background: linear-gradient(135deg, #2e90fa, #7a5af8); }
+.fx-avatar.is-employee { background: linear-gradient(135deg, #12b76a, #0ea5a4); }
+.fx-role { display: inline-flex; align-items: center; height: 24px; padding: 0 .6rem; border-radius: 999px; font-size: .76rem; font-weight: 650; background: var(--off-soft); color: var(--off-ink); }
+.fx-role.is-administrator { background: var(--warn-soft); color: var(--warn-ink); }
+.fx-role.is-technician { background: var(--pend-soft); color: var(--pend-ink); }
+.fx-role.is-employee { background: var(--ok-soft); color: var(--ok-ink); }
+.fx-tag { display: inline-block; margin: 0 .25rem .2rem 0; padding: .1rem .5rem; border-radius: 6px; font-size: .76rem; background: var(--line-2); color: var(--ink-2); white-space: nowrap; }
+.fx-noresult { padding: 2.5rem 1rem; text-align: center; color: var(--mute); }
+.fx-callout.is-bad { background: var(--crit-soft); border-color: var(--crit-line); color: var(--crit-ink); }
+.fx > .fx-callout { margin-bottom: 1rem; }
+
+/* ---------- Person form ---------- */
+.fx-roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; }
+.fx-teams { display: flex; flex-wrap: wrap; gap: .5rem; }
+.fx-tagcheck { cursor: pointer; }
+.fx-tagcheck input { position: absolute; opacity: 0; pointer-events: none; }
+.fx-tagcheck span { display: inline-flex; align-items: center; height: 32px; padding: 0 .85rem; border: 1px solid var(--line-3); border-radius: 999px; font-size: .84rem; font-weight: 600;
+                    color: var(--ink-2); background: var(--surface); transition: all .15s; }
+.fx-tagcheck:hover span { border-color: var(--focus-line); }
+.fx-tagcheck input:checked + span { background: var(--navy); border-color: var(--navy); color: var(--on-navy); }
+.fx-tagcheck input:focus-visible + span { outline: 2px solid var(--focus-line); outline-offset: 2px; }
+[data-teams].is-muted { opacity: .45; pointer-events: none; }
+.fx-danger + .fx-danger { margin-top: 1rem; }
+@media (max-width: 760px) { .fx-roles { grid-template-columns: 1fr; } }
+
+/* ---------- One-time link ---------- */
+.fx-invite { max-width: 860px; margin: 1.2rem 0; padding: 1.3rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.fx-invite > label { display: block; margin-bottom: .45rem; font-size: .85rem; font-weight: 600; color: var(--ink-2); }
+.fx-invite-row { display: flex; gap: .6rem; }
+.fx-invite-row input { flex: 1; min-width: 0; height: 40px; padding: 0 .8rem; border: 1px solid var(--line-3); border-radius: 10px; background: var(--sunken); color: var(--ink);
+                       font: .82rem var(--mono); }
+.fx-invite-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1.2rem 0 0; padding-top: 1rem; border-top: 1px solid var(--line-2); }
+.fx-invite-meta dt { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.fx-invite-meta dd { margin: .2rem 0 0; font-weight: 600; overflow-wrap: anywhere; }
+@media (max-width: 640px) { .fx-invite-meta { grid-template-columns: 1fr; } .fx-invite-row { flex-direction: column; } }
+
+/* ---------- SLA policies ---------- */
+.fx-sla { max-width: 960px; display: grid; gap: 1rem; }
+.fx-sla-row { padding: 1.2rem 1.3rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); border-left-width: 4px; }
+.fx-sla-row.p-P1 { border-left-color: var(--crit); } .fx-sla-row.p-P2 { border-left-color: var(--warn); }
+.fx-sla-row.p-P3 { border-left-color: var(--pend); } .fx-sla-row.p-P4 { border-left-color: var(--off); }
+.fx-sla-row.is-off { opacity: .7; }
+.fx-sla-row > header { display: flex; align-items: center; gap: .85rem; margin-bottom: 1rem; }
+.fx-sla-row h2 { margin: 0; font-size: 1.02rem; }
+.fx-sla-row header p { margin: .1rem 0 0; font-size: .8rem; color: var(--mute); }
+.fx-prio { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; font-weight: 800; font-size: .9rem; background: var(--off-soft); color: var(--off-ink); }
+.fx-prio.is-P1 { background: var(--crit-soft); color: var(--crit-ink); } .fx-prio.is-P2 { background: var(--warn-soft); color: var(--warn-ink); }
+.fx-prio.is-P3 { background: var(--pend-soft); color: var(--pend-ink); }
+.fx-sla .fx-fields { grid-template-columns: 1.3fr 1fr 1fr; align-items: start; }
+.fx-sla .fx-check { grid-column: 1 / -1; }
+.fx-note { margin: .2rem 0 0; font-size: .84rem; color: var(--mute); }
+@media (max-width: 760px) { .fx-sla .fx-fields { grid-template-columns: 1fr; } }
+
+/* ---------- Typography (People, person form, SLA) ----------
+   The monitoring table is dense on purpose; these pages are read, so text gets more room. */
+.fx-people { font-size: .94rem; line-height: 1.45; }
+.fx-people th { white-space: nowrap; padding: .8rem .85rem; font-size: .74rem; font-weight: 700; letter-spacing: .09em; }
+.fx-people td { padding: .7rem .85rem; }
+.fx-people td, .fx-people th { vertical-align: middle; }
+.fx-people td:nth-child(2), .fx-people td:nth-child(3), .fx-people td:nth-child(5), .fx-people td:nth-child(6) { white-space: nowrap; }
+.fx-people td:nth-child(1) { min-width: 205px; }
+.fx-people td.r small { display: block; margin-top: .1rem; line-height: 1.1; }
+.fx-people tr.is-off { opacity: .62; }
+.fx-off { margin-left: .4rem; padding: .08rem .45rem; border-radius: 6px; font-style: normal; font-size: .72rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; background: var(--off-soft); color: var(--off-ink); vertical-align: 1px; }
+.fx-people .srv { gap: .85rem; }
+.fx-people .srv b { font-size: 1rem; font-weight: 600; letter-spacing: -.005em; }
+.fx-people .srv small { margin-top: .1rem; font-size: .84rem; color: var(--mute); }
+.fx-people td.r { font-variant-numeric: tabular-nums; font-weight: 650; }
+.fx-people td.r small { font-weight: 450; font-size: .8rem; }
+.fx-avatar { width: 40px; height: 40px; font-size: .86rem; }
+.fx-role { height: 28px; padding: 0 .75rem; font-size: .82rem; letter-spacing: .005em; }
+.fx-tag { padding: .2rem .6rem; font-size: .82rem; font-weight: 550; }
+.fx-people .fx-badge { height: 28px; padding: 0 .75rem; font-size: .82rem; }
+.fx > .fx-head .fx-lede { font-size: 1rem; line-height: 1.55; }
+.fx-toolbar .fx-seg a { height: 34px; padding: 0 .85rem; font-size: .88rem; font-weight: 600; }
+.fx-search input { font-size: .92rem; }
+.fx-fieldset h2 { font-size: 1.02rem; }
+.fx-fieldset > div > p, .fx-field .help { font-size: .86rem; }
+.fx-field label { font-size: .9rem; }
+.fx-field input:not([type=checkbox]), .fx-field select, .fx-field textarea { font-size: .96rem; }
+.fx-tagcheck span { height: 34px; font-size: .88rem; }
+.fx-sla-row h2 { font-size: 1.1rem; } .fx-sla-row header p { font-size: .86rem; }
+.fx-prio { font-size: .95rem; }
+.fx-invite-row input { height: 44px; font-size: .88rem; }
+.fx-danger h2 { font-size: 1.02rem; } .fx-danger p { font-size: .9rem; }
+.fx-people .num { font-feature-settings: "tnum"; }
+/* Layout and legibility fixes found by measuring the rendered pages at 1100px */
+.fx-form .fx-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }  /* 1fr alone lets long words push the page wider */
+.fx-sla .fx-fields { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 760px) { .fx-form .fx-fields, .fx-sla .fx-fields { grid-template-columns: minmax(0, 1fr); } }
+.fx-eyebrow { font-size: .78rem; }
+.fx-seg .count { font-size: .78rem; }
+.fx-invite-meta dt { font-size: .76rem; }
+.fx-people td:nth-child(4) { min-width: 120px; }
+.fx-people .srv > span:last-child { min-width: 0; }
+.fx-people .srv small { max-width: 210px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fx-people .srv b { display: block; max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fx-people { table-layout: auto; }
+.fx-people td:nth-child(1) { min-width: 0; width: 34%; }
+.fx-people .srv small { max-width: 190px; }
+.fx-people .srv b { max-width: 210px; }
+.fx-people td:nth-child(4) { min-width: 0; }
+@media (max-width: 1250px) { .fx-people th, .fx-people td { padding-left: .65rem; padding-right: .65rem; } }
+
+/* ---------- Role picker: one card per role, the whole card is the button ---------- */
+.fx-rolecard { position: relative; display: block; padding: 1rem 1.1rem 1.05rem; border: 1.5px solid var(--line-3); border-radius: 14px; cursor: pointer;
+               background: var(--surface); transition: border-color .18s, box-shadow .18s, background .18s, transform .18s; }
+.fx-rolecard:hover { border-color: var(--focus-line); transform: translateY(-1px); }
+.fx-rolecard input { position: absolute; opacity: 0; pointer-events: none; }
+.fx-rolecard b { display: block; padding-right: 2rem; font-size: 1rem; font-weight: 700; letter-spacing: -.005em; color: var(--ink); }
+.fx-rolecard p { margin: .35rem 0 0; font-size: .86rem; line-height: 1.5; color: var(--mute); }
+.fx-roletick { position: absolute; top: .9rem; right: .9rem; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+               border: 1.5px solid var(--line-3); color: transparent; transition: all .18s; }
+.fx-roletick svg { width: 13px; height: 13px; }
+.fx-rolecard:has(input:checked) { border-color: var(--navy); background: var(--pend-soft); box-shadow: 0 0 0 3px var(--focus-ring); }
+.fx-rolecard:has(input:checked) b { color: var(--navy); }
+.fx-rolecard:has(input:checked) p { color: var(--ink-2); }
+.fx-rolecard:has(input:checked) .fx-roletick { background: var(--navy); border-color: var(--navy); color: var(--on-navy); }
+.fx-rolecard:has(input:focus-visible) { outline: 2px solid var(--focus-line); outline-offset: 2px; }
+
+/* ---------- Role filter with a department dropdown ---------- */
+.fx-pop { position: relative; display: inline-flex; }
+.fx-pop-btn { cursor: pointer; }
+.fx-pop-chev { width: 14px !important; height: 14px !important; margin-left: -.1rem; color: var(--faint); transition: transform .2s; }
+.fx-pop-btn[aria-expanded="true"] .fx-pop-chev { transform: rotate(180deg); color: var(--ink); }
+.fx-pop-dept { color: var(--mute); font-weight: 600; }
+.fx-pop-menu { position: absolute; top: calc(100% + 8px); left: 0; z-index: 40; width: max-content; min-width: 250px; max-width: min(340px, calc(100vw - 2rem));
+               max-height: 360px; overflow-y: auto; padding: .4rem; background: var(--surface); border: 1px solid var(--line-3); border-radius: 14px;
+               box-shadow: 0 18px 40px -12px rgba(var(--shadow-rgb), .32), 0 2px 6px rgba(var(--shadow-rgb), .08);
+               animation: fx-pop-in .16s var(--ease); }
+.fx-pop-menu[hidden] { display: none; }
+.fx-pop:last-child .fx-pop-menu { left: auto; right: 0; }
+@keyframes fx-pop-in { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
+.fx-pop-title { margin: 0; padding: .45rem .7rem .35rem; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.fx-pop-menu a { display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; padding: .6rem .7rem; border-radius: 9px; font-size: .92rem; font-weight: 550;
+                 color: var(--ink); background-image: linear-gradient(90deg, var(--hl-a), var(--hl-b)); background-repeat: no-repeat; background-size: 0% 100%;
+                 transition: background-size .3s var(--ease), color .15s; }
+.fx-pop-menu a:hover { background-size: 100% 100%; text-decoration: none; }
+.fx-pop-menu a .n { min-width: 1.7rem; padding: .05rem .5rem; border-radius: 999px; background: var(--line-2); font-size: .8rem; font-weight: 650; text-align: center; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.fx-pop-menu a[aria-current="true"] { background-color: var(--pend-soft); color: var(--navy); font-weight: 700; }
+.fx-pop-menu a[aria-current="true"] .n { background: var(--navy); color: var(--on-navy); }
+.fx-pop-menu a + a { margin-top: 1px; }
+@media (max-width: 760px) { .fx-pop-menu { position: fixed; left: 1rem !important; right: 1rem !important; top: auto; bottom: 1rem; max-width: none; width: auto; max-height: 60vh; } }

@@ -1,0 +1,82 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}{% if person %}{{ person }}{% else %}Add person{% endif %}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/people.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <nav class="fx-crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'people:list' %}">People</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    <span aria-current="page">{% if person %}{{ person }}{% else %}Add person{% endif %}</span>
+  </nav>
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">{% if person %}Edit person{% else %}New person{% endif %}</p>
+      <h1 class="fx-title">{% if person %}{{ person.get_full_name|default:person.username }}{% else %}Add a person{% endif %}</h1>
+      <p class="fx-lede">{% if person %}{% if person.last_login %}Last signed in {{ person.last_login|timesince }} ago{% else %}Has not signed in yet{% endif %}{% else %}They get a one-time link to choose their own password. You never see or type it.{% endif %}</p>
+    </div>
+  </header>
+
+  {% for message in messages %}<div class="fx-callout{% if message.tags == 'error' %} is-bad{% endif %}" role="status">{{ message }}</div>{% endfor %}
+
+  <form method="post" class="fx-form" novalidate>{% csrf_token %}
+    {% if form.non_field_errors %}<div class="fx-callout is-bad">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+    <section class="fx-fieldset">
+      <div><h2>Who</h2><p>Shown on tickets, comments and the assignee list.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.first_name %}
+        {% include "monitoring/_field.html" with f=form.last_name %}
+        {% include "monitoring/_field.html" with f=form.email %}
+        {% include "monitoring/_field.html" with f=form.phone %}
+        {% include "monitoring/_field.html" with f=form.username %}
+        {% include "monitoring/_field.html" with f=form.department %}
+      </div>
+    </section>
+    <section class="fx-fieldset">
+      <div><h2>Access</h2><p>What they can see and do in Helply.</p></div>
+      <div class="fx-fields">
+        <div class="fx-field full{% if form.role.errors %} has-error{% endif %}">
+          <label>Role</label>
+          <div class="fx-roles" role="radiogroup" data-roles>
+            {% for radio in form.role %}
+            <label class="fx-rolecard is-{{ radio.data.value }}" for="role-{{ radio.data.value }}">
+              <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" id="role-{{ radio.data.value }}"{% if radio.data.selected %} checked{% endif %}>
+              <span class="fx-roletick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
+              <b>{{ radio.choice_label }}</b>
+              <p>{% if radio.data.value == "employee" %}Raises tickets, reads the knowledge base and sees their own devices.{% elif radio.data.value == "technician" %}Works tickets and sees assets and cloud servers.{% else %}Everything a technician does, plus People and SLA policies.{% endif %}</p>
+            </label>
+            {% endfor %}
+          </div>
+          {% if form.role.errors %}<span class="err">{{ form.role.errors|join:" " }}</span>{% endif %}
+        </div>
+        <div class="fx-field full" data-teams>
+          <label>Support teams</label>
+          <div class="fx-teams">{% for box in form.support_groups %}<label class="fx-tagcheck" for="team-{{ box.data.value }}"><input type="checkbox" name="{{ box.data.name }}" value="{{ box.data.value }}" id="team-{{ box.data.value }}"{% if box.data.selected %} checked{% endif %}><span>{{ box.choice_label }}</span></label>{% empty %}<span class="help">No support teams exist yet. Add them in Admin.</span>{% endfor %}</div>
+          <span class="help">{{ form.support_groups.help_text }}</span>
+        </div>
+        <label class="fx-check full" for="{{ form.is_active.id_for_label }}">{{ form.is_active }}
+          <span><b>{{ form.is_active.label }}</b><span>{{ form.is_active.help_text }}</span></span></label>
+      </div>
+    </section>
+    <div class="fx-form-actions">
+      <a class="fx-btn fx-btn-ghost" href="{% url 'people:list' %}">Cancel</a>
+      <button class="fx-btn fx-btn-primary">{% if person %}Save changes{% else %}Create and get setup link{% endif %}</button>
+    </div>
+  </form>
+
+  {% if person %}
+  <section class="fx-danger">
+    <div><h2>Password</h2><p>{% if person.is_active %}Makes a new one-time link that lets them choose a new password. Anything they already have stops working once they use it.{% else %}Turn the account back on first.{% endif %}</p></div>
+    {% if person.is_active %}<form method="post" action="{% url 'people:reset' person.pk %}">{% csrf_token %}<button class="fx-btn">Make password link</button></form>{% endif %}
+  </section>
+  <section class="fx-danger">
+    <div>
+      <h2>{% if person.is_active %}Turn off sign-in{% else %}Turn sign-in back on{% endif %}</h2>
+      <p>{% if is_self %}You cannot turn off your own account.{% elif not person.is_active %}They will be able to sign in again with their existing password.{% elif not can_remove %}Helply needs at least one active administrator - make someone else an administrator first.{% else %}They can no longer sign in. Tickets and history stay.{% if open_assigned %} <b>{{ open_assigned }} open ticket{{ open_assigned|pluralize }} {{ open_assigned|pluralize:"is,are" }} still assigned to them</b> - reassign {{ open_assigned|pluralize:"it,them" }} first.{% endif %}{% endif %}</p>
+    </div>
+    {% if not is_self and can_remove or not person.is_active %}<form method="post" action="{% url 'people:toggle' person.pk %}">{% csrf_token %}<button class="fx-btn {% if person.is_active %}fx-btn-danger{% else %}fx-btn-primary{% endif %}">{% if person.is_active %}Turn off sign-in{% else %}Turn on sign-in{% endif %}</button></form>{% endif %}
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}SLA policies{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/people.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">Administration</p>
+      <h1 class="fx-title">SLA policies</h1>
+      <p class="fx-lede">How quickly each priority must get a first response and be resolved. Tickets turn amber when most of the time is used and red when it runs out.</p>
+    </div>
+  </header>
+
+  {% for message in messages %}<div class="fx-callout{% if message.tags == 'error' %} is-bad{% else %} is-info{% endif %}" role="status">{{ message }}</div>{% endfor %}
+
+  <form method="post" class="fx-sla" novalidate>{% csrf_token %}
+    {% for f in forms %}
+    <section class="fx-sla-row p-{{ f.priority }}{% if not f.is_bound and f.policy and not f.policy.is_active %} is-off{% endif %}">
+      <header>
+        <span class="fx-prio is-{{ f.priority }}">{{ f.priority }}</span>
+        <div><h2>{{ f.title }}</h2>
+          <p>{% if f.open_count %}{{ f.open_count }} open ticket{{ f.open_count|pluralize }} right now{% else %}No open tickets right now{% endif %}</p></div>
+      </header>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=f.name %}
+        <div class="fx-field fx-duration{% if f.response_minutes.errors %} has-error{% endif %}">
+          <label for="{{ f.response_minutes.id_for_label }}">{{ f.response_minutes.label }}</label>
+          {{ f.response_minutes }}
+          {% if f.response_minutes.errors %}<span class="err">{{ f.response_minutes.errors|join:" " }}</span>{% else %}<span class="help" data-human="{{ f.response_minutes.id_for_label }}">e.g. 30m, 4h, 1d</span>{% endif %}
+        </div>
+        <div class="fx-field fx-duration{% if f.resolution_minutes.errors %} has-error{% endif %}">
+          <label for="{{ f.resolution_minutes.id_for_label }}">{{ f.resolution_minutes.label }}</label>
+          {{ f.resolution_minutes }}
+          {% if f.resolution_minutes.errors %}<span class="err">{{ f.resolution_minutes.errors|join:" " }}</span>{% else %}<span class="help" data-human="{{ f.resolution_minutes.id_for_label }}">e.g. 8h, 2d</span>{% endif %}
+        </div>
+        <label class="fx-check" for="{{ f.is_active.id_for_label }}">{{ f.is_active }}<span><b>{{ f.is_active.label }}</b><span>Off means tickets of this priority get no due dates.</span></span></label>
+      </div>
+    </section>
+    {% endfor %}
+    <p class="fx-note">Changes apply to tickets created from now on. Tickets that are already open keep the due dates they have.</p>
+    <div class="fx-form-actions"><button class="fx-btn fx-btn-primary">Save SLA policies</button></div>
+  </form>
+</div>
+{% endblock %}

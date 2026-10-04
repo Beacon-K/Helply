@@ -1,0 +1,38 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}{% if welcome %}Setup link{% else %}Password link{% endif %}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/people.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <nav class="fx-crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'people:list' %}">People</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    <span aria-current="page">{{ person }}</span>
+  </nav>
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">{% if welcome %}Account created{% else %}Password reset{% endif %}</p>
+      <h1 class="fx-title">{% if welcome %}{{ person }} is ready{% else %}New password link{% endif %}</h1>
+      <p class="fx-lede">{% if emailed %}We emailed this link to {{ person.email }}.{% else %}The email could not be sent - give {{ person.first_name|default:person.username }} this link yourself.{% endif %}</p>
+    </div>
+  </header>
+  <div class="fx-callout is-info">For security the link is shown only now and works once. Anyone who has it can set this person's password, so send it privately. You can make a new one at any time from their page.</div>
+  <section class="fx-invite">
+    <label for="setup-link">One-time link</label>
+    <div class="fx-invite-row">
+      <input id="setup-link" type="text" readonly value="{{ link }}" data-select-all>
+      <button type="button" class="fx-btn fx-btn-primary" data-copy-from="#setup-link">Copy</button>
+    </div>
+    <dl class="fx-invite-meta">
+      <div><dt>Username</dt><dd>{{ person.username }}</dd></div>
+      <div><dt>Role</dt><dd>{{ person.get_role_display }}</dd></div>
+      <div><dt>Email</dt><dd>{{ person.email }}</dd></div>
+    </dl>
+  </section>
+  <div class="fx-form-actions" style="border-top:0;justify-content:flex-start">
+    <a class="fx-btn" href="{% url 'people:list' %}">Back to people</a>
+    {% if welcome %}<a class="fx-btn fx-btn-ghost" href="{% url 'people:create' %}">Add another person</a>{% endif %}
+  </div>
+</div>
+{% endblock %}
