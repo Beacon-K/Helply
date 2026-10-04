@@ -1,9 +1,12 @@
 @echo off
-rem Public demo: serves Helply at https://helply.work through Cloudflare Tunnel.
+rem Serves Helply at https://helply.work through Cloudflare Tunnel.
 rem The tunnel connects OUT to Cloudflare, so no ports need to be opened and it works on any network.
 rem Needs CLOUDFLARE_TUNNEL_TOKEN (and optionally ONLINE_HOSTNAME) in .env. Public-mode settings
 rem are switched on only for this window, never for normal local runs.
-rem NOTE: refreshes the demo data (deletes ALL tickets) and gives every demo account a new random password.
+rem
+rem Starting this file never changes your data: no tickets are deleted, no passwords or people are reset.
+rem Demo data is loaded only when the database has no users at all (a brand-new install). To wipe the
+rem demo and start it over on purpose, run reset-demo.bat.
 cd /d "%~dp0"
 call tools\helply-env.bat
 
@@ -41,9 +44,10 @@ if not errorlevel 1 (
 )
 
 call tools\start-db.bat
-echo Preparing the demo...
+echo Applying database updates...
 "%HELPLY_PY%" manage.py migrate --verbosity 0 || goto :failed
-"%HELPLY_PY%" manage.py seed_demo --reset || goto :failed
+rem Only a brand-new, empty database gets demo data (public mode: each account gets its own one-time password).
+"%HELPLY_PY%" manage.py seed_demo --if-empty || goto :failed
 "%HELPLY_PY%" manage.py collectstatic --noinput --verbosity 0 || goto :failed
 
 rem Production-style settings for this session only.
@@ -52,19 +56,17 @@ set "DJANGO_DEBUG=false"
 set "HELPLY_SITE_URL=https://%HELPLY_PUBLIC_HOST%"
 for /f "delims=" %%k in ('"%HELPLY_PY%" -c "import secrets; print(secrets.token_urlsafe(50))"') do set "DJANGO_SECRET_KEY=%%k"
 
-echo.
-"%HELPLY_PY%" manage.py demo_passwords --public || goto :failed
-echo.
-
 echo Connecting the Cloudflare tunnel...
 start "" /b "tools\cloudflared.exe" tunnel --no-autoupdate --protocol http2 --loglevel warn run
-rem Offline detection for real monitored servers (stops when this window closes).
+rem Scheduled jobs: SLA checks, ticket follow-ups, renewal reminders, daily backup (stop when this window closes).
+start "" /b "%HELPLY_PY%" manage.py run_jobs --every 5
+rem Offline detection for monitored servers.
 start "" /b "%HELPLY_PY%" manage.py monitor_check --every 30
 
 echo.
 echo ================================================================
 echo   Helply is online at  https://%HELPLY_PUBLIC_HOST%
-echo   Use the passwords listed above. Close this window to go offline.
+echo   Close this window to go offline. Your data is kept.
 echo ================================================================
 echo.
 rem cloudflared runs on this computer, so trust only its X-Forwarded-Proto header (it marks HTTPS visits).
@@ -74,6 +76,6 @@ exit /b 0
 
 :failed
 echo.
-echo Could not start the public demo - see the error above.
+echo Could not start Helply - see the error above.
 pause
 exit /b 1

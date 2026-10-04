@@ -27,6 +27,7 @@
 | 服务器国家和国旗 | agent 上报时按公网 IP 在本地查国家（DB-IP country lite，CC BY 4.0，总览页底部有署名；国旗为 flag-icons，MIT）；编辑页可手动改国家，手动值不会被覆盖；内网地址不显示旗帜；只到国家，地区文字来自云厂商元数据 |
 | 人员管理（`/people/`） | 仅管理员；搜索，按角色、状态、部门筛选（点角色按钮弹出部门下拉并显示人数）；新增、编辑、关闭或恢复登录；角色卡片选择，保存后立即生效；新人收到一次性设置密码链接（页面显示一次并发邮件）；保护：不能降级或关闭自己，系统始终保留一个有效管理员；不删除用户 |
 | SLA 设置（`/sla/`） | 仅管理员；P1–P4 的名称、首次响应时间、解决时间、是否启用，一次保存；只影响新建工单，已有工单保持原到期时间 |
+| 邮件发送（Brevo）和收信转发 | **2026-10-03 已验证**：经 Brevo（`smtp-relay.brevo.com:587`）发出的测试邮件，经 Cloudflare Email Routing（3 条 MX + Catch-all 转发到管理员真实邮箱）成功收到。helply.work 的 DNS 齐全（DKIM、DMARC、品牌链接、Cloudflare 收信记录）；SMTP 配置在 `.env`（模板 `.env.example`，凭据由 Kevin 自己填）。Brevo 的「授权 IP」限制已对 SMTP 关闭。**Brevo 会自动拉黑出现过硬退信的地址**（日志 `blacklist user`），新增收件域名前先确认它能收信。SMTP key 约 2027-10-03 到期，连续 90 天不用也会失效。**不往保留的假域名发信**（`example.com/.org/.net`、`*.example/.test/.invalid/.localhost`，可用 `HELPLY_EMAIL_BLOCKED_DOMAINS` 追加）：站内通知照常，日志记一行；People 页对这类地址也不发设置密码邮件，仍显示一次性链接。详见 README「邮件发送（Brevo）」。演示账号邮箱统一为 `用户名@helply.work`，邮件通知默认关闭，只给 alice、tom、tina、sam 打开（转发后都进管理员的一个邮箱）；`demo_emails` 命令可把旧的 `@example.com` 账号改过来 |
 | 续费提醒 | 订阅和云服务器在到期前 30/14/7 天及到期当天提醒（站内 + 邮件，发给管理员和资产负责人），同一续费日期每档只发一次，由 un_jobs 触发；超期 14 天后不再提醒 |
 | 报告 | 已交过 5 页英文报告（之前会话里输出的 Word 文件，不在仓库里） |
 
@@ -52,7 +53,8 @@
 | 3 | 推送代码 | 本地已提交，**还没 push** 到 `github.com/Beacon-K/Helply`（Private） |
 | 4 | 学校服务器迁移 | 在等学校确认：能否长期运行网站、能否用 Cloudflare 隧道、机器能用多久。确认后要写开机自启的安装脚本（计划任务或 Windows 服务）和迁移步骤清单 |
 | 5 | 监控第 2 阶段剩余部分 | 费用汇总报表、访问登记（堡垒机暂缓） |
-| 6 | 可选 | 深色模式；agent 打包成 exe（Windows 上就不用装 Python）；LLM 分类后端 |
+| 6 | 邮件转工单 | 收信：用 Cloudflare Email Routing 把 `support@helply.work` 转进 Helply，解析成工单（发件人对应用户、回复邮件接到原工单）。**只列待办，还没做**；目前 Email Routing 只计划转发到个人邮箱 |
+| 7 | 可选 | agent 打包成 exe（Windows 上就不用装 Python）；LLM 分类后端 |
 
 ## 5. 做过的决定（不要轻易推翻）
 - 自己写 agent，不用 Komari，也不用 SSH 轮询。原因：只读、安全、能和工单系统集成。
@@ -74,8 +76,8 @@
 ## 7. 已知问题和注意事项
 - 新增依赖 `maxminddb`：其他机器要重新运行 `setup.bat`（或 `pip install -r requirements.txt`），否则国家识别静默不工作。
 - 公网站点的代码、模板和静态文件只在 `start-online.bat` 启动时加载，改完代码要重启它。
-- `start-online.bat` 不跑 `run_jobs`，续费提醒要手动执行 `python manage.py renewal_reminders`。
 - 本机没装 psutil，所以 `AgentTests` 会被跳过。
-- `start-online.bat` 每次启动都会重置演示工单，并给所有演示账号重新生成随机密码（密码打印在启动窗口里）；你添加的服务器会保留。
+- 演示公司现在是 **100 人**（1 管理员、3 技术员、96 员工，10 个部门；员工用户名就是名字小写，例如 `ava`、`noah`）。名单是固定写在 `apps/core/demo/people.py` 里的，每次生成结果一致。
+- **启动不再改动任何数据**（2026-10-03 起）：`start-online.bat`、`start-demo.bat`、`setup.bat` 只在数据库没有用户时才生成演示数据；人员、角色、密码、SLA、工单、资产都不会被覆盖。演示账号的初始密码只在创建时设置一次（公网模式每人随机，记在 `demo-passwords.txt`，不提交），之后归用户所有。有意重置演示用 `reset-demo.bat`（需输入 RESET）；统一换密码用 `demo_passwords --rotate`。`start-online.bat` 现在同时运行定时任务（SLA、跟进、续费提醒、备份）。
 - 在 `127.0.0.1` 上打开 Helply 时，页面生成的安装命令服务器用不了。必须通过公网地址打开，接入页面也会提示这一点。
 - Windows 下 Git 会提示换行符转换的警告，这是正常的；`.gitattributes` 规定 `*.bat` 用 CRLF、`*.sh` 和 `agent/*.py` 用 LF。

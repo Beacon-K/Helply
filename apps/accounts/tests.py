@@ -70,7 +70,7 @@ class PeopleListTests(PeopleBase):
 class PeopleCreateEditTests(PeopleBase):
     def test_create_gives_a_one_time_link_and_no_password(self):
         self.client.force_login(self.admin)
-        response = self.client.post(reverse("people:create"), self.payload())
+        response = self.client.post(reverse("people:create"), self.payload(email="nora@acme-corp.com"))
         self.assertEqual(response.status_code, 200)
         nora = User.objects.get(username="nora")
         self.assertFalse(nora.has_usable_password())
@@ -87,6 +87,13 @@ class PeopleCreateEditTests(PeopleBase):
         self.assertEqual(page.status_code, 200)
         self.assertContains(page, "Choose a password")
 
+    def test_reserved_placeholder_address_gets_no_email_but_still_a_link(self):
+        self.client.force_login(self.admin)
+        response = self.client.post(reverse("people:create"), self.payload())  # nora@example.com
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertTrue(response.context["reserved_address"])
+        self.assertContains(response, "placeholder address that cannot receive email")
+        self.assertContains(response, response.context["link"])  # the administrator can still hand it over
     def test_employee_gets_no_support_teams(self):
         self.client.force_login(self.admin)
         self.client.post(reverse("people:create"), self.payload(username="eve", email="eve@example.com", role="employee"))

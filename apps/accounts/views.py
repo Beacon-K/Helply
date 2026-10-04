@@ -13,6 +13,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
+from apps.notifications.services import email_is_blocked
 from apps.tickets.choices import OPEN_STATUSES
 
 from .decorators import role_required
@@ -95,6 +96,8 @@ def _setup_link(user):
 
 
 def _send_setup_email(user, link, welcome):
+    if email_is_blocked(user.email):  # a reserved test address: nothing could be delivered there
+        return False
     intro = "An administrator created a Helply account for you." if welcome else "An administrator reset your Helply password."
     try:
         send_mail("Set your Helply password" if welcome else "Reset your Helply password",
@@ -111,7 +114,8 @@ def _send_setup_email(user, link, welcome):
 def _show_link(request, user, welcome):
     link = _setup_link(user)
     return render(request, "people/invite.html", {
-        "person": user, "link": link, "welcome": welcome, "emailed": _send_setup_email(user, link, welcome)})
+        "person": user, "link": link, "welcome": welcome, "reserved_address": email_is_blocked(user.email),
+        "emailed": _send_setup_email(user, link, welcome)})
 
 
 @admin_only

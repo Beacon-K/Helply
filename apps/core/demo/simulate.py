@@ -18,7 +18,7 @@ from apps.tickets.models import Category, Ticket
 
 from . import people
 from .assets import ASSETS as DEMO_ASSETS
-from .passwords import demo_password
+from .passwords import initial_hash
 from .tickets import SCENARIOS
 
 
@@ -29,37 +29,54 @@ def clock(at):
         yield
 
 
-def ensure_organisation():
-    """Create or update demo departments, users, support groups, SLA policies and assets."""
+def ensure_organisation(overwrite=False):
+    """Create the demo departments, users, support groups, SLA policies and assets that are missing.
+
+    The database is the source of truth: whatever already exists - a role changed on the People page, an SLA
+    target edited by an administrator, an asset someone corrected - is left exactly as it is. Only with
+    overwrite=True (reset-demo.bat, seed_demo --overwrite) are existing demo records put back to the demo
+    values. New accounts get their password once, here (see passwords.initial_hash), and never again.
+    """
     depts = {name: Department.objects.get_or_create(name=name)[0] for name in {u[4] for u in people.USERS}}
     users = {}
     for username, first, last, role, dept, _title in people.USERS:
-        user, created = User.objects.get_or_create(username=username)
-        user.first_name, user.last_name, user.role = first, last, role
-        user.department, user.email = depts[dept], f"{username}@example.com"
-        if role == User.Role.ADMINISTRATOR:
-            user.is_staff = user.is_superuser = True
+        values = {"first_name": first, "last_name": last, "role": role, "department": depts[dept],
+                  "email": people.email_for(username)}
+        user, created = User.objects.get_or_create(username=username, defaults=values)
         if created:
-            user.set_password(demo_password())
-        user.save()
+            user.password = initial_hash(username, role)
+            user.is_staff = user.is_superuser = role == User.Role.ADMINISTRATOR
+            user.email_notifications = False  # the address has no mailbox: see people.EMAIL_DOMAIN
+            user.save()
+        elif overwrite:
+            for field, value in values.items():
+                setattr(user, field, value)
+            user.save()
         users[username] = user
 
     groups, categories = ensure_categories()
     for name, members in people.GROUP_MEMBERS.items():
-        groups[name].members.set([users[m] for m in members])
+        if overwrite or not groups[name].members.exists():  # a team someone has already staffed is left alone
+            groups[name].members.set([users[m] for m in members])
 
     for priority, name, response, resolution in SLA:
-        SLAPolicy.objects.update_or_create(
-            priority=priority, defaults={"name": name, "response_minutes": response, "resolution_minutes": resolution}
-        )
+        defaults = {"name": name, "response_minutes": response, "resolution_minutes": resolution}
+        if overwrite:
+            SLAPolicy.objects.update_or_create(priority=priority, defaults=defaults)
+        else:
+            SLAPolicy.objects.get_or_create(priority=priority, defaults=defaults)
 
     for a in DEMO_ASSETS:
-        Asset.objects.update_or_create(asset_tag=a.tag, defaults={
+        defaults = {
             "name": a.name, "type": a.type, "status": a.status, "owner": users.get(a.owner),
             "department": depts.get(a.department) or Department.objects.get_or_create(name=a.department)[0],
             "serial_number": a.serial_number, "location": a.location, "supplier": a.supplier,
             "purchase_date": a.purchased, "purchase_cost": a.cost, "warranty_expiry": a.warranty, "notes": a.notes,
-        })
+        }
+        if overwrite:
+            Asset.objects.update_or_create(asset_tag=a.tag, defaults=defaults)
+        else:
+            Asset.objects.get_or_create(asset_tag=a.tag, defaults=defaults)
     return users, categories
 
 

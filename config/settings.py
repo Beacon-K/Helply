@@ -189,6 +189,15 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Helply IT Service Desk <helpdesk@example.com>")
+# Never send email to these domains: they are reserved for documentation and testing (RFC 2606 / 6761), so
+# nothing can be delivered there, and the bounces would damage the sending domain's reputation with the mail
+# provider. A name without a leading dot blocks that domain and its subdomains; ".test" blocks the whole suffix.
+# Notifications to such addresses still appear in the app. Set HELPLY_EMAIL_BLOCKED_DOMAINS (comma separated)
+# to block more, e.g. a placeholder domain used by demo accounts; the reserved ones are always blocked.
+HELPLY_EMAIL_BLOCKED_DOMAINS = tuple(dict.fromkeys(
+    ("example.com", "example.org", "example.net", ".example", ".test", ".invalid", ".localhost")
+    + tuple(d.strip().lower() for d in os.environ.get("HELPLY_EMAIL_BLOCKED_DOMAINS", "").split(",") if d.strip())
+))
 # Used to build links in emails.
 HELPLY_SITE_URL = os.environ.get("HELPLY_SITE_URL", "http://127.0.0.1:8000").rstrip("/")
 # At most one email of the same kind per ticket per person within this window; in-app notifications are not throttled.

@@ -1,16 +1,27 @@
 """Demo account passwords - kept out of the source code.
 
-Passwords are always stored hashed in the database (Django's PBKDF2). The only
-plaintext is the shared password the demo loader gives new demo accounts, and
-that lives in the local, git-ignored .env file as HELPLY_DEMO_PASSWORD. If it
-is missing, a random one is generated and saved there on first use.
+Passwords are always stored hashed in the database (Django's PBKDF2); a hash cannot be turned back into
+the password. A demo account gets its password exactly once, when the account is created, and nothing
+resets it afterwards: after that the password belongs to the person. Only an explicit command
+(demo_passwords --rotate / --shared, or reset-demo.bat) ever changes existing demo passwords.
+
+How a new account gets its first password:
+  * Normal (local) use: the shared HELPLY_DEMO_PASSWORD from the git-ignored .env file. If it is missing,
+    a random one is generated and saved there on first use.
+  * Public site (HELPLY_PUBLIC_HOST is set): its own random password, appended to demo-passwords.txt on
+    this drive (git-ignored). The shared password must never protect accounts reachable from the internet.
 """
 import os
 import secrets
 
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 
 ENV_KEY = "HELPLY_DEMO_PASSWORD"
+LIST_HEADER = ("Helply demo accounts - first passwords, written once when each account is created.\n"
+               "People who change their own password make this file out of date for them. Keep it private; "
+               "it is not committed to git.\n\n")
+_shared = {}
 
 
 def _random_password():
@@ -29,6 +40,31 @@ def demo_password():
     return password
 
 
+def password_list():
+    return settings.BASE_DIR / "demo-passwords.txt"
+
+
+def _record(username, role, password):
+    path = password_list()
+    new = not path.exists()
+    with path.open("a", encoding="utf-8") as f:
+        if new:
+            f.write(LIST_HEADER)
+        f.write(f"{username:<12} {role:<14} {password}\n")
+
+
+def initial_hash(username, role):
+    """The password hash for a brand-new demo account (see the module docstring)."""
+    if settings.HELPLY_PUBLIC_HOST:
+        password = _random_password()
+        _record(username, role, password)
+        return make_password(password)
+    password = demo_password()
+    if _shared.get("password") != password:  # hashing is deliberately slow: do it once for all new accounts
+        _shared.update(password=password, hash=make_password(password))
+    return _shared["hash"]
+
+
 def demo_users():
     from apps.accounts.models import User
 
@@ -38,7 +74,7 @@ def demo_users():
 
 
 def reset_to_shared():
-    """Give every demo account the shared demo password again (for local demos)."""
+    """Give every demo account the shared demo password again (explicit, for local demos)."""
     password = demo_password()
     for user in demo_users():
         user.set_password(password)
@@ -47,7 +83,7 @@ def reset_to_shared():
 
 
 def randomize():
-    """Give every demo account its own random password (for demos on the public internet)."""
+    """Give every demo account its own new random password (explicit rotation). Returns [(user, password)]."""
     result = []
     for user in demo_users():
         password = _random_password()

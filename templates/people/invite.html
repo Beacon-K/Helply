@@ -14,7 +14,7 @@
     <div>
       <p class="fx-eyebrow">{% if welcome %}Account created{% else %}Password reset{% endif %}</p>
       <h1 class="fx-title">{% if welcome %}{{ person }} is ready{% else %}New password link{% endif %}</h1>
-      <p class="fx-lede">{% if emailed %}We emailed this link to {{ person.email }}.{% else %}The email could not be sent - give {{ person.first_name|default:person.username }} this link yourself.{% endif %}</p>
+      <p class="fx-lede">{% if emailed %}We emailed this link to {{ person.email }}.{% elif reserved_address %}{{ person.email }} is a placeholder address that cannot receive email, so nothing was sent - give {{ person.first_name|default:person.username }} this link yourself.{% else %}The email could not be sent - give {{ person.first_name|default:person.username }} this link yourself.{% endif %}</p>
     </div>
   </header>
   <div class="fx-callout is-info">For security the link is shown only now and works once. Anyone who has it can set this person's password, so send it privately. You can make a new one at any time from their page.</div>

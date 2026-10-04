@@ -17,6 +17,7 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
   - 仓库保持 **Private**；`.env`、`db.sqlite3*`、`tools/cloudflared*`、`backups/`、`logs/` 不提交。
   - 下载任何东西前，先说明文件名、来源和大小。
   - 监控 agent 必须**只读**，永远不接受远程命令。
+- **数据库是唯一的事实来源**：启动脚本、种子命令、迁移都不能覆盖或重置已有数据（人员、角色、密码、SLA、工单、资产）。重置只能由 Kevin 明确触发（`reset-demo.bat`）。密码只在账号创建时设置一次，之后归用户所有，不得自动重置。
 - 只在 Kevin 要求时 commit / push。提交前跑完整测试，并扫描有没有密钥。
 - 改 `.bat` 文件后确认是 **CRLF** 换行（Git Bash 里的 python 写出来是 LF，会坏掉批处理）。
 
@@ -42,14 +43,16 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 
 ## 常用命令
 ```bash
-python manage.py test                     # 全部测试（目前 150 项）
-python manage.py seed_demo --reset        # 重置演示数据（生产环境下拒绝执行）
+python manage.py test                     # 全部测试（目前 173 项）
+python manage.py seed_demo               # 只补缺少的演示数据，已有的一律不动（生产环境下拒绝执行）
+python manage.py seed_demo --reset --overwrite  # 有意重置演示：删全部工单、演示人员/SLA/资产恢复原值（或运行 reset-demo.bat）
+python manage.py demo_passwords --rotate # 有意给全部演示账号换一批随机密码
 python manage.py run_jobs --every 5       # SLA 检查、跟进、监控检查、每日备份
 python manage.py monitor_check --every 30 # 离线检测 + 指标汇总 + 清理超时未接入的占位服务器
 python manage.py init_helply              # 真实公司首次初始化
 python manage.py backup_db
 ```
-- Windows 启动脚本：`setup.bat`、`start-demo.bat`、`start-online.bat`、`start-production.bat`；Linux 用 `setup.sh` 和 `start-demo.sh`。
+- Windows 启动脚本：`setup.bat`、`start-demo.bat`、`start-online.bat`、`reset-demo.bat`（有意重置演示）、`start-production.bat`；Linux 用 `setup.sh` 和 `start-demo.sh`。
 - 每台机器用独立的虚拟环境 `.venv-%COMPUTERNAME%`，由 `tools/helply-env.bat` 选择。
 - 运行模式由环境变量 `HELPLY_ENVIRONMENT` 决定：`development` | `demo` | `production`。production 要求 `DJANGO_SECRET_KEY` 至少 40 个字符；演示数据命令在 production 下拒绝执行，在库里有非演示账号时也拒绝执行（`apps/core/demo/guard.py`）。
 - 公网模式只在设置了 `HELPLY_PUBLIC_HOST` 时开启（由启动脚本设置，**不要**写进 `.env`）。

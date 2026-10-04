@@ -43,7 +43,8 @@ if /i "%ENV_MODE%"=="production" goto :production
 call tools\start-db.bat
 echo Creating the database tables and loading demo data...
 "%HELPLY_PY%" manage.py migrate --verbosity 0 || goto :failed
-"%HELPLY_PY%" manage.py seed_demo --reset || goto :failed
+rem --if-empty: running setup again on another computer that shares this drive must never wipe existing data.
+"%HELPLY_PY%" manage.py seed_demo --if-empty || goto :failed
 echo.
 echo Setup complete. Double-click start-demo.bat to run the demo.
 pause

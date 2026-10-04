@@ -5,6 +5,9 @@ asks for it, the person has email notifications on, and they have not already
 been sent the same kind of email about the same ticket within
 HELPLY_EMAIL_THROTTLE_MINUTES. A burst of five replies produces one email, while
 different events (received, then replied, then resolved) still each get one.
+
+No email goes to a reserved test domain (HELPLY_EMAIL_BLOCKED_DOMAINS: example.com, *.test, ...): it cannot
+be delivered and the bounces would hurt the sending domain. The in-app notification is kept.
 """
 import logging
 from contextlib import contextmanager
@@ -52,9 +55,24 @@ def notify(recipients, kind, title, *, body="", ticket=None, actor=None, email=F
     return created
 
 
+def email_is_blocked(address):
+    """True for an address that must never be emailed: reserved test domains, or no usable domain at all."""
+    domain = (address or "").strip().rpartition("@")[2].lower().rstrip(".")
+    if not domain or "@" not in (address or ""):
+        return True
+    for entry in settings.HELPLY_EMAIL_BLOCKED_DOMAINS:
+        bare = entry.lstrip(".")
+        if domain == bare or domain.endswith("." + bare):
+            return True
+    return False
+
+
 def _should_email(note):
     user = note.recipient
     if _email_muted.get() or not user.email or not user.email_notifications:
+        return False
+    if email_is_blocked(user.email):
+        log.info("Not emailing notification %s: %s is a reserved test domain", note.pk, user.email.rpartition("@")[2])
         return False
     if note.ticket_id is None:
         return True

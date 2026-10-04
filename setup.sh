@@ -16,6 +16,7 @@ fi
 "$VENV/bin/python" -m pip install --quiet -r requirements.txt
 source tools/start-db.sh
 "$VENV/bin/python" manage.py migrate --verbosity 0
-"$VENV/bin/python" manage.py seed_demo --reset
+# --if-empty: running setup again on another computer that shares this drive must never wipe existing data.
+"$VENV/bin/python" manage.py seed_demo --if-empty
 echo
 echo "Setup complete. Run ./start-demo.sh to start Helply."

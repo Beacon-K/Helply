@@ -162,8 +162,8 @@ class AssetValueTests(TestCase):
 class RenewalReminderTests(TestCase):
     def setUp(self):
         self.today = timezone.localdate()
-        self.owner = User.objects.create_user("owner", password="x", email="owner@example.com")
-        self.admin = User.objects.create_user("boss", password="x", email="boss@example.com",
+        self.owner = User.objects.create_user("owner", password="x", email="owner@acme-corp.com")
+        self.admin = User.objects.create_user("boss", password="x", email="boss@acme-corp.com",
                                               role=User.Role.ADMINISTRATOR)
         self.tech = User.objects.create_user("tech2", password="x", role=User.Role.TECHNICIAN)
 
