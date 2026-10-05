@@ -66,6 +66,49 @@ class UserForm(forms.ModelForm):
         user.support_groups.set(groups or [])
 
 
+class DepartmentForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = ["name"]
+        widgets = {"name": forms.TextInput(attrs={"placeholder": "New department, e.g. Finance", "autocomplete": "off"})}
+
+    def clean_name(self):
+        name = " ".join(self.cleaned_data["name"].split())
+        if Department.objects.filter(name__iexact=name).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError(f"A department called {name} already exists.")
+        return name
+
+
+class TeamForm(forms.ModelForm):
+    """A support team: who is in it decides whose queue a category's tickets land in."""
+
+    members = forms.ModelMultipleChoiceField(
+        label="Members", required=False, widget=forms.CheckboxSelectMultiple,
+        queryset=User.objects.filter(role__in=[User.Role.TECHNICIAN, User.Role.ADMINISTRATOR], is_active=True)
+        .order_by("first_name", "username"),
+        help_text="Technicians and administrators who work this team's tickets. Employees do not work tickets.")
+
+    class Meta:
+        model = SupportGroup
+        fields = ["name", "description", "members"]
+        widgets = {"description": forms.Textarea(attrs={"rows": 3, "placeholder": "What this team looks after"})}
+        help_texts = {"description": "Shown to administrators only."}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            # people who were turned off stay in the team until someone removes them, so keep them selectable
+            current = self.instance.members.all()
+            self.fields["members"].queryset = (self.fields["members"].queryset | current).distinct().order_by("first_name", "username")
+            self.initial["members"] = list(current.values_list("pk", flat=True))
+
+    def clean_name(self):
+        name = " ".join(self.cleaned_data["name"].split())
+        if SupportGroup.objects.filter(name__iexact=name).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError(f"A team called {name} already exists.")
+        return name
+
+
 def last_admin_guard(user):
     """True when `user` is not the only active administrator (so it is safe to remove their access)."""
     return User.objects.filter(role=User.Role.ADMINISTRATOR, is_active=True).exclude(pk=user.pk).exists()

@@ -13,12 +13,12 @@ from django.utils.http import urlsafe_base64_encode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
-from apps.notifications.services import email_is_blocked
+from apps.notifications.services import deliver, email_is_blocked
 from apps.tickets.choices import OPEN_STATUSES
 
 from .decorators import role_required
-from .forms import UserForm, last_admin_guard
-from .models import User
+from .forms import DepartmentForm, TeamForm, UserForm, last_admin_guard
+from .models import Department, SupportGroup, User
 
 log = logging.getLogger(__name__)
 admin_only = role_required(User.Role.ADMINISTRATOR)
@@ -84,6 +84,99 @@ def people_list(request):
     })
 
 
+@admin_only
+def organization(request):
+    """Departments and support teams on one page: who is where, and who works which queue."""
+    departments = Department.objects.annotate(
+        people=Count("members", filter=Q(members__is_active=True), distinct=True),
+        everyone=Count("members", distinct=True)).order_by("name")
+    teams = (SupportGroup.objects.prefetch_related("members", "categories")
+             .annotate(open_tickets=Count("tickets", filter=Q(tickets__status__in=OPEN_STATUSES), distinct=True))
+             .order_by("name"))
+    unassigned = User.objects.filter(is_active=True, department__isnull=True).count()
+    return render(request, "people/organization.html", {
+        "departments": departments, "teams": teams, "no_department": unassigned,
+        "new_department": DepartmentForm(prefix="new")})
+
+
+@admin_only
+@require_POST
+def department_create(request):
+    form = DepartmentForm(request.POST, prefix="new")
+    if form.is_valid():
+        messages.success(request, f"Added the {form.save()} department.")
+    else:
+        messages.error(request, " ".join(form.errors.get("name", ["Enter a department name."])))
+    return redirect("people:organization")
+
+
+@admin_only
+@require_POST
+def department_rename(request, pk):
+    department = get_object_or_404(Department, pk=pk)
+    form = DepartmentForm(request.POST, instance=department, prefix=f"d{pk}")
+    if form.is_valid():
+        form.save()
+        messages.success(request, f"Renamed to {department}.")
+    else:
+        messages.error(request, " ".join(form.errors.get("name", ["Enter a department name."])))
+    return redirect("people:organization")
+
+
+@admin_only
+@require_POST
+def department_delete(request, pk):
+    """Only an empty department can go: deleting it would silently leave people without one."""
+    department = get_object_or_404(Department, pk=pk)
+    count = department.members.count()
+    if count:
+        messages.error(request, f"{department} still has {count} {'person' if count == 1 else 'people'}. "
+                                "Move them to another department first.")
+    else:
+        department.delete()
+        messages.success(request, f"Removed the {department} department.")
+    return redirect("people:organization")
+
+
+@admin_only
+def team_create(request):
+    form = TeamForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        team = form.save()
+        messages.success(request, f"Created the {team} team.")
+        return redirect("people:organization")
+    return render(request, "people/team_form.html", {"form": form, "team": None})
+
+
+@admin_only
+def team_edit(request, pk):
+    team = get_object_or_404(SupportGroup, pk=pk)
+    form = TeamForm(request.POST or None, instance=team)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, f"Saved the {team} team.")
+        return redirect("people:organization")
+    return render(request, "people/team_form.html", {
+        "form": form, "team": team,
+        "categories": team.categories.all(),
+        "open_tickets": team.tickets.filter(status__in=OPEN_STATUSES).count(),
+        "can_delete": not team.categories.exists()})
+
+
+@admin_only
+@require_POST
+def team_delete(request, pk):
+    """A team that still owns ticket categories cannot go: new tickets in them would have nowhere to land."""
+    team = get_object_or_404(SupportGroup, pk=pk)
+    names = ", ".join(team.categories.values_list("name", flat=True))
+    if names:
+        messages.error(request, f"{team} is the default team for: {names}. Point those categories at another team first.")
+        return redirect("people:team_edit", pk=team.pk)
+    team.delete()
+    messages.success(request, f"Removed the {team} team.")
+    return redirect("people:organization")
+
+
 def _setup_link(user):
     """A one-time link where the person chooses their own password (Django's password-reset flow)."""
     uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -95,15 +188,18 @@ def _send_setup_email(user, link, welcome):
     if email_is_blocked(user.email):  # a reserved test address: nothing could be delivered there
         return False
     intro = "An administrator created a Helply account for you." if welcome else "An administrator reset your Helply password."
-    try:
-        send_mail("Set your Helply password" if welcome else "Reset your Helply password",
-                  f"Hi {user.first_name or user.username},\n\n{intro}\nChoose your password here (the link works once "
-                  f"and expires in a few days):\n\n{link}\n\nYour username is: {user.username}\n\n--\nHelply IT Service Desk",
-                  None, [user.email])
-        return True
-    except Exception:  # a mail outage must not stop an administrator handing the link over by hand
-        log.exception("Could not email the setup link to user %s", user.pk)
-        return False
+    subject = "Set your Helply password" if welcome else "Reset your Helply password"
+    body = (f"Hi {user.first_name or user.username},\n\n{intro}\nChoose your password here (the link works once "
+            f"and expires in a few days):\n\n{link}\n\nYour username is: {user.username}\n\n--\nHelply IT Service Desk")
+
+    def send():
+        try:
+            send_mail(subject, body, None, [user.email])
+        except Exception:  # a mail outage must not stop an administrator handing the link over by hand
+            log.exception("Could not email the setup link to user %s", user.pk)
+
+    deliver(send)  # in the background: the page must appear even when the mail server is slow
+    return True
 
 
 @never_cache

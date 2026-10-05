@@ -10,6 +10,7 @@ No email goes to a reserved test domain (HELPLY_EMAIL_BLOCKED_DOMAINS: example.c
 be delivered and the bounces would hurt the sending domain. The in-app notification is kept.
 """
 import logging
+import threading
 from contextlib import contextmanager
 from contextvars import ContextVar
 from datetime import timedelta
@@ -50,7 +51,7 @@ def notify(recipients, kind, title, *, body="", ticket=None, actor=None, email=F
         if email and _should_email(note):
             note.emailed = True
             note.save(update_fields=["emailed"])
-            transaction.on_commit(lambda n=note: _send_email(n))
+            transaction.on_commit(lambda n=note: deliver(lambda: _send_email(n)))
         created.append(note)
     return created
 
@@ -98,6 +99,18 @@ def _send_email(note):
         send_mail(subject, "\n".join(lines), None, [note.recipient.email])
     except Exception:  # an email outage must never break the ticket workflow
         log.exception("Could not send notification email %s", note.pk)
+
+
+def deliver(send):
+    """Run `send` (an email-sending callable) without holding up the page.
+
+    A mail server that accepts the connection but never answers would otherwise freeze the request, and a few
+    of those use up every web thread. The in-memory test mailbox runs inline so tests can read it at once.
+    """
+    if settings.EMAIL_BACKEND.endswith("locmem.EmailBackend"):
+        send()
+        return
+    threading.Thread(target=send, daemon=True, name="helply-email").start()
 
 
 def unread_count(user):

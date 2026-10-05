@@ -15,6 +15,11 @@
     });
   });
 
+  document.querySelectorAll(".fx-rename").forEach(function (form) {  // show Rename only after the name was edited
+    var input = form.querySelector("input[type=text]"), original = input.value;
+    input.addEventListener("input", function () { form.classList.toggle("is-dirty", input.value.trim() !== original); });
+  });
+
   var roles = document.querySelector("[data-roles]"), teams = document.querySelector("[data-teams]");
   if (roles && teams) {  // employees do not work tickets, so the team picker would do nothing for them
     var sync = function () {

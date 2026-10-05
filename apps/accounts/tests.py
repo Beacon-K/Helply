@@ -318,3 +318,66 @@ class SLASettingsTests(PeopleBase):
         ticket = Ticket(priority="P3")
         services.apply_policy(ticket)
         self.assertIsNone(ticket.resolution_due_at)
+
+
+class OrganizationTests(PeopleBase):
+    def setUp(self):
+        self.client.force_login(self.admin)
+
+    def test_page_lists_departments_and_teams_for_administrators_only(self):
+        self.team.members.add(self.tech)
+        page = self.client.get(reverse("people:organization"))
+        self.assertContains(page, "Service Desk")
+        self.assertContains(page, "Tina")
+        for user in (self.tech, self.emp):
+            self.client.force_login(user)
+            self.assertEqual(self.client.get(reverse("people:organization")).status_code, 403)
+            self.assertEqual(self.client.post(reverse("people:department_create"), {"new-name": "X"}).status_code, 403)
+
+    def test_add_and_rename_department_refuse_duplicates(self):
+        self.client.post(reverse("people:department_create"), {"new-name": "  Finance  "})
+        finance = Department.objects.get(name="Finance")
+        self.client.post(reverse("people:department_create"), {"new-name": "finance"})
+        self.assertEqual(Department.objects.filter(name__iexact="finance").count(), 1)
+        self.client.post(reverse("people:department_rename", args=[finance.pk]), {f"d{finance.pk}-name": "Accounting"})
+        finance.refresh_from_db()
+        self.assertEqual(finance.name, "Accounting")
+        self.client.post(reverse("people:department_rename", args=[finance.pk]), {f"d{finance.pk}-name": "it"})
+        finance.refresh_from_db()
+        self.assertEqual(finance.name, "Accounting")
+
+    def test_only_an_empty_department_can_be_removed(self):
+        self.emp.department = self.dept
+        self.emp.save()
+        self.client.post(reverse("people:department_delete", args=[self.dept.pk]))
+        self.assertTrue(Department.objects.filter(pk=self.dept.pk).exists())
+        self.emp.department = None
+        self.emp.save()
+        self.client.post(reverse("people:department_delete", args=[self.dept.pk]))
+        self.assertFalse(Department.objects.filter(pk=self.dept.pk).exists())
+
+    def test_create_and_edit_team_with_members(self):
+        response = self.client.post(reverse("people:team_create"), {
+            "name": "Network", "description": "Wi-Fi and VPN", "members": [self.tech.pk]})
+        self.assertRedirects(response, reverse("people:organization"))
+        team = SupportGroup.objects.get(name="Network")
+        self.assertEqual(list(team.members.all()), [self.tech])
+        self.client.post(reverse("people:team_edit", args=[team.pk]), {"name": "Network", "members": [self.admin.pk]})
+        self.assertEqual(list(team.members.all()), [self.admin])
+        page = self.client.post(reverse("people:team_edit", args=[team.pk]), {"name": "service desk"})
+        self.assertContains(page, "already exists")
+
+    def test_employees_cannot_be_team_members(self):
+        page = self.client.post(reverse("people:team_create"), {"name": "Ops", "members": [self.emp.pk]})
+        self.assertEqual(page.status_code, 200)
+        self.assertFalse(SupportGroup.objects.filter(name="Ops").exists())
+
+    def test_team_that_owns_a_category_cannot_be_removed(self):
+        from apps.tickets.models import Category
+
+        Category.objects.create(name="Email", default_group=self.team)
+        self.client.post(reverse("people:team_delete", args=[self.team.pk]))
+        self.assertTrue(SupportGroup.objects.filter(pk=self.team.pk).exists())
+        Category.objects.update(default_group=None)
+        self.client.post(reverse("people:team_delete", args=[self.team.pk]))
+        self.assertFalse(SupportGroup.objects.filter(pk=self.team.pk).exists())

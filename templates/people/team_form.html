@@ -1,0 +1,63 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}{% if team %}{{ team }}{% else %}Add team{% endif %}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/people.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <nav class="fx-crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'people:organization' %}">Departments and teams</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    <span aria-current="page">{% if team %}{{ team }}{% else %}Add team{% endif %}</span>
+  </nav>
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">{% if team %}Edit team{% else %}New team{% endif %}</p>
+      <h1 class="fx-title">{% if team %}{{ team }}{% else %}Add a support team{% endif %}</h1>
+      <p class="fx-lede">{% if team %}{{ open_tickets }} open ticket{{ open_tickets|pluralize }} in this team's queue.{% else %}A team is a group of technicians who work the same kind of tickets.{% endif %}</p>
+    </div>
+  </header>
+
+  {% for message in messages %}<div class="fx-callout{% if message.tags == 'error' %} is-bad{% endif %}" role="status">{{ message }}</div>{% endfor %}
+
+  <form method="post" class="fx-form" novalidate>{% csrf_token %}
+    {% if form.non_field_errors %}<div class="fx-callout is-bad">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+    <section class="fx-fieldset">
+      <div><h2>Team</h2><p>The name appears on tickets and in the assignee list.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.name full=True %}
+        {% include "monitoring/_field.html" with f=form.description full=True %}
+      </div>
+    </section>
+    <section class="fx-fieldset">
+      <div><h2>Members</h2><p>New tickets in this team's categories go to the least busy member.</p></div>
+      <div class="fx-fields">
+        <div class="fx-field full">
+          <label>Who works these tickets</label>
+          <div class="fx-teams">{% for box in form.members %}<label class="fx-tagcheck" for="member-{{ box.data.value }}"><input type="checkbox" name="{{ box.data.name }}" value="{{ box.data.value }}" id="member-{{ box.data.value }}"{% if box.data.selected %} checked{% endif %}><span>{{ box.choice_label }}</span></label>{% empty %}<span class="help">There are no technicians yet. Add one on the People page first.</span>{% endfor %}</div>
+          <span class="help">{{ form.members.help_text }}</span>
+        </div>
+      </div>
+    </section>
+    {% if team %}
+    <section class="fx-fieldset">
+      <div><h2>Handles</h2><p>Set per category.</p></div>
+      <div class="fx-fields"><div class="fx-field full">
+        <div class="fx-teams">{% for c in categories %}<span class="fx-tag">{{ c.name }}</span>{% empty %}<span class="help">No ticket category sends tickets to this team yet.</span>{% endfor %}</div>
+      </div></div>
+    </section>
+    {% endif %}
+    <div class="fx-form-actions">
+      <a class="fx-btn fx-btn-ghost" href="{% url 'people:organization' %}">Cancel</a>
+      <button class="fx-btn fx-btn-primary">{% if team %}Save changes{% else %}Create team{% endif %}</button>
+    </div>
+  </form>
+
+  {% if team %}
+  <section class="fx-danger">
+    <div><h2>Remove team</h2><p>{% if can_delete %}Members stay in Helply; they just leave this team. Tickets keep their history but lose this team.{% else %}This team is the default for the categories above, so it cannot be removed. Point them at another team first.{% endif %}</p></div>
+    <form method="post" action="{% url 'people:team_delete' team.pk %}">{% csrf_token %}<button class="fx-btn fx-btn-danger"{% if not can_delete %} disabled{% endif %}>Remove team</button></form>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

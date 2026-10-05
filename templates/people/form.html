@@ -52,7 +52,7 @@
         </div>
         <div class="fx-field full" data-teams>
           <label>Support teams</label>
-          <div class="fx-teams">{% for box in form.support_groups %}<label class="fx-tagcheck" for="team-{{ box.data.value }}"><input type="checkbox" name="{{ box.data.name }}" value="{{ box.data.value }}" id="team-{{ box.data.value }}"{% if box.data.selected %} checked{% endif %}><span>{{ box.choice_label }}</span></label>{% empty %}<span class="help">No support teams exist yet. Add them in Admin.</span>{% endfor %}</div>
+          <div class="fx-teams">{% for box in form.support_groups %}<label class="fx-tagcheck" for="team-{{ box.data.value }}"><input type="checkbox" name="{{ box.data.name }}" value="{{ box.data.value }}" id="team-{{ box.data.value }}"{% if box.data.selected %} checked{% endif %}><span>{{ box.choice_label }}</span></label>{% empty %}<span class="help">No support teams exist yet. <a href="{% url 'people:team_create' %}">Add one</a>.</span>{% endfor %}</div>
           <span class="help">{{ form.support_groups.help_text }}</span>
         </div>
         <label class="fx-check full" for="{{ form.is_active.id_for_label }}">{{ form.is_active }}

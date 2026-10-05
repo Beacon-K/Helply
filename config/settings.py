@@ -188,6 +188,7 @@ EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "10"))  # Django waits forever by default
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Helply IT Service Desk <helpdesk@example.com>")
 # Never send email to these domains: they are reserved for documentation and testing (RFC 2606 / 6761), so
 # nothing can be delivered there, and the bounces would damage the sending domain's reputation with the mail

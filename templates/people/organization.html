@@ -1,0 +1,72 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}Departments and teams{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/people.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">Administration</p>
+      <h1 class="fx-title">Departments and teams</h1>
+      <p class="fx-lede">Departments say where people work. Support teams say who answers which tickets.</p>
+    </div>
+    <div class="fx-actions">
+      <div class="fx-seg" role="group" aria-label="Administration pages">
+        <a href="{% url 'people:list' %}">People</a>
+        <a href="{% url 'people:organization' %}" aria-current="true">Departments and teams</a>
+      </div>
+    </div>
+  </header>
+
+  {% for message in messages %}<div class="fx-callout{% if message.tags == 'error' %} is-bad{% endif %}" role="status">{{ message }}</div>{% endfor %}
+
+  <div class="fx-org">
+    <section class="fx-panel" aria-labelledby="dept-h">
+      <div class="fx-panel-head"><h2 id="dept-h">Departments</h2><span class="hint">{{ departments|length }} in total</span></div>
+      <form class="fx-inline-add" method="post" action="{% url 'people:department_create' %}">{% csrf_token %}
+        <label class="fx-sr" for="{{ new_department.name.id_for_label }}">New department</label>
+        {{ new_department.name }}
+        <button class="fx-btn fx-btn-primary">Add department</button>
+      </form>
+      <ul class="fx-rows">
+        {% for d in departments %}
+        <li class="fx-row">
+          <form class="fx-rename" method="post" action="{% url 'people:department_rename' d.pk %}">{% csrf_token %}
+            <label class="fx-sr" for="dept-{{ d.pk }}">Name of {{ d.name }}</label>
+            <input id="dept-{{ d.pk }}" type="text" name="d{{ d.pk }}-name" value="{{ d.name }}" maxlength="100" required>
+            <button class="fx-btn fx-btn-ghost" title="Save the new name">Rename</button>
+          </form>
+          <a class="fx-count" href="{% url 'people:list' %}?dept={{ d.pk }}" title="Show these people"><b>{{ d.people }}</b> {{ d.people|pluralize:"person,people" }}</a>
+          <form method="post" action="{% url 'people:department_delete' d.pk %}">{% csrf_token %}
+            <button class="fx-btn fx-btn-danger"{% if d.everyone %} disabled title="Move its {{ d.everyone }} {{ d.everyone|pluralize:'person,people' }} to another department first"{% endif %}>Remove</button>
+          </form>
+        </li>
+        {% empty %}
+        <li class="fx-empty">No departments yet. Add the first one above.</li>
+        {% endfor %}
+      </ul>
+      {% if no_department %}<p class="fx-note">{{ no_department }} active {{ no_department|pluralize:"person has,people have" }} no department.</p>{% endif %}
+    </section>
+
+    <section class="fx-panel" aria-labelledby="team-h">
+      <div class="fx-panel-head">
+        <h2 id="team-h">Support teams</h2>
+        <a class="fx-btn fx-btn-primary" href="{% url 'people:team_create' %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add team</a>
+      </div>
+      <ul class="fx-teamlist">
+        {% for t in teams %}
+        <li><a class="fx-teamcard" href="{% url 'people:team_edit' t.pk %}">
+          <span class="fx-teamhead"><b>{{ t.name }}</b><span class="fx-teamstat">{{ t.open_tickets }} open</span></span>
+          {% if t.description %}<span class="fx-teamdesc">{{ t.description }}</span>{% endif %}
+          <span class="fx-teamline"><i>Members</i>{% for m in t.members.all %}<span class="fx-tag">{{ m }}</span>{% empty %}<span class="muted">Nobody yet</span>{% endfor %}</span>
+          <span class="fx-teamline"><i>Handles</i>{% for c in t.categories.all %}<span class="fx-tag">{{ c.name }}</span>{% empty %}<span class="muted">No categories</span>{% endfor %}</span>
+        </a></li>
+        {% empty %}
+        <li class="fx-empty">No support teams yet. Without a team, tickets are not routed to anyone.</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

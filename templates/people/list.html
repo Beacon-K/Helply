@@ -12,6 +12,7 @@
       <p class="fx-lede">{{ active_total }} active · {{ counts.administrator }} administrator{{ counts.administrator|pluralize }}, {{ counts.technician }} technician{{ counts.technician|pluralize }}, {{ counts.employee }} employee{{ counts.employee|pluralize }}</p>
     </div>
     <div class="fx-actions">
+      <a class="fx-btn" href="{% url 'people:organization' %}">Departments and teams</a>
       <a class="fx-btn fx-btn-primary" href="{% url 'people:create' %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add person</a>
     </div>
   </header>
