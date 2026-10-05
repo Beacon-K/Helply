@@ -1,17 +1,32 @@
-{% extends "admin/base.html" %}{% load static %}
+{% extends "admin/base.html" %}{% load static i18n %}
 
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{# Django's own theme.js / dark_mode.css are replaced by Helply's switch, so the admin follows the same saved light/dark choice. #}
+{% block dark-mode-vars %}
+<script>/* Set the theme before the first paint so a dark-mode visitor never sees a white flash. */(function(){var t=null;try{t=localStorage.getItem("helply-theme")}catch(e){}if(t!=="light"&&t!=="dark"){t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)})();</script>
+{% endblock %}
+
+{% block extrastyle %}<link rel="stylesheet" href="{% static 'css/admin-helply.css' %}?v={{ asset_version }}">{% endblock %}
 
 {% block extrahead %}
 <link rel="icon" href="{% static 'img/brand/favicon.ico' %}" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/icon-32.png' %}">
+<script src="{% static 'js/theme.js' %}?v={{ asset_version }}" defer></script>
 {% endblock %}
 
 {% block branding %}
-<div id="site-name"><a href="{% url 'admin:index' %}"><img src="{% static 'img/brand/app-icon-256.png' %}" alt="" style="height:28px;vertical-align:middle;margin-right:8px">{{ site_header|default:_('Django administration') }}</a></div>
-{% if user.is_anonymous %}
-  {% include "admin/color_theme_toggle.html" %}
-{% endif %}
+<div id="site-name"><a href="{% url 'admin:index' %}"><img src="{% static 'img/brand/app-icon-256.png' %}" alt=""><span>Helply</span><em>Admin</em></a></div>
+{% if user.is_anonymous %}{% include "admin/helply_theme_toggle.html" %}{% endif %}
+{% endblock %}
+
+{% block welcome-msg %}<span class="hl-who">{% firstof user.get_full_name user.get_username %}</span>{% endblock %}
+
+{% block userlinks %}
+  <a href="{{ site_url|default:'/' }}">Back to Helply</a>
+  {% if user.has_usable_password %}<a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a>{% endif %}
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit">{% translate 'Log out' %}</button></form>
+  {% include "admin/helply_theme_toggle.html" %}
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
