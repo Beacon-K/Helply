@@ -195,6 +195,20 @@ class AlertTests(MonitoringBase):
         alert.refresh_from_db()
         self.assertFalse(alert.is_open)
 
+    def test_offline_emails_the_configured_contact(self):
+        from django.core import mail
+
+        self.admin.email = "alice@helply.work"
+        self.admin.save()
+        self.push(report())
+        Server.objects.filter(pk=self.server.pk).update(last_seen_at=timezone.now() - timedelta(minutes=10))
+        with self.captureOnCommitCallbacks(execute=True):
+            alerts.check_offline()
+        sent = [m for m in mail.outbox if m.to == ["alice@helply.work"]]
+        self.assertEqual(len(sent), 1)
+        self.assertIn("offline", sent[0].subject.lower())
+        self.assertIn(Alert.objects.get().ticket.reference, sent[0].subject)
+
     def test_problem_coming_back_reuses_the_open_ticket(self):
         self.push(report(disk=93))
         first = Alert.objects.get().ticket

@@ -169,6 +169,12 @@ def _ticket_for(alert):
     if previous and previous.ticket.is_open:
         TicketEvent.objects.create(ticket=previous.ticket, kind=TicketEvent.Kind.MONITOR,
                                    note=f"The problem came back: {alert.message}.")
+        if alert.rule == Alert.Rule.OFFLINE:
+            from apps.notifications.models import Notification
+            from apps.notifications.services import notify
+
+            notify(_offline_contacts(), Notification.Kind.MONITOR, f"Server offline again: {alert.server.name}",
+                   ticket=previous.ticket, body=alert.message, email=True)
         return previous.ticket
     return _create_ticket(alert)
 
@@ -208,13 +214,29 @@ def _create_ticket(alert):
     else:
         ai.auto_assign(ticket)
     ticket.refresh_from_db()
+    offline = alert.rule == Alert.Rule.OFFLINE
     if ticket.assignee_id is None:
-        notify(events._administrators(), Notification.Kind.MONITOR, f"Server alert needs an owner: {server.name}",
+        # one call for everyone so a person who is both an administrator and an offline contact gets one notice
+        recipients = list(events._administrators()) + (_offline_contacts() if offline else [])
+        notify(recipients, Notification.Kind.MONITOR, f"Server alert needs an owner: {server.name}",
                ticket=ticket, body=alert.message, email=True)
-    elif alert.rule == Alert.Rule.OFFLINE and server.criticality == Server.Criticality.HIGH:
-        notify(events._administrators(), Notification.Kind.MONITOR, f"Critical server offline: {server.name}",
-               ticket=ticket, body=alert.message)
+    elif offline:
+        critical = server.criticality == Server.Criticality.HIGH
+        recipients = (list(events._administrators()) if critical else []) + _offline_contacts()
+        notify(recipients, Notification.Kind.MONITOR,
+               f"Critical server offline: {server.name}" if critical else f"Server offline: {server.name}",
+               ticket=ticket, body=alert.message, email=True)
     return ticket
+
+
+def _offline_contacts():
+    """Active users who must be emailed when a server goes offline (HELPLY_MONITOR_OFFLINE_EMAILS)."""
+    from apps.accounts.models import User
+
+    emails = [e.lower() for e in settings.HELPLY_MONITOR_OFFLINE_EMAILS]
+    if not emails:
+        return []
+    return [u for u in User.objects.filter(is_active=True) if (u.email or "").lower() in emails]
 
 
 def _description(alert):

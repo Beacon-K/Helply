@@ -238,6 +238,9 @@ HELPLY_BACKUP_KEEP = int(os.environ.get("HELPLY_BACKUP_KEEP", "14"))
 # Cloud server monitoring (apps.monitoring). The agent reports about every 10 seconds.
 HELPLY_MONITOR_OFFLINE_SECONDS = int(os.environ.get("HELPLY_MONITOR_OFFLINE_SECONDS", "60"))  # card turns grey
 HELPLY_MONITOR_ALERT_OFFLINE_SECONDS = int(os.environ.get("HELPLY_MONITOR_ALERT_OFFLINE_SECONDS", "120"))  # ticket
+# Who is emailed (besides the ticket assignee's normal notices) when a server goes offline; must match a user's email.
+HELPLY_MONITOR_OFFLINE_EMAILS = tuple(
+    e.strip() for e in os.environ.get("HELPLY_MONITOR_OFFLINE_EMAILS", "alice@helply.work").split(",") if e.strip())
 HELPLY_MONITOR_CPU_PERCENT = float(os.environ.get("HELPLY_MONITOR_CPU_PERCENT", "90"))
 HELPLY_MONITOR_MEM_PERCENT = float(os.environ.get("HELPLY_MONITOR_MEM_PERCENT", "90"))
 HELPLY_MONITOR_DISK_PERCENT = float(os.environ.get("HELPLY_MONITOR_DISK_PERCENT", "90"))

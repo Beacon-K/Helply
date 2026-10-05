@@ -43,7 +43,7 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 
 ## 常用命令
 ```bash
-python manage.py test                     # 全部测试（目前 191 项）
+python manage.py test                     # 全部测试（目前 192 项）
 python manage.py seed_demo               # 只补缺少的演示数据，已有的一律不动（生产环境下拒绝执行）
 python manage.py seed_demo --reset --overwrite  # 有意重置演示：删全部工单、演示人员/SLA/资产恢复原值（或运行 reset-demo.bat）
 python manage.py demo_passwords --rotate # 有意给全部演示账号换一批随机密码
