@@ -1,9 +1,14 @@
 {% load helply %}
-<section class="kpis">
+<section class="kpis kpis-6">
   <a class="kpi" href="{% url 'tickets:list' %}?status=open">
     <span class="kpi-label">Open tickets</span>
     <span class="kpi-value">{{ kpi.open }}</span>
     <span class="kpi-sub">{{ kpi.not_started }} not started · {{ kpi.on_hold }} on hold</span>
+  </a>
+  <a class="kpi {% if kpi.unassigned %}kpi-warn{% endif %}" href="{% url 'tickets:list' %}?status=open&assignee=none">
+    <span class="kpi-label">Unassigned</span>
+    <span class="kpi-value">{{ kpi.unassigned }}</span>
+    <span class="kpi-sub">{% if kpi.unassigned %}waiting for a technician{% else %}everything has an owner{% endif %}</span>
   </a>
   <div class="kpi {% if kpi.breached %}kpi-danger{% elif kpi.at_risk %}kpi-warn{% endif %}">
     <span class="kpi-label">SLA risk</span>
@@ -64,6 +69,11 @@
 
     <section class="card">
       <h2>Team workload</h2>
+      <a class="bar-row" href="{% url 'tickets:list' %}?status=open&assignee=none">
+        <span class="bar-label {% if unassigned.count %}t-warn{% endif %}">Unassigned</span>
+        <span class="bar"><span class="bar-fill {% if unassigned.count %}bar-warn{% endif %}" style="width: {{ unassigned.count|percent_of:workload_max }}%"></span></span>
+        <span class="bar-value">{{ unassigned.count }}</span>
+      </a>
       {% for tech, n, risky in workload %}
         <div class="bar-row">
           <span class="bar-label">{{ tech.first_name }}</span>
@@ -74,4 +84,11 @@
       <p class="muted small">Open tickets per technician · ⚠ at risk or breached</p>
     </section>
   </div>
+</div>
+
+<h2 class="ov-title">Company overview</h2>
+<div class="ov-grid">
+  {% include "core/_ov_servers.html" %}
+  {% include "core/_ov_people.html" %}
+  {% include "core/_ov_renewals.html" %}
 </div>

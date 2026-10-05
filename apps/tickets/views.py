@@ -24,13 +24,19 @@ def ticket_list(request):
     else:
         current, tickets = DEFAULT_LIST_FILTER, visible.filter(status__in=LIST_FILTERS[DEFAULT_LIST_FILTER][1])
 
+    # ?assignee=none: only tickets no technician has picked up (the dashboard's "Unassigned" link). Agents only.
+    unassigned_only = request.GET.get("assignee") == "none" and request.user.is_agent
+    if unassigned_only:
+        tickets = tickets.filter(assignee__isnull=True)
+
     per_status = dict(visible.order_by().values_list("status").annotate(n=Count("pk", distinct=True)))
     filters = [
         (key, label, sum(per_status.get(s, 0) for s in statuses))
         for key, (label, statuses) in LIST_FILTERS.items()
     ]
     rows = [(t, sla_state(t)) for t in tickets[:200]]
-    return render(request, "tickets/list.html", {"rows": rows, "filters": filters, "current": current})
+    return render(request, "tickets/list.html", {"rows": rows, "filters": filters, "current": current,
+                                                 "unassigned_only": unassigned_only})
 
 
 @login_required

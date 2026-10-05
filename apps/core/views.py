@@ -19,6 +19,8 @@ from apps.sla.services import SLAState, sla_state
 from apps.tickets.choices import LIST_FILTERS, OPEN_STATUSES, Status
 from apps.tickets.models import Satisfaction, Ticket
 
+from . import overview
+
 # Most urgent first when sorting a queue.
 URGENCY = {SLAState.BREACHED: 0, SLAState.AT_RISK: 1, SLAState.OK: 2, SLAState.NONE: 3, SLAState.PAUSED: 4}
 
@@ -35,7 +37,7 @@ PROGRESS_STEPS = [
 def dashboard(request):
     user, now = request.user, timezone.now()
     if user.is_administrator:
-        context = administrator_context(now)
+        context = administrator_context(user, now)
     elif user.is_technician:
         context = technician_context(user, now)
     else:
@@ -43,7 +45,7 @@ def dashboard(request):
     return render(request, "core/dashboard.html", context)
 
 
-def administrator_context(now):
+def administrator_context(user, now):
     open_tickets = list(Ticket.objects.filter(status__in=OPEN_STATUSES).select_related("assignee", "category"))
     state = {t.pk: sla_state(t, now) for t in open_tickets}
     breached = [t for t in open_tickets if state[t.pk] == SLAState.BREACHED or t.sla_breached]
@@ -93,13 +95,18 @@ def administrator_context(now):
             "ai_accuracy": ai_accuracy(),
             "ai_reviewed": reviewed.count(),
             "ai_auto": AISuggestion.objects.filter(kind=AISuggestion.Kind.CLASSIFY, applied=True).count(),
+            "unassigned": len(unassigned),
         },
         "attention": attention[:8],
         "attention_more": max(0, len(attention) - 8),
         "stages": stages,
         "stage_max": max([n for *_, n in stages] + [1]),
         "workload": workload,
-        "workload_max": max([n for _, n, _ in workload] + [1]),
+        "workload_max": max([n for _, n, _ in workload] + [len(unassigned), 1]),
+        "unassigned": overview.unassigned_tickets(user),
+        "servers": overview.server_health(),
+        "people": overview.people_overview(),
+        "renewals": overview.renewals_and_assets(),
     }
 
 
@@ -110,9 +117,11 @@ def technician_context(user, now):
     rows.sort(key=lambda r: (URGENCY.get(r[1], 9), r[0].resolution_due_at or far_future))
     week = now - timedelta(days=7)
     my_csat = Satisfaction.objects.filter(ticket__assignee=user).aggregate(avg=Avg("rating"))["avg"]
+    unassigned = overview.unassigned_tickets(user)
     return {
         "kpi": {
             "open": len(rows),
+            "unassigned": unassigned["count"],
             "urgent": sum(s in (SLAState.AT_RISK, SLAState.BREACHED) for _, s in rows),
             "on_hold": sum(t.status == Status.ON_HOLD for t in mine),
             "resolved_7d": Ticket.objects.filter(assignee=user, resolved_at__gte=week).count(),
@@ -120,6 +129,9 @@ def technician_context(user, now):
         },
         "queue": rows,
         "awaiting": Ticket.objects.filter(assignee=user, status=Status.RESOLVED).select_related("requester"),
+        "unassigned": unassigned,
+        "servers": overview.server_health(),
+        "renewals": overview.renewals_and_assets(),
     }
 
 

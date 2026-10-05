@@ -32,34 +32,30 @@ def _with_counts(queryset):
     )
 
 
-def _role_menus(everyone, status):
-    """For each role: how many people it has and how they split across departments (for the dropdown).
+def _department_menu(everyone, status):
+    """How many people each department has, whatever their role (for the Department dropdown).
 
-    Counts follow the Active / Turned off / Everyone switch, so a number always matches the list it opens.
+    Every department with people appears, IT included even though it holds technicians and an administrator
+    rather than employees. Counts follow the Active / Turned off switch, so a number always matches the list it opens.
     """
     base = everyone
     if status == "active":
         base = base.filter(is_active=True)
     elif status == "inactive":
         base = base.filter(is_active=False)
-    rows = base.values("role", "department_id", "department__name").annotate(n=Count("pk"))
-    by_role = {value: {"value": value, "label": label, "total": 0, "depts": []} for value, label in User.Role.choices}
-    for row in rows:
-        menu = by_role[row["role"]]
-        menu["total"] += row["n"]
-        menu["depts"].append({"key": row["department_id"] or "none", "name": row["department__name"] or "No department",
-                              "n": row["n"]})
-    for menu in by_role.values():
-        menu["depts"].sort(key=lambda d: (d["key"] == "none", d["name"].lower()))
-    return list(by_role.values())
+    rows = base.values("department_id", "department__name").annotate(n=Count("pk"))
+    depts = [{"key": row["department_id"] or "none", "name": row["department__name"] or "No department", "n": row["n"]}
+             for row in rows]
+    depts.sort(key=lambda d: (d["key"] == "none", d["name"].lower()))  # "No department" always last
+    return {"total": sum(d["n"] for d in depts), "depts": depts}
 
 
 @admin_only
 def people_list(request):
     role = request.GET.get("role", "")
-    status = request.GET.get("status", "active")
+    status = "inactive" if request.GET.get("status") == "inactive" else "active"  # only these two views exist
     query = request.GET.get("q", "").strip()
-    dept = request.GET.get("dept", "") if role in User.Role.values else ""
+    dept = request.GET.get("dept", "")
     everyone = User.objects.all()
     people = _with_counts(everyone.select_related("department").prefetch_related("support_groups"))
     if role in User.Role.values:
@@ -78,11 +74,11 @@ def people_list(request):
         people = people.filter(Q(first_name__icontains=word) | Q(last_name__icontains=word) | Q(username__icontains=word)
                                | Q(email__icontains=word) | Q(department__name__icontains=word))
     counts = {r: everyone.filter(role=r, is_active=True).count() for r in User.Role.values}
-    menus = _role_menus(everyone, status)
+    menu = _department_menu(everyone, status)
     return render(request, "people/list.html", {
         "people": people.order_by("-is_active", "first_name", "username"), "q": query, "role": role, "status": status,
-        "dept": dept, "role_menus": menus,
-        "dept_name": next((d["name"] for m in menus for d in m["depts"] if str(d["key"]) == dept and m["value"] == role), ""),
+        "dept": dept, "dept_menu": menu,
+        "dept_name": next((d["name"] for d in menu["depts"] if str(d["key"]) == dept), ""),
         "roles": User.Role.choices, "counts": counts, "active_total": sum(counts.values()),
         "inactive_total": everyone.filter(is_active=False).count(),
     })

@@ -266,3 +266,33 @@ tr.just-updated td, .just-updated { animation: row-flash 4s ease-out; }
 .kpis-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 @media (max-width: 1200px) { .kpis-6 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .kpis-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- Dashboard: company overview ---------- */
+.ov-title { margin: 1.6rem 0 .8rem; font-size: 1.05rem; }
+.ov-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+.ov-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .ov-grid, .ov-grid-2 { grid-template-columns: minmax(0, 1fr); } }
+.ov-card { margin-bottom: 0; }
+.dot { display: inline-block; flex-shrink: 0; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+.dot-healthy { background: var(--ok); } .dot-warning { background: var(--warn); } .dot-critical { background: var(--danger); }
+.dot-offline { background: var(--stage-idle); } .dot-pending { background: var(--primary); }
+.dot-role-administrator { background: var(--brand-orange); } .dot-role-technician { background: var(--primary); } .dot-role-employee { background: var(--ok); }
+.seg-bar { display: flex; height: 10px; margin: .2rem 0 .7rem; border-radius: 999px; overflow: hidden; background: var(--soft); gap: 2px; }
+.seg { display: block; min-width: 4px; height: 100%; }
+.seg-healthy { background: var(--ok); } .seg-warning { background: var(--warn); } .seg-offline { background: var(--stage-idle); } .seg-pending { background: var(--primary); }
+.ov-legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: 0 0 .9rem; font-size: .84rem; color: var(--muted); }
+.ov-legend span { display: inline-flex; align-items: center; gap: .4rem; }
+.ov-legend b { color: var(--text); font-variant-numeric: tabular-nums; }
+.ov-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; margin: .2rem 0 .9rem; padding: .75rem 0; border-block: 1px solid var(--line); }
+.ov-stats div { display: flex; flex-direction: column; min-width: 0; }
+.ov-stats b { font-size: 1.35rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.ov-stats span { font-size: .76rem; color: var(--muted); }
+.ov-big { display: flex; align-items: baseline; gap: .6rem; margin-bottom: .5rem; }
+.ov-big b { font-size: 2.2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ov-big span { color: var(--muted); font-size: .88rem; }
+.ov-flag { width: 16px; height: 12px; border-radius: 2px; vertical-align: -1px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .15); }
+.chip-ok { background: var(--green-bg); color: var(--ok); font-weight: 600; }
+.bar-fill.bar-warn { background: var(--warn); }
+.bar-row .bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card .attn-row + .ov-stats { margin-top: .6rem; }
+.ov-card .bar-row { grid-template-columns: 8.4rem minmax(0, 1fr) 2.2rem; }  /* long department names ("Customer Service") fit */

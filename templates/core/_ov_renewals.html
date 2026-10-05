@@ -1,0 +1,23 @@
+<section class="card ov-card">
+  <div class="panel-head">
+    <h2>Renewals &amp; assets</h2>
+    <a class="small" href="{% url 'assets:list' %}">Asset register →</a>
+  </div>
+  {% for r in renewals.due %}
+    <a class="attn-row" href="{{ r.asset.get_absolute_url }}">
+      <span class="attn-main">
+        <span class="attn-title">{{ r.asset.name }}</span>
+        <span class="attn-meta">{{ r.asset.asset_tag }} · {{ r.asset.warranty_expiry|date:"M j, Y" }}</span>
+      </span>
+      <span class="chip {% if r.overdue %}chip-danger{% elif r.days <= 7 %}chip-warn{% endif %}">{{ r.text }}</span>
+    </a>
+  {% empty %}
+    <p class="empty">No subscription renews in the next 30 days.</p>
+  {% endfor %}
+  {% if renewals.due_more %}<p class="muted small">+ {{ renewals.due_more }} more renewing soon</p>{% endif %}
+  <div class="ov-stats">
+    <div><b>{{ renewals.assets_total }}</b><span>assets in the register</span></div>
+    <div><b class="{% if renewals.warranty_expired %}t-warn{% endif %}">{{ renewals.warranty_expired }}</b><span>warranties expired</span></div>
+    <div><b class="{% if renewals.in_repair %}t-warn{% endif %}">{{ renewals.in_repair }}</b><span>in repair</span></div>
+  </div>
+</section>

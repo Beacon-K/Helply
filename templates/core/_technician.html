@@ -1,10 +1,15 @@
 {% load helply %}
-<section class="kpis kpis-4">
+<section class="kpis">
   <div class="kpi">
     <span class="kpi-label">My open tickets</span>
     <span class="kpi-value">{{ kpi.open }}</span>
     <span class="kpi-sub">{{ kpi.on_hold }} on hold</span>
   </div>
+  <a class="kpi {% if kpi.unassigned %}kpi-warn{% endif %}" href="{% url 'tickets:list' %}?status=open&assignee=none">
+    <span class="kpi-label">Unassigned</span>
+    <span class="kpi-value">{{ kpi.unassigned }}</span>
+    <span class="kpi-sub">{% if kpi.unassigned %}up for grabs{% else %}everything has an owner{% endif %}</span>
+  </a>
   <div class="kpi {% if kpi.urgent %}kpi-warn{% endif %}">
     <span class="kpi-label">Urgent</span>
     <span class="kpi-value">{{ kpi.urgent }}</span>
@@ -56,3 +61,11 @@
   {% endfor %}
 </section>
 {% endif %}
+
+{% include "core/_ov_unassigned.html" %}
+
+<h2 class="ov-title">Overview</h2>
+<div class="ov-grid ov-grid-2">
+  {% include "core/_ov_servers.html" %}
+  {% include "core/_ov_renewals.html" %}
+</div>

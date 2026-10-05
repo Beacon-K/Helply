@@ -1,0 +1,24 @@
+{% load helply %}
+<section class="card ov-card">
+  <div class="panel-head">
+    <h2>People</h2>
+    <a class="small" href="{% url 'people:list' %}">Manage →</a>
+  </div>
+  <div class="ov-big">
+    <b>{{ people.total }}</b><span>active people in {{ people.dept_total }} department{{ people.dept_total|pluralize }}</span>
+  </div>
+  <p class="ov-legend">
+    <span><i class="dot dot-role-administrator"></i>Administrators <b>{{ people.roles.administrator }}</b></span>
+    <span><i class="dot dot-role-technician"></i>Technicians <b>{{ people.roles.technician }}</b></span>
+    <span><i class="dot dot-role-employee"></i>Employees <b>{{ people.roles.employee }}</b></span>
+  </p>
+  {% for d in people.departments %}
+    <a class="bar-row" href="{% url 'people:list' %}?dept={{ d.key }}">
+      <span class="bar-label">{{ d.name }}</span>
+      <span class="bar"><span class="bar-fill" style="width: {{ d.n|percent_of:people.dept_max }}%"></span></span>
+      <span class="bar-value">{{ d.n }}</span>
+    </a>
+  {% endfor %}
+  {% if people.dept_more %}<p class="muted small">+ {{ people.dept_more }} more department{{ people.dept_more|pluralize }}</p>{% endif %}
+  {% if people.turned_off %}<p class="muted small"><a href="{% url 'people:list' %}?status=inactive">{{ people.turned_off }} account{{ people.turned_off|pluralize }} turned off</a></p>{% endif %}
+</section>

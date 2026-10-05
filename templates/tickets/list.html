@@ -8,6 +8,7 @@
 <p class="filters">
   {% for key, label, count in filters %}<a href="?status={{ key }}" {% if current == key %}class="on"{% endif %}>{{ label }} <span class="filter-count">{{ count }}</span></a>{% endfor %}
 </p>
+{% if unassigned_only %}<p class="muted small">Showing tickets no technician has picked up yet · <a href="?status={{ current }}">show all</a></p>{% endif %}
 <div class="card table-wrap">
 <table>
   <tr><th>Ref</th><th>Title</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>SLA</th><th>Created</th></tr>

@@ -61,7 +61,7 @@ class PeopleListTests(PeopleBase):
         names = lambda **q: sorted(p.username for p in self.client.get(reverse("people:list"), q).context["people"])
         self.assertEqual(names(), ["alice", "emma", "tina"])  # active people by default
         self.assertEqual(names(status="inactive"), ["gone"])
-        self.assertEqual(len(names(status="all")), 4)
+        self.assertEqual(names(status="all"), names())  # there is no "everyone" view: unknown values mean Active
         self.assertEqual(names(role="technician"), ["tina"])
         self.assertEqual(names(q="emma@example"), ["emma"])
         self.assertEqual(names(q="nobody"), [])
@@ -215,46 +215,62 @@ class RolePickerTests(PeopleBase):
         self.assertEqual(self.client.get(reverse("people:list")).status_code, 200)
 
 class DepartmentDropdownTests(PeopleBase):
-    """Each role button lists its departments with head counts, and picking one filters the list."""
+    """The Department dropdown lists every department with its head count (any role), and picking one filters the list."""
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         cls.sales = Department.objects.create(name="Sales")
+        User.objects.filter(username__in=["alice", "tina"]).update(department=cls.dept)  # IT: an administrator and a technician
         for i, dept in enumerate([cls.sales, cls.sales, cls.dept, None]):
             User.objects.create_user(f"extra{i}", password="x", first_name=f"Extra{i}", email=f"x{i}@example.com", department=dept)
         User.objects.create_user("off", password="x", first_name="Off", email="off@example.com", department=cls.sales, is_active=False)
 
-    def menu(self, response, role):
-        return next(m for m in response.context["role_menus"] if m["value"] == role)
-
-    def test_counts_per_role_and_department(self):
+    def test_counts_per_department_count_everyone_not_just_employees(self):
         self.client.force_login(self.admin)
-        employees = self.menu(self.client.get(reverse("people:list")), "employee")
-        self.assertEqual(employees["total"], 5)  # Emma + four extras; the turned-off one is not counted
-        counts = {d["name"]: d["n"] for d in employees["depts"]}
-        self.assertEqual(counts, {"IT": 1, "Sales": 2, "No department": 2})
-        self.assertEqual(employees["depts"][-1]["name"], "No department")  # always last
-        inactive = self.menu(self.client.get(reverse("people:list"), {"status": "inactive"}), "employee")
+        menu = self.client.get(reverse("people:list")).context["dept_menu"]
+        counts = {d["name"]: d["n"] for d in menu["depts"]}
+        # IT holds an administrator, a technician and one employee: it must be listed, and counted in full.
+        self.assertEqual(counts, {"IT": 3, "Sales": 2, "No department": 2})
+        self.assertEqual(menu["total"], 7)  # the turned-off person is not counted
+        self.assertEqual(menu["depts"][-1]["name"], "No department")  # always last
+        inactive = self.client.get(reverse("people:list"), {"status": "inactive"}).context["dept_menu"]
         self.assertEqual({d["name"]: d["n"] for d in inactive["depts"]}, {"Sales": 1})  # counts follow the status switch
+
+    def test_a_department_with_no_employees_is_still_listed(self):
+        self.client.force_login(self.admin)
+        User.objects.filter(username="extra2").update(department=self.sales)  # IT now has no employee at all
+        menu = self.client.get(reverse("people:list")).context["dept_menu"]
+        self.assertEqual({d["name"]: d["n"] for d in menu["depts"]}["IT"], 2)  # administrator + technician
 
     def test_picking_a_department_filters_the_list(self):
         self.client.force_login(self.admin)
         names = lambda **q: sorted(p.username for p in self.client.get(reverse("people:list"), q).context["people"])
-        self.assertEqual(names(role="employee", dept=self.sales.pk), ["extra0", "extra1"])
-        self.assertEqual(names(role="employee", dept="none"), sorted(["extra3", "emma"]))
-        page = self.client.get(reverse("people:list"), {"role": "employee", "dept": self.sales.pk})
+        self.assertEqual(names(dept=self.dept.pk), ["alice", "extra2", "tina"])  # every role in IT
+        self.assertEqual(names(dept=self.sales.pk), ["extra0", "extra1"])
+        self.assertEqual(names(dept="none"), ["emma", "extra3"])
+        page = self.client.get(reverse("people:list"), {"dept": self.sales.pk})
         self.assertEqual(page.context["dept_name"], "Sales")
         self.assertContains(page, "· Sales")
-        self.assertEqual(names(role="employee", dept="garbage"), sorted(["extra0", "extra1", "extra2", "extra3", "emma"]))
-        self.assertEqual(names(dept=self.sales.pk), sorted(p.username for p in User.objects.filter(is_active=True)))  # dept needs a role
+        self.assertEqual(len(names(dept="garbage")), 7)  # an unknown value filters nothing
 
     def test_dropdown_markup(self):
         self.client.force_login(self.admin)
         page = self.client.get(reverse("people:list")).content.decode()
-        self.assertEqual(page.count("data-pop-btn"), 3)  # one button per role
-        self.assertIn("Employee · by department", page)
-        self.assertIn(f"role=employee&dept={self.sales.pk}", page)
+        self.assertEqual(page.count("data-pop-btn"), 1)  # one Department dropdown, no role buttons
+        self.assertIn("By department", page)
+        self.assertNotIn("Technician", page.split('aria-label="Filter by department"')[1].split("</form>")[0])
+        self.assertNotIn("Everyone", page)
+        self.assertIn(f"dept={self.dept.pk}", page)
+        self.assertIn(">IT<", page.replace("\n", "").replace("  ", ""))
+
+    def test_the_status_switch_only_has_active_and_turned_off(self):
+        self.client.force_login(self.admin)
+        names = lambda **q: sorted(p.username for p in self.client.get(reverse("people:list"), q).context["people"])
+        self.assertEqual(names(status="inactive"), ["off"])
+        everyone = names()
+        self.assertEqual(names(status="anything-else"), everyone)  # unknown values fall back to Active
+        self.assertEqual(self.client.get(reverse("people:list"), {"status": "all"}).context["status"], "active")
 
 class SLASettingsTests(PeopleBase):
     def test_duration_parsing_round_trips(self):

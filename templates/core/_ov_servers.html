@@ -1,0 +1,39 @@
+<section class="card ov-card">
+  <div class="panel-head">
+    <h2>Cloud servers</h2>
+    <a class="small" href="{% url 'monitoring:list' %}">All servers →</a>
+  </div>
+  {% if servers.total %}
+    <div class="seg-bar" role="img" aria-label="Server health">
+      {% for state, n, pct in servers.segments %}<span class="seg seg-{{ state }}" style="width: {{ pct }}%" title="{{ n }} {{ state }}"></span>{% endfor %}
+    </div>
+    <p class="ov-legend">
+      <span><i class="dot dot-healthy"></i>Healthy <b>{{ servers.counts.healthy }}</b></span>
+      <span><i class="dot dot-warning"></i>Attention <b>{{ servers.counts.warning }}</b></span>
+      <span><i class="dot dot-offline"></i>Offline <b>{{ servers.counts.offline }}</b></span>
+      {% if servers.counts.pending %}<span><i class="dot dot-pending"></i>Waiting <b>{{ servers.counts.pending }}</b></span>{% endif %}
+    </p>
+    <div class="ov-stats">
+      <div><b>{% if servers.avg_cpu is not None %}{{ servers.avg_cpu|floatformat:0 }}%{% else %}–{% endif %}</b><span>average CPU</span></div>
+      <div><b class="{% if servers.alerts %}t-danger{% endif %}">{{ servers.alerts }}</b><span>open alert{{ servers.alerts|pluralize }}</span></div>
+      <div><b>${{ servers.monthly|floatformat:0 }}</b><span>per month</span></div>
+    </div>
+    {% for r in servers.rows %}
+      <a class="attn-row" href="{% url 'monitoring:detail' r.server.pk %}">
+        <i class="dot dot-{{ r.bucket }}"></i>
+        <span class="attn-main">
+          <span class="attn-title">{{ r.server.name }}</span>
+          <span class="attn-meta">{% if r.server.country_name %}<img class="ov-flag" src="{{ r.server.flag_url }}" alt="" width="16" height="12"> {{ r.server.country_name }} · {% endif %}{% if r.online and r.cpu is not None %}CPU {{ r.cpu|floatformat:0 }}% · Mem {{ r.mem|floatformat:0 }}%{% else %}{{ r.server.get_provider_display }}{% endif %}</span>
+        </span>
+        {% if r.alerts %}<span class="chip chip-danger">{{ r.alerts }} alert{{ r.alerts|pluralize }}</span>
+        {% elif r.state == "offline" %}<span class="chip chip-danger">Offline</span>
+        {% elif r.state == "pending" %}<span class="chip">Waiting</span>
+        {% elif r.state == "warning" %}<span class="chip chip-warn">Attention</span>
+        {% else %}<span class="chip chip-ok">Healthy</span>{% endif %}
+      </a>
+    {% endfor %}
+    {% if servers.more %}<p class="muted small">+ {{ servers.more }} more servers</p>{% endif %}
+  {% else %}
+    <p class="empty">No servers connected yet.{% if user.is_administrator %} <a href="{% url 'monitoring:list' %}">Add the first one →</a>{% endif %}</p>
+  {% endif %}
+</section>

@@ -1,0 +1,20 @@
+{% load helply %}
+<section class="card">
+  <div class="panel-head">
+    <h2>Waiting for a technician <small class="muted">· {{ unassigned.count }} unassigned</small></h2>
+    <a class="small" href="{% url 'tickets:list' %}?status=open&assignee=none">See all →</a>
+  </div>
+  {% for t in unassigned.rows %}
+    <a class="attn-row" href="{{ t.get_absolute_url }}">
+      <span class="badge p-{{ t.priority }}">{{ t.priority }}</span>
+      <span class="attn-main">
+        <span class="attn-title">{{ t.title }}</span>
+        <span class="attn-meta">{{ t.reference }} · {{ t.category|default:"Uncategorized" }}</span>
+      </span>
+      <span class="chip">{{ t.created_at|ago }}</span>
+    </a>
+  {% empty %}
+    <p class="empty">Every open ticket has an owner.</p>
+  {% endfor %}
+  {% if unassigned.more %}<p class="muted small">+ {{ unassigned.more }} more · <a href="{% url 'tickets:list' %}?status=open&assignee=none">see all</a></p>{% endif %}
+</section>
