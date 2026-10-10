@@ -1,0 +1,23 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}Helply{% endblock %}</title>
+  <meta name="description" content="Helply is the IT service desk for teams of 10 to 100 people: tickets that sort themselves, SLAs that keep their promise, and a live view of your servers and assets.">
+  <link rel="icon" href="{% static 'img/brand/favicon.ico' %}" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/icon-32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/brand/icon-16.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/brand/apple-touch-icon.png' %}">
+  <link rel="manifest" href="{% static 'site.webmanifest' %}">
+  <meta name="theme-color" content="#000000">
+  <script>/* Set the theme before the first paint so a dark-mode visitor never sees a white flash. */(function(){var t=null;try{t=localStorage.getItem("helply-theme")}catch(e){}if(t!=="light"&&t!=="dark"){t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)})();</script>
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}?v={{ asset_version }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="lp">
+{% block body %}{% endblock %}
+<script src="{% static 'js/theme.js' %}?v={{ asset_version }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

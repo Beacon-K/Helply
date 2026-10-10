@@ -1,15 +1,228 @@
-{% extends "base.html" %}{% load static %}
-{% block title %}Sign in{% endblock %}
-{% block content %}
-<div class="login card">
-  <img src="{% static 'img/brand/app-icon-256.png' %}" alt="Helply" class="login-logo">
-  <h1>Helply</h1>
-  <p class="muted">IT help desk for small teams</p>
-  <form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="hidden" name="next" value="{{ next }}">
-    <button class="btn primary wide">Sign in</button>
-  </form>
-  <p class="small"><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
-</div>
+{% extends "base_landing.html" %}{% load static %}
+{% block title %}Helply · IT help, handled{% endblock %}
+{% block scripts %}<script src="{% static 'js/landing.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block body %}
+<header class="lp-nav" data-nav>
+  <a class="lp-brand" href="#top" aria-label="Helply, back to the top"><img src="{% static 'img/brand/logo-glyph.png' %}" alt="" width="28" height="28"><span>Helply</span></a>
+  <nav class="lp-links" aria-label="Sections">
+    <a href="#tickets">Tickets</a><a href="#ai">AI</a><a href="#sla">SLA</a><a href="#servers">Servers</a><a href="#assets">Assets</a>
+  </nav>
+  <div class="lp-nav-end">
+    <button type="button" class="lp-toggle" data-theme-toggle aria-label="Switch between light and dark mode" title="Switch theme">
+      <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+      <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <a class="lp-pill" href="#signin" data-goto-signin>Sign in</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ============ Hero + sign in ============ -->
+  <section class="lp-hero">
+    <div class="lp-hero-bg" aria-hidden="true"><img src="{% static 'img/landing/servers.jpg' %}" alt="" width="1050" height="700" decoding="async"><i class="orb o1"></i><i class="orb o2"></i></div>
+    <div class="lp-hero-inner">
+      <div class="lp-hero-copy">
+        <p class="lp-eyebrow reveal">The IT service desk for teams of 10 to 100</p>
+        <h1 class="lp-display reveal" style="--d:.08s">IT help,<br><span class="lp-grad">handled.</span></h1>
+        <p class="lp-lede reveal" style="--d:.16s">Tickets that sort themselves. Servers that speak up. Renewals that never sneak up on you. One calm place for the people who keep the company running.</p>
+        <p class="lp-scrollcue reveal" style="--d:.3s"><a href="#showcase">Explore Helply <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a></p>
+      </div>
+
+      <div class="lp-card reveal" id="signin" style="--d:.2s">
+        <h2>Sign in</h2>
+        <p class="lp-card-sub">Use the account your administrator created for you.</p>
+        <form method="post" class="lp-form" novalidate>{% csrf_token %}
+          {% if form.non_field_errors %}<div class="lp-alert" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+          <div class="lp-field{% if form.username.errors %} has-error{% endif %}">
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}<span class="lp-err">{{ form.username.errors|join:" " }}</span>{% endif %}
+          </div>
+          <div class="lp-field{% if form.password.errors %} has-error{% endif %}">
+            <label for="{{ form.password.id_for_label }}">Password</label>
+            <div class="lp-pass">
+              {{ form.password }}
+              <button type="button" class="lp-eye" data-eye aria-label="Show password" aria-pressed="false">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            {% if form.password.errors %}<span class="lp-err">{{ form.password.errors|join:" " }}</span>{% endif %}
+          </div>
+          <input type="hidden" name="next" value="{{ next }}">
+          <button class="lp-submit">Sign in</button>
+        </form>
+        <p class="lp-card-foot"><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
+        <p class="lp-secure"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted connection. Repeated wrong passwords are temporarily blocked.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Showcase ============ -->
+  <section class="lp-showcase" id="showcase">
+    <div class="lp-showcase-frame" data-parallax>
+      <img src="{% static 'img/landing/technician.jpg' %}" alt="A technician plugging a network cable into a switch" width="2000" height="1121" decoding="async">
+      <div class="lp-showcase-shade"></div>
+      <div class="lp-showcase-copy">
+        <p class="lp-kicker">One desk for everything IT</p>
+        <h2 class="lp-h2">Every request.<br>Every server.<br>One calm place.</h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Tickets ============ -->
+  <section class="lp-feature" id="tickets">
+    <div class="lp-wrap lp-split">
+      <div class="lp-copy">
+        <p class="lp-kicker reveal">Tickets</p>
+        <h2 class="lp-h2 reveal" style="--d:.06s">Requests that find their own way.</h2>
+        <p class="lp-p reveal" style="--d:.12s">People describe the problem in plain words. Helply reads it, suggests the category, sends it to the right team and starts the clock. Technicians open a queue that is already in order, with the history, the device and the likely fix beside each ticket.</p>
+        <ul class="lp-list reveal" style="--d:.18s">
+          <li><b>A clear life cycle</b> from new to closed, with a note required whenever work is paused or resolved.</li>
+          <li><b>Priority from impact and urgency</b> using the same matrix IT teams already know.</li>
+          <li><b>Every change on record</b> so nobody has to ask who did what, and when.</li>
+        </ul>
+      </div>
+      <figure class="lp-media reveal" style="--d:.1s">
+        <img src="{% static 'img/landing/tickets.jpg' %}" alt="Network cables in a dark server rack with green status lights" width="1050" height="700" loading="lazy" decoding="async">
+        <figcaption class="chip c1"><i class="dot"></i>Category suggested</figcaption>
+        <figcaption class="chip c2"><i class="dot teal"></i>Routed to the right team</figcaption>
+        <figcaption class="chip c3"><i class="dot amber"></i>Response clock started</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ AI ============ -->
+  <section class="lp-ai" id="ai">
+    <div class="lp-wrap">
+      <p class="lp-kicker center reveal">Intelligence, built in</p>
+      <h2 class="lp-h2 center reveal" style="--d:.06s">AI inside the workflow.<br><span class="lp-grad">Not a chat box.</span></h2>
+      <p class="lp-p center reveal" style="--d:.12s">It works where the work happens: when a ticket arrives, when it needs an owner, and when someone asks &ldquo;haven&rsquo;t we solved this before?&rdquo;</p>
+      <div class="lp-trio">
+        <article class="lp-tile reveal" style="--d:.05s">
+          <span class="lp-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span>
+          <h3>It sorts.</h3>
+          <p>A new ticket gets a suggested category and a confidence level. When Helply is sure, it triages the ticket by itself.</p>
+        </article>
+        <article class="lp-tile reveal" style="--d:.12s">
+          <span class="lp-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M17 11l2 2 3-4"/></svg></span>
+          <h3>It routes.</h3>
+          <p>The ticket goes to the technician with the lightest load on the team that owns that kind of problem.</p>
+        </article>
+        <article class="lp-tile reveal" style="--d:.19s">
+          <span class="lp-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H20v15H6.5A1.5 1.5 0 0 0 5 19.5Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H20"/><path d="M9 8h7M9 12h5"/></svg></span>
+          <h3>It remembers.</h3>
+          <p>Related articles and similar past tickets appear beside the new one, so solved problems stay solved.</p>
+        </article>
+      </div>
+      <p class="lp-fine center reveal">Every correction a person makes is measured, so the dashboard always shows how often the suggestion was right.</p>
+    </div>
+  </section>
+
+  <!-- ============ SLA ============ -->
+  <section class="lp-feature alt" id="sla">
+    <div class="lp-wrap lp-split flip">
+      <div class="lp-copy">
+        <p class="lp-kicker reveal">Service levels</p>
+        <h2 class="lp-h2 reveal" style="--d:.06s">A promise you can see being kept.</h2>
+        <p class="lp-p reveal" style="--d:.12s">Set a first-response and a resolution target for each priority in plain language, like 30m or 1d 2h. Helply pauses the clock while you wait on someone else, warns before a ticket is late, and flags it the moment it is.</p>
+        <ul class="lp-list reveal" style="--d:.18s">
+          <li><b>P1 to P4</b> targets you control, changed in seconds on one page.</li>
+          <li><b>At risk</b> and <b>breached</b> tickets rise to the top of every dashboard.</li>
+        </ul>
+      </div>
+      <div class="lp-sla reveal" style="--d:.1s" aria-hidden="true">
+        <div class="row p1"><span class="tag">P1</span><span class="name">Critical</span><span class="bar"><i style="--w:92%"></i></span></div>
+        <div class="row p2"><span class="tag">P2</span><span class="name">High</span><span class="bar"><i style="--w:68%"></i></span></div>
+        <div class="row p3"><span class="tag">P3</span><span class="name">Medium</span><span class="bar"><i style="--w:44%"></i></span></div>
+        <div class="row p4"><span class="tag">P4</span><span class="name">Low</span><span class="bar"><i style="--w:22%"></i></span></div>
+        <p class="legend">Illustration of how SLA timers look in Helply</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Servers ============ -->
+  <section class="lp-feature dark" id="servers">
+    <div class="lp-wrap lp-split">
+      <figure class="lp-media reveal">
+        <img src="{% static 'img/landing/switch.jpg' %}" alt="Cables and glowing ports on a network switch" width="1050" height="700" loading="lazy" decoding="async">
+        <figcaption class="chip c1"><i class="dot"></i>Reporting every 10 seconds</figcaption>
+        <figcaption class="chip c2"><i class="dot amber"></i>Offline for 2 minutes opens a ticket</figcaption>
+      </figure>
+      <div class="lp-copy">
+        <p class="lp-kicker reveal">Cloud servers</p>
+        <h2 class="lp-h2 reveal" style="--d:.06s">See your servers before your users do.</h2>
+        <p class="lp-p reveal" style="--d:.12s">Install a tiny agent with one command on Linux or Windows. Helply learns the machine by itself, draws live CPU, memory, disk and network, and turns a real problem into a ticket with an owner and a clock.</p>
+        <ul class="lp-list reveal" style="--d:.18s">
+          <li><b>Read-only by design.</b> The agent only sends readings. It opens no ports and accepts no commands.</li>
+          <li><b>Where it runs, what it costs.</b> Country, provider and renewal date sit beside the graphs.</li>
+          <li><b>Recovery noted for you.</b> When the server returns, the ticket says so.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Assets ============ -->
+  <section class="lp-feature" id="assets">
+    <div class="lp-wrap lp-split flip">
+      <div class="lp-copy">
+        <p class="lp-kicker reveal">Assets and renewals</p>
+        <h2 class="lp-h2 reveal" style="--d:.06s">Know what you own, and when it expires.</h2>
+        <p class="lp-p reveal" style="--d:.12s">Laptops, screens, network gear, software licences and cloud servers in one register, each with an owner, a location and a warranty or renewal date. The right people hear about it at 30, 14 and 7 days, then on the day.</p>
+        <ul class="lp-list reveal" style="--d:.18s">
+          <li><b>Every device keeps its story</b>, including the tickets raised against it.</li>
+          <li><b>Repeat faults stand out</b>, so replacing a problem laptop is a decision, not a hunch.</li>
+        </ul>
+      </div>
+      <figure class="lp-media reveal" style="--d:.1s">
+        <img src="{% static 'img/landing/assets.jpg' %}" alt="Network equipment on a desk in front of a server room" width="936" height="624" loading="lazy" decoding="async">
+        <figcaption class="chip c1"><i class="dot teal"></i>Renews in 14 days</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ Small team ============ -->
+  <section class="lp-bento-sec">
+    <div class="lp-wrap">
+      <p class="lp-kicker center reveal">Made for small teams</p>
+      <h2 class="lp-h2 center reveal" style="--d:.06s">Big-company discipline.<br>Small-company calm.</h2>
+      <div class="lp-bento">
+        <article class="bento b-wide reveal"><img src="{% static 'img/landing/team.jpg' %}" alt="Tiny figures plugging in a network cable" width="728" height="486" loading="lazy" decoding="async"><div class="bento-copy"><h3>One to five people in IT?</h3><p>That is exactly who Helply is for. No consultants, no month of setup, no seat-by-seat licensing.</p></div></article>
+        <article class="bento reveal" style="--d:.08s"><div class="bento-copy"><h3>Three roles, nothing extra</h3><p>Employees see their own tickets and devices. Technicians see their team&rsquo;s queue. Administrators manage people and policy.</p></div>
+          <ul class="mini mini-roles" aria-hidden="true"><li><i class="pd e"></i><b>Employee</b><span>Own tickets</span></li><li><i class="pd t"></i><b>Technician</b><span>Team queue</span></li><li><i class="pd a"></i><b>Administrator</b><span>Everything</span></li></ul></article>
+        <article class="bento reveal" style="--d:.14s"><div class="bento-copy"><h3>Fix it yourself first</h3><p>A built-in knowledge base suggests answers while people type their request, so simple problems never become tickets.</p></div>
+          <div class="mini mini-kb" aria-hidden="true"><div class="q"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>My printer will not print</div><div class="hit"><b>Reset the print spooler</b><span>Suggested article</span></div></div></article>
+        <article class="bento b-wide reveal" style="--d:.06s"><img src="{% static 'img/landing/cables.jpg' %}" alt="Colourful patch cables in a data centre rack" width="933" height="700" loading="lazy" decoding="async"><div class="bento-copy"><h3>Quiet, useful notifications</h3><p>In-app and email, only when someone has to act, and never twice for the same thing.</p></div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Trust ============ -->
+  <section class="lp-trust">
+    <div class="lp-wrap">
+      <ul class="lp-facts">
+        <li class="reveal"><b>10 to 100</b><span>people, the size Helply is designed for</span></li>
+        <li class="reveal" style="--d:.06s"><b>0</b><span>remote commands. The agent only reports</span></li>
+        <li class="reveal" style="--d:.12s"><b>1</b><span>database as the single source of truth</span></li>
+        <li class="reveal" style="--d:.18s"><b>2 themes</b><span>light and dark, following your device</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ Closing ============ -->
+  <section class="lp-cta">
+    <div class="lp-wrap center">
+      <h2 class="lp-display sm reveal">Ready when you are.</h2>
+      <p class="lp-lede center reveal" style="--d:.08s">Sign in to see what needs you today.</p>
+      <a class="lp-pill big reveal" style="--d:.14s" href="#signin" data-goto-signin>Sign in</a>
+    </div>
+  </section>
+</main>
+
+<footer class="lp-footer">
+  <div class="lp-wrap">
+    <span>Helply &middot; IT service desk</span>
+    <span>A Fanshawe College capstone project</span>
+  </div>
+</footer>
 {% endblock %}

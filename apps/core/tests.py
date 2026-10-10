@@ -322,3 +322,30 @@ class DemoEmailAddressTests(TestCase):
         with self.settings(IS_PRODUCTION=True):
             with self.assertRaises(CommandError):
                 call_command("demo_emails", stdout=StringIO())
+
+
+class LoginLandingTests(TestCase):
+    """The sign-in page doubles as the product introduction; the form must keep working inside it."""
+
+    def test_page_has_the_form_the_intro_and_working_images(self):
+        import re
+
+        from django.contrib.staticfiles import finders
+
+        page = self.client.get("/accounts/login/")
+        self.assertEqual(page.status_code, 200)
+        html = page.content.decode()
+        for needle in ('name="username"', 'name="password"', "csrfmiddlewaretoken", 'id="signin"', "IT help,", "Forgot your password?"):
+            self.assertIn(needle, html)
+        for src in re.findall(r'src="/static/(img/landing/[^"?]+)', html):
+            self.assertIsNotNone(finders.find(src), src)
+        self.assertEqual(html.count("<form"), 1)  # one form: the "Sign in" links scroll to it, they do not duplicate it
+
+    def test_next_parameter_survives_for_the_hidden_field(self):
+        html = self.client.get("/accounts/login/?next=/tickets/").content.decode()
+        self.assertIn('name="next" value="/tickets/"', html)
+
+    def test_wrong_password_shows_the_error_inside_the_card(self):
+        page = self.client.post("/accounts/login/", {"username": "nobody", "password": "x"})
+        self.assertContains(page, 'class="lp-alert"')
+        self.assertContains(page, "Please enter a correct")
