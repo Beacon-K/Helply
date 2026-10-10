@@ -39,11 +39,11 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 | `apps/monitoring` | 云服务器监控：模型、上报 API、告警转工单、`presenters.py`（页面和 JSON 数据）、`geo.py`（按 IP 在本地查国家，数据库在 `data/`）、`countries.py` |
 | `apps/core` | 仪表盘（`views.py`；公司概况数据在 `overview.py`：未分配工单、人员、云服务器、续费）、演示数据（`demo/`）、生产运维命令 |
 | `agent/` | 监控 agent（`helply_agent.py`）和 `install.sh` / `install.ps1` |
-| `templates/`, `static/css`, `static/js` | 模板、样式和脚本；监控模块用 `monitoring.css`、`fleet.js`、`fleet-detail.js`；白天/夜间主题是 `theme.css` + `theme.js`（颜色一律用变量，不要写死）；国旗在 `static/img/flags/` |
+| `templates/`, `static/css`, `static/js` | 模板、样式和脚本；监控模块用 `monitoring.css`、`fleet.js`、`fleet-detail.js`；白天/夜间主题是 `theme.css` + `theme.js`（颜色一律用变量，不要写死）；登录后的整体质感（毛玻璃栏、大字标题、圆角卡片、药丸按钮、分段筛选）在最后加载的 `apple.css`；登录页是独立的 `base_landing.html` + `landing.css`；国旗在 `static/img/flags/` |
 
 ## 常用命令
 ```bash
-python manage.py test                     # 全部测试（目前 230 项）
+python manage.py test                     # 全部测试（目前 232 项）
 python manage.py seed_demo               # 只补缺少的演示数据，已有的一律不动（生产环境下拒绝执行）
 python manage.py seed_demo --reset --overwrite  # 有意重置演示：删全部工单、演示人员/SLA/资产恢复原值（或运行 reset-demo.bat）
 python manage.py demo_passwords --rotate # 有意给全部演示账号换一批随机密码

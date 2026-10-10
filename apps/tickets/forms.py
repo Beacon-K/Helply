@@ -17,6 +17,7 @@ class TicketCreateForm(forms.ModelForm):
         }
 
     def __init__(self, *args, user, **kwargs):
+        kwargs.setdefault("label_suffix", "")  # labels read cleaner without a colon
         super().__init__(*args, **kwargs)
         self.fields["category"].queryset = Category.objects.filter(is_active=True)
         self.fields["category"].empty_label = "Not sure - let Helply decide"
