@@ -672,3 +672,25 @@ class PasswordResetThrottleTests(PeopleBase):
             self.ask("emma@example.com")
         self.assertIn("suppressed", logs.output[0])
         self.assertRegex(ResetRequest.objects.filter(sent=False).get().at_local, r"[+-]\d\d:\d\d$")
+
+class AdminHeaderTests(PeopleBase):
+    """Every admin and password page uses the Helply theme switch; Django's own button (huge without its stylesheet) is gone."""
+
+    def test_password_pages_use_the_helply_toggle_and_header_links(self):
+        self.client.force_login(User.objects.create_user("staffer", password="x", is_staff=True, is_superuser=True))
+        for url in ("/admin/", "/admin/password_change/"):
+            html = self.client.get(url).content.decode()
+            self.assertIn("hl-theme-toggle", html, url)
+            self.assertNotIn("theme-icon-when", html, url)
+            self.assertIn("Back to Helply", html, url)
+        done = self.client.get("/admin/password_change/done/").content.decode()
+        self.assertIn("hl-theme-toggle", done)
+
+    def test_the_main_site_has_its_own_password_page(self):
+        self.client.force_login(self.emp)
+        page = self.client.get("/accounts/password_change/").content.decode()
+        self.assertIn('class="sidebar"', page)
+        self.assertNotIn("admin-helply.css", page)
+        self.assertIn("Change my password", page)
+        done = self.client.get("/accounts/password_change/done/").content.decode()
+        self.assertIn("Password changed", done)

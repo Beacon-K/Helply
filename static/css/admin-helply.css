@@ -261,6 +261,7 @@ input[type=checkbox], input[type=radio] { accent-color: var(--hl-accent); width:
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
   display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 1.1rem; border-radius: 10px; border: 1px solid transparent; font: inherit;
   font-size: .9rem; font-weight: 650; background: var(--button-bg); color: var(--button-fg); cursor: pointer; transition: background .15s, transform .1s, box-shadow .15s; }
+.button, input[type=submit], input[type=button] { text-transform: none; letter-spacing: -.005em; }
 .button:hover, input[type=submit]:hover, input[type=button]:hover, a.button:hover { background: var(--button-hover-bg); }
 .button:active, input[type=submit]:active { transform: translateY(1px); }
 .button.default, input[type=submit].default, .submit-row input.default { background: var(--default-button-bg); }

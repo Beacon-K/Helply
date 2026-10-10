@@ -8,6 +8,8 @@ from apps.accounts.forms import ThrottledAdminAuthenticationForm, ThrottledAuthe
 
 admin.site.site_header = "Helply Administration"
 admin.site.site_title = "Helply"
+admin.site.password_change_template = "admin/password_change_form.html"  # the main site has its own page under registration/
+admin.site.password_change_done_template = "admin/password_change_done.html"
 admin.site.login_form = ThrottledAdminAuthenticationForm  # the admin login is a second door for password guessing
 
 urlpatterns = [

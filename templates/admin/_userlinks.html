@@ -1,0 +1,5 @@
+{% load i18n %}
+  <a href="{{ site_url|default:'/' }}">Back to Helply</a>
+  {% if user.has_usable_password %}<a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a>{% endif %}
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit">{% translate 'Log out' %}</button></form>
+  {% include "admin/helply_theme_toggle.html" %}

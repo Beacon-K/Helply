@@ -23,10 +23,7 @@
 {% block welcome-msg %}<span class="hl-who">{% firstof user.get_full_name user.get_username %}</span>{% endblock %}
 
 {% block userlinks %}
-  <a href="{{ site_url|default:'/' }}">Back to Helply</a>
-  {% if user.has_usable_password %}<a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a>{% endif %}
-  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit">{% translate 'Log out' %}</button></form>
-  {% include "admin/helply_theme_toggle.html" %}
+  {% include "admin/_userlinks.html" %}
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
