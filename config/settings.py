@@ -91,6 +91,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.accounts.login_records.LoginActivityMiddleware",  # online time for the sign-in record
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -151,6 +152,15 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+# Sign-in throttling (apps/accounts/throttle.py): failures counted inside a sliding window of this many minutes.
+HELPLY_LOGIN_LOCK_MINUTES = int(os.environ.get("HELPLY_LOGIN_LOCK_MINUTES", "15"))
+HELPLY_LOGIN_MAX_FAILURES = int(os.environ.get("HELPLY_LOGIN_MAX_FAILURES", "5"))  # same username and address
+HELPLY_LOGIN_MAX_FAILURES_USER = int(os.environ.get("HELPLY_LOGIN_MAX_FAILURES_USER", "20"))  # same username, any address
+HELPLY_LOGIN_MAX_FAILURES_IP = int(os.environ.get("HELPLY_LOGIN_MAX_FAILURES_IP", "30"))  # same address, any username
+# Password-reset form: emails one address can trigger, and requests one visitor can make, per window.
+HELPLY_RESET_WINDOW_MINUTES = int(os.environ.get("HELPLY_RESET_WINDOW_MINUTES", "60"))
+HELPLY_RESET_MAX_PER_EMAIL = int(os.environ.get("HELPLY_RESET_MAX_PER_EMAIL", "3"))
+HELPLY_RESET_MAX_PER_IP = int(os.environ.get("HELPLY_RESET_MAX_PER_IP", "10"))
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "core:dashboard"
 LOGOUT_REDIRECT_URL = "login"

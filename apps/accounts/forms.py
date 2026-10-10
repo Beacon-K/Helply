@@ -1,6 +1,49 @@
 from django import forms
+from django.contrib.admin.forms import AdminAuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 
+from . import throttle
 from .models import Department, SupportGroup, User
+
+
+class ThrottleMixin:
+    """Refuses sign-in while too many wrong passwords were typed (see throttle.py) and records new failures."""
+
+    def clean(self):
+        username = self.data.get(self.add_prefix("username"), "")
+        ip = throttle.client_ip(self.request) if self.request is not None else None
+        wait = throttle.blocked_for(username, ip) if username else 0
+        if wait:
+            raise forms.ValidationError(throttle.lock_message(wait), code="throttled")
+        try:
+            cleaned = super().clean()
+        except forms.ValidationError as error:
+            if any(e.code == "invalid_login" for e in error.error_list):
+                throttle.record_failure(username, ip)
+            raise
+        if cleaned and username:
+            throttle.record_success(username, ip)
+        return cleaned
+
+
+class ThrottledPasswordResetForm(PasswordResetForm):
+    """The public reset form, with a cap on how many emails one address or one visitor can trigger."""
+
+    def save(self, *args, **kwargs):
+        email, ip = self.cleaned_data["email"], throttle.client_ip(kwargs["request"]) if kwargs.get("request") else None
+        if throttle.reset_blocked(email, ip):
+            throttle.record_reset(email, ip, sent=False)
+            return  # same page as a normal request: nothing tells the visitor, or an attacker, that no email went out
+        throttle.record_reset(email, ip, sent=True)
+        return super().save(*args, **kwargs)
+
+
+class ThrottledAuthenticationForm(ThrottleMixin, AuthenticationForm):
+    pass
+
+
+class ThrottledAdminAuthenticationForm(ThrottleMixin, AdminAuthenticationForm):
+    pass
 
 
 class UserForm(forms.ModelForm):

@@ -1,12 +1,15 @@
+from datetime import timedelta
+
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.sla.forms import format_duration, parse_duration
 from apps.sla.models import SLAPolicy
 from apps.tickets.choices import Priority
 
-from .models import Department, SupportGroup, User
+from .models import Department, LoginFailure, LoginRecord, ResetRequest, SupportGroup, User
 
 
 class PeopleBase(TestCase):
@@ -381,3 +384,291 @@ class OrganizationTests(PeopleBase):
         Category.objects.update(default_group=None)
         self.client.post(reverse("people:team_delete", args=[self.team.pk]))
         self.assertFalse(SupportGroup.objects.filter(pk=self.team.pk).exists())
+
+
+class LoginThrottleTests(PeopleBase):
+    """Password guessing is slowed down on both sign-in pages (apps/accounts/throttle.py)."""
+
+    PASSWORD = "Str0ng-Test-Pass!"
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.emp.set_password(cls.PASSWORD)
+        cls.emp.save()
+        cls.admin.set_password(cls.PASSWORD)
+        cls.admin.is_staff = True
+        cls.admin.save()
+
+    def attempt(self, username, password, ip="203.0.113.7", url="/accounts/login/"):
+        return self.client.post(url, {"username": username, "password": password,
+                                      "next": "/", "this_is_the_login_form": "1"}, headers={"CF-Connecting-IP": ip})
+
+    def test_correct_password_is_refused_while_locked_and_works_again_later(self):
+        for _ in range(5):
+            self.assertContains(self.attempt("emma", "wrong"), "Please enter a correct")
+        locked = self.attempt("emma", self.PASSWORD)
+        self.assertContains(locked, "Too many failed sign-in attempts")
+        self.assertNotIn("_auth_user_id", self.client.session)
+        LoginFailure.objects.update(at=timezone.now() - timedelta(minutes=16))
+        self.assertEqual(self.attempt("emma", self.PASSWORD).status_code, 302)
+
+    def test_a_lock_on_one_address_does_not_stop_the_real_user_elsewhere(self):
+        for _ in range(5):
+            self.attempt("emma", "wrong", ip="198.51.100.9")
+        self.assertContains(self.attempt("emma", self.PASSWORD, ip="198.51.100.9"), "Too many failed")
+        self.assertEqual(self.attempt("emma", self.PASSWORD, ip="203.0.113.50").status_code, 302)
+
+    def test_guessing_from_many_addresses_locks_the_username(self):
+        for i in range(20):
+            self.attempt("emma", "wrong", ip=f"198.51.100.{i + 1}")
+        self.assertContains(self.attempt("emma", self.PASSWORD, ip="203.0.113.99"), "Too many failed")
+
+    def test_one_address_trying_many_usernames_is_blocked(self):
+        for i in range(30):
+            self.attempt(f"nobody{i}", "wrong", ip="198.51.100.200")
+        self.assertContains(self.attempt("emma", self.PASSWORD, ip="198.51.100.200"), "Too many failed")
+
+    def test_compatibility_spellings_of_a_username_share_one_counter(self):
+        # fullwidth letters normalise (NFKC) to "emma" when Django signs the person in
+        variants = ["emma", "\uff45mma", "e\uff4dma", "\uff45\uff4d\uff4d\uff41", "emm\uff41"]
+        for name in variants:
+            self.attempt(name, "wrong")
+        self.assertContains(self.attempt("emma", self.PASSWORD), "Too many failed")
+        self.assertEqual(LoginFailure.objects.values("username").distinct().count(), 1)
+    def test_unknown_and_known_usernames_get_the_same_treatment(self):
+        for name in ("emma", "no-such-person"):
+            for _ in range(5):
+                self.attempt(name, "wrong", ip="198.51.100.77")
+            self.assertContains(self.attempt(name, self.PASSWORD, ip="198.51.100.77"), "Too many failed")
+
+    def test_success_clears_the_count(self):
+        for _ in range(4):
+            self.attempt("emma", "wrong")
+        self.assertEqual(self.attempt("emma", self.PASSWORD).status_code, 302)
+        self.client.logout()
+        for _ in range(4):
+            self.attempt("emma", "wrong")
+        self.assertEqual(self.attempt("emma", self.PASSWORD).status_code, 302)  # 4 + 4 would have locked without the reset
+
+    def test_username_case_does_not_dodge_the_limit(self):
+        for name in ("emma", "EMMA", "Emma", "eMMa", "emma "):
+            self.attempt(name, "wrong")
+        self.assertContains(self.attempt("emma", self.PASSWORD), "Too many failed")
+
+    def test_admin_login_is_throttled_too(self):
+        for _ in range(5):
+            self.attempt("alice", "wrong", url="/admin/login/")
+        self.assertContains(self.attempt("alice", self.PASSWORD, url="/admin/login/"), "Too many failed")
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_failures_are_logged_and_counted_in_the_database(self):
+        with self.assertLogs("helply.security", level="WARNING") as logs:
+            self.attempt("emma", "wrong")
+        self.assertIn("Failed sign-in for 'emma' from 203.0.113.7", logs.output[0])
+        self.assertEqual(LoginFailure.objects.filter(username="emma", ip="203.0.113.7").count(), 1)
+
+
+class LoginRecordTests(PeopleBase):
+    """The local sign-in record: written on sign-in, kept up to date, closed on sign-out, and never shown in the app."""
+
+    PASSWORD = "Str0ng-Test-Pass!"
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.emp.set_password(cls.PASSWORD)
+        cls.emp.save()
+        cls.admin.set_password(cls.PASSWORD)
+        cls.admin.is_staff = True
+        cls.admin.is_superuser = True
+        cls.admin.save()
+
+    def sign_in(self, username="emma", ip="203.0.113.7", url="/accounts/login/"):
+        return self.client.post(url, {"username": username, "password": self.PASSWORD, "next": "/"},
+                                headers={"CF-Connecting-IP": ip, "User-Agent": "TestBrowser/1.0"})
+
+    def test_sign_in_is_recorded_with_time_address_and_browser(self):
+        before = timezone.now()
+        self.assertEqual(self.sign_in().status_code, 302)
+        record = LoginRecord.objects.get()
+        self.assertEqual((record.username, record.role, record.ip, record.user_agent), ("emma", "employee", "203.0.113.7", "TestBrowser/1.0"))
+        self.assertEqual(record.user, self.emp)
+        self.assertTrue(before <= record.logged_in_at <= timezone.now())
+        self.assertTrue(record.session_key)
+        self.assertIsNone(record.logged_out_at)
+
+    def test_wrong_password_creates_no_record(self):
+        self.client.post("/accounts/login/", {"username": "emma", "password": "nope"})
+        self.assertFalse(LoginRecord.objects.exists())
+
+    def test_admin_site_sign_in_is_recorded_too(self):
+        self.sign_in("alice", url="/admin/login/")
+        self.assertEqual(LoginRecord.objects.get().username, "alice")
+
+    def test_activity_extends_online_time_and_sign_out_closes_the_record(self):
+        from apps.accounts import login_records
+
+        self.sign_in()
+        record = LoginRecord.objects.get()
+        LoginRecord.objects.update(logged_in_at=timezone.now() - timedelta(minutes=30), last_seen_at=timezone.now() - timedelta(minutes=30))
+        login_records._touched.clear()  # the 15-second limit is per process; start fresh
+        self.client.get("/")
+        record.refresh_from_db()
+        self.assertGreaterEqual(record.duration, timedelta(minutes=29))
+        self.client.post("/accounts/logout/")
+        record.refresh_from_db()
+        self.assertIsNotNone(record.logged_out_at)
+        self.assertEqual(record.ended_at, record.logged_out_at)
+
+    def test_page_loads_are_not_written_on_every_request(self):
+        from apps.accounts import login_records
+
+        self.sign_in()
+        login_records._touched.clear()
+        self.client.get("/")
+        first = LoginRecord.objects.get().last_seen_at
+        LoginRecord.objects.update(last_seen_at=first - timedelta(hours=1))
+        self.client.get("/")  # inside the 15 seconds: no new write
+        self.assertEqual(LoginRecord.objects.get().last_seen_at, first - timedelta(hours=1))
+
+    def test_an_expired_session_keeps_the_last_activity_as_its_end(self):
+        self.sign_in()
+        LoginRecord.objects.update(logged_in_at=timezone.now() - timedelta(hours=3), last_seen_at=timezone.now() - timedelta(hours=1))
+        record = LoginRecord.objects.get()
+        self.assertAlmostEqual(record.duration.total_seconds(), 7200, delta=1)
+
+    def test_the_record_is_not_visible_in_the_app_or_the_admin(self):
+        from django.contrib import admin
+
+        self.sign_in("alice")
+        self.assertNotIn(LoginRecord, admin.site._registry)
+        for url in ("/admin/accounts/loginrecord/", "/people/", "/"):
+            html = self.client.get(url).content.decode()
+            self.assertNotIn("TestBrowser/1.0", html)
+        self.assertEqual(self.client.get("/admin/accounts/loginrecord/").status_code, 404)
+
+    def test_local_time_text_and_online_seconds_are_stored_next_to_the_utc_timestamps(self):
+        from apps.accounts import login_records
+
+        self.sign_in()
+        record = LoginRecord.objects.get()
+        self.assertEqual(record.logged_in_local, timezone.localtime(record.logged_in_at).isoformat(sep=" ", timespec="seconds"))
+        self.assertRegex(record.logged_in_local, r"^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d[+-]\d\d:\d\d$")
+        self.assertEqual(record.logged_out_local, "")
+        LoginRecord.objects.update(logged_in_at=timezone.now() - timedelta(minutes=10))
+        login_records._touched.clear()
+        self.client.get("/")
+        record.refresh_from_db()
+        self.assertAlmostEqual(record.online_seconds, 600, delta=5)
+        self.assertRegex(record.last_seen_local, r"[+-]\d\d:\d\d$")
+        self.client.post("/accounts/logout/")
+        record.refresh_from_db()
+        self.assertTrue(record.logged_out_local)
+        self.assertAlmostEqual(record.online_seconds, 600, delta=5)
+
+    def test_local_time_text_follows_daylight_saving(self):
+        from datetime import datetime, timezone as dt_timezone
+
+        winter = LoginRecord.objects.create(username="x", logged_in_at=datetime(2026, 1, 15, 17, 0, tzinfo=dt_timezone.utc))
+        summer = LoginRecord.objects.create(username="x", logged_in_at=datetime(2026, 7, 15, 17, 0, tzinfo=dt_timezone.utc))
+        self.assertEqual(winter.logged_in_local, "2026-01-15 12:00:00-05:00")
+        self.assertEqual(summer.logged_in_local, "2026-07-15 13:00:00-04:00")
+
+    def test_failed_attempts_also_carry_local_time(self):
+        self.client.post("/accounts/login/", {"username": "emma", "password": "nope"})
+        self.assertRegex(LoginFailure.objects.get().at_local, r"^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d[+-]\d\d:\d\d$")
+    def test_readable_view_shows_local_times_for_people_opening_the_database(self):
+        from django.db import connection
+
+        self.sign_in()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT username, ip_address, signed_in, signed_out, online_seconds FROM login_records_readable")
+            username, ip, signed_in, signed_out, seconds = cursor.fetchone()
+        self.assertEqual((username, ip), ("emma", "203.0.113.7"))
+        self.assertEqual(signed_in, LoginRecord.objects.get().logged_in_local)
+        self.assertRegex(signed_in, r"[+-]\d\d:\d\d$")
+        self.assertEqual(signed_out, "")
+    def test_command_lists_filters_and_exports(self):
+        import tempfile
+        from io import StringIO
+        from pathlib import Path
+
+        from django.core.management import call_command
+
+        self.sign_in("emma", ip="203.0.113.7")
+        self.client.logout()
+        self.sign_in("alice", ip="198.51.100.4")
+        out = StringIO()
+        call_command("login_records", stdout=out)
+        self.assertIn("emma", out.getvalue())
+        self.assertIn("198.51.100.4", out.getvalue())
+        out = StringIO()
+        call_command("login_records", "--user", "emma", stdout=out)
+        self.assertNotIn("198.51.100.4", out.getvalue())
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "logins.csv"
+            call_command("login_records", "--csv", str(target), stdout=StringIO())
+            text = target.read_text(encoding="utf-8-sig")
+        self.assertIn("Signed in,User,Role,IP address,Country,Online for", text.splitlines()[0])
+        self.assertEqual(len(text.splitlines()), 3)
+
+    def test_prune_refuses_to_throw_away_recent_history(self):
+        from io import StringIO
+
+        from django.core.management import CommandError, call_command
+
+        self.sign_in()
+        with self.assertRaises(CommandError):
+            call_command("login_records", "--prune", "7", stdout=StringIO())
+        LoginRecord.objects.update(logged_in_at=timezone.now() - timedelta(days=400))
+        call_command("login_records", "--prune", "365", stdout=StringIO())
+        self.assertFalse(LoginRecord.objects.exists())
+
+
+class PasswordResetThrottleTests(PeopleBase):
+    """The public reset form cannot be used to flood one mailbox or use up the shared mail quota."""
+
+    def ask(self, email, ip="203.0.113.7"):
+        return self.client.post("/accounts/password_reset/", {"email": email}, headers={"CF-Connecting-IP": ip})
+
+    def test_each_address_gets_a_few_emails_per_hour_and_the_page_never_changes(self):
+        replies = [self.ask("emma@example.com") for _ in range(6)]
+        self.assertEqual({r.status_code for r in replies}, {302})
+        self.assertEqual({r["Location"] for r in replies}, {"/accounts/password_reset/done/"})
+        self.assertEqual(len(mail.outbox), 3)  # HELPLY_RESET_MAX_PER_EMAIL
+        self.assertEqual(ResetRequest.objects.filter(sent=False).count(), 3)
+
+    def test_unknown_addresses_look_the_same_and_count_against_the_visitor(self):
+        for i in range(10):
+            self.ask(f"nobody{i}@example.com")
+        self.ask("emma@example.com")  # the 11th request from this visitor
+        self.assertEqual(mail.outbox, [])
+        self.assertEqual(ResetRequest.objects.filter(sent=False).count(), 1)
+
+    def test_other_visitors_are_not_blocked_by_one_visitor(self):
+        for i in range(10):
+            self.ask(f"nobody{i}@example.com", ip="198.51.100.9")
+        self.ask("emma@example.com", ip="203.0.113.50")
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_spelling_variants_of_one_address_share_the_limit(self):
+        for email in ("emma@example.com", "EMMA@example.com", "Emma@Example.com", "emma@EXAMPLE.com ", "\uff45mma@example.com"):
+            self.ask(email)
+        self.assertLessEqual(len(mail.outbox), 3)
+
+    def test_limit_expires_after_the_window(self):
+        for _ in range(4):
+            self.ask("emma@example.com")
+        self.assertEqual(len(mail.outbox), 3)
+        ResetRequest.objects.update(at=timezone.now() - timedelta(minutes=61))
+        self.ask("emma@example.com")
+        self.assertEqual(len(mail.outbox), 4)
+
+    def test_blocked_requests_are_logged_with_local_time(self):
+        for _ in range(3):
+            self.ask("emma@example.com")
+        with self.assertLogs("helply.security", level="WARNING") as logs:
+            self.ask("emma@example.com")
+        self.assertIn("suppressed", logs.output[0])
+        self.assertRegex(ResetRequest.objects.filter(sent=False).get().at_local, r"[+-]\d\d:\d\d$")
