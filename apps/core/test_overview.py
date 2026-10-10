@@ -112,11 +112,17 @@ class PeopleOverviewTests(OverviewBase):
         self.assertEqual(data["turned_off"], 1)
         self.assertEqual(data["departments"][0]["name"], "IT")  # biggest first
 
-    def test_long_department_lists_are_cut_with_a_count_of_the_rest(self):
+    def test_every_department_is_listed_however_many_there_are(self):
         for i in range(10):
             User.objects.create_user(f"p{i}", password="x", department=Department.objects.create(name=f"Dept {i}"))
-        data = overview.people_overview(max_departments=8)
-        self.assertEqual((len(data["departments"]), data["dept_total"], data["dept_more"]), (8, 12, 4))
+        data = overview.people_overview()
+        self.assertEqual((len(data["departments"]), data["dept_total"]), (12, 12))
+        self.assertNotIn("dept_more", data)
+        self.client.force_login(self.admin)
+        page = self.client.get(reverse("core:dashboard")).content.decode()
+        self.assertNotIn("more department", page)
+        for i in range(10):
+            self.assertIn(f"Dept {i}", page)
 
     def test_only_administrators_see_the_people_card(self):
         self.client.force_login(self.admin)

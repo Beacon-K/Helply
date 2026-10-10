@@ -60,17 +60,16 @@ def server_health(limit=5):
     }
 
 
-def people_overview(max_departments=8):
-    """Head count by role and by department (active people only)."""
+def people_overview():
+    """Head count by role and by department (active people only). Every department is listed, never a "+ N more".""" 
     active = User.objects.filter(is_active=True)
     roles = {r: active.filter(role=r).count() for r in User.Role.values}
     rows = list(active.values("department_id", "department__name").annotate(n=Count("pk")))
     depts = sorted(({"key": r["department_id"] or "none", "name": r["department__name"] or "No department", "n": r["n"]}
                     for r in rows), key=lambda d: (d["key"] == "none", -d["n"], d["name"].lower()))
-    shown = depts[:max_departments]
     return {
-        "total": sum(roles.values()), "roles": roles, "departments": shown, "dept_max": max([d["n"] for d in depts] + [1]),
-        "dept_total": len(depts), "dept_more": max(0, len(depts) - len(shown)),
+        "total": sum(roles.values()), "roles": roles, "departments": depts, "dept_max": max([d["n"] for d in depts] + [1]),
+        "dept_total": len(depts),
         "turned_off": User.objects.filter(is_active=False).count(),
     }
 
