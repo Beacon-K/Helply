@@ -1,4 +1,4 @@
-/* Helply · console feel
+﻿/* Helply Â· console feel
    Loaded after apple.css. Dark-first details borrowed from the best developer-tool products: a tinted near-black,
    translucent white hairlines instead of solid borders, layered glass surfaces, a cursor-following spotlight on cards,
    glowing status dots, monospace for identifiers, a command palette and a thin navigation progress bar.
@@ -125,7 +125,7 @@ tr[data-href]:hover td:first-child { box-shadow: inset 2px 0 0 rgb(var(--glow-a)
 
 /* Unified hover highlight: anything clickable lights up with the accent so selectable items are obvious. */
 .side-nav a:not(.active):hover, .attn-row:hover, .note-row:hover, .ticket-progress:hover,
-.filters a:not(.active):hover, .kb-item:hover, a.ov-row:hover, .fx-sla-row:hover {
+.filters a:not(.active):hover, .kb-item:hover, a.ov-row:hover {
   background-color: rgba(var(--glow-a), .12);
   box-shadow: inset 3px 0 0 rgb(var(--glow-a)), 0 0 0 1px rgba(var(--glow-a), .22);
   color: var(--text);
@@ -136,3 +136,20 @@ tr[data-href]:hover td:first-child { box-shadow: inset 2px 0 0 rgb(var(--glow-a)
 tbody tr[data-href]:hover td, tbody tr:hover td { background-color: rgba(var(--glow-a), .09); }
 .btn:not(.primary):hover, .chip[href]:hover, a.chip:hover { border-color: rgba(var(--glow-a), .6); background-color: rgba(var(--glow-a), .12); }
 .attn-row, .side-nav a, .filters a, .kb-item { transition: background-color .15s, box-shadow .15s, color .15s; }
+
+/* Round two: every remaining clickable block, link and title gets the same accent hover (bars, device/asset cells, server rows, team cards, plain text links). */
+.bar-row:hover, .device-top:hover, .fx-teamcard:hover, .bell:hover, a.kpi:hover {
+  background-color: rgba(var(--glow-a), .14);
+  box-shadow: inset 3px 0 0 rgb(var(--glow-a));
+  border-radius: 10px; text-decoration: none;
+}
+.bar-row, .asset-cell, .device-top, a.srv { transition: background-color .15s, box-shadow .15s, color .15s; }
+.bar-row { padding-left: .5rem; padding-right: .5rem; margin-left: -.5rem; margin-right: -.5rem; }
+.bar-row:hover .bar-label, .asset-cell:hover b, .device-top:hover b, a.srv:hover b, a.srv:hover .name { color: rgb(var(--glow-a)); text-decoration: none; }
+tbody tr:hover td a:not(.btn):not(.fx-btn), tr[data-href]:hover td:first-child, tbody tr:hover td b { color: rgb(var(--glow-a)); }
+main a.small:hover, .panel-head a:hover, main a:not([class]):hover {
+  color: rgb(var(--glow-a)); text-decoration: underline; text-underline-offset: 3px;
+}
+a, button, [role="button"], tr[data-href], summary, label[for], select { cursor: pointer; }
+/* Stronger tint so the highlight reads at a glance on both themes. */
+.side-nav a:not(.active):hover, .attn-row:hover, .note-row:hover, .ticket-progress:hover, .filters a:not(.active):hover, .kb-item:hover, tbody tr:hover td { background-color: rgba(var(--glow-a), .16); }
