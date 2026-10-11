@@ -186,6 +186,12 @@ HELPLY_AI_BACKEND = os.environ.get("HELPLY_AI_BACKEND", "apps.ai.backends.keywor
 HELPLY_AI_AUTO_TRIAGE_THRESHOLD = float(os.environ.get("HELPLY_AI_AUTO_TRIAGE_THRESHOLD", "0.6"))
 # Auto-assign auto-triaged tickets to the least-loaded technician of the group.
 HELPLY_AI_AUTO_ASSIGN = env_bool("HELPLY_AI_AUTO_ASSIGN", True)
+# Cloudflare Workers AI backend (apps.ai.backends.cloudflare.CloudflareBackend). The token is
+# pasted into .env by the administrator only; give it the Workers AI permission and nothing else.
+HELPLY_CF_ACCOUNT_ID = os.environ.get("HELPLY_CF_ACCOUNT_ID", "")
+HELPLY_CF_API_TOKEN = os.environ.get("HELPLY_CF_API_TOKEN", "")
+HELPLY_CF_AI_MODEL = os.environ.get("HELPLY_CF_AI_MODEL", "@cf/meta/llama-3.1-8b-instruct")
+HELPLY_CF_AI_TIMEOUT = float(os.environ.get("HELPLY_CF_AI_TIMEOUT", "6"))
 # Share of the resolution window elapsed after which a ticket is flagged "at risk".
 HELPLY_SLA_AT_RISK_RATIO = float(os.environ.get("HELPLY_SLA_AT_RISK_RATIO", "0.75"))
 

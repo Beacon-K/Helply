@@ -34,7 +34,7 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 | `apps/sla` | SLA 策略：暂停/恢复、即将超时、已超时；`/sla/` 设置页（时间写成 `30m`、`4h`、`1d 2h`） |
 | `apps/assets` | 资产台账，`live.py` 提供实时版本号 |
 | `apps/kb` | 知识库（Markdown，数据库为准；`seed_kb` 只新增，`--overwrite` 才覆盖） |
-| `apps/ai` | 关键词基线分类器（可替换后端）、AISuggestion 反馈、准确率 |
+| `apps/ai` | 关键词基线分类器（可替换后端；`backends/cloudflare.py` 可选接 Cloudflare Workers AI，失败自动退回关键词）、AISuggestion 反馈、准确率 |
 | `apps/notifications` | 站内铃铛 + 邮件，按「工单 + 类型」节流 |
 | `apps/monitoring` | 云服务器监控：模型、上报 API、告警转工单、`presenters.py`（页面和 JSON 数据）、`geo.py`（按 IP 在本地查国家，数据库在 `data/`）、`countries.py` |
 | `apps/core` | 仪表盘（`views.py`；公司概况数据在 `overview.py`：未分配工单、人员、云服务器、续费）、演示数据（`demo/`）、生产运维命令 |
@@ -43,7 +43,7 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 
 ## 常用命令
 ```bash
-python manage.py test                     # 全部测试（目前 232 项）
+python manage.py test                     # 全部测试（目前 238 项）
 python manage.py seed_demo               # 只补缺少的演示数据，已有的一律不动（生产环境下拒绝执行）
 python manage.py seed_demo --reset --overwrite  # 有意重置演示：删全部工单、演示人员/SLA/资产恢复原值（或运行 reset-demo.bat）
 python manage.py demo_passwords --rotate # 有意给全部演示账号换一批随机密码
