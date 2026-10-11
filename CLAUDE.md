@@ -39,7 +39,7 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 | `apps/monitoring` | 云服务器监控：模型、上报 API、告警转工单、`presenters.py`（页面和 JSON 数据）、`geo.py`（按 IP 在本地查国家，数据库在 `data/`）、`countries.py` |
 | `apps/core` | 仪表盘（`views.py`；公司概况数据在 `overview.py`：未分配工单、人员、云服务器、续费）、演示数据（`demo/`）、生产运维命令 |
 | `agent/` | 监控 agent（`helply_agent.py`）和 `install.sh` / `install.ps1` |
-| `templates/`, `static/css`, `static/js` | 模板、样式和脚本；监控模块用 `monitoring.css`、`fleet.js`、`fleet-detail.js`；白天/夜间主题是 `theme.css` + `theme.js`（颜色一律用变量，不要写死）；登录后的整体质感（毛玻璃栏、大字标题、圆角卡片、药丸按钮、分段筛选）在最后加载的 `apple.css`；登录页是独立的 `base_landing.html` + `landing.css`；国旗在 `static/img/flags/` |
+| `templates/`, `static/css`, `static/js` | 模板、样式和脚本；监控模块用 `monitoring.css`、`fleet.js`、`fleet-detail.js`；白天/夜间主题是 `theme.css` + `theme.js`（颜色一律用变量，不要写死）；登录后的整体质感（毛玻璃栏、大字标题、圆角卡片、药丸按钮、分段筛选）在 `apple.css`；其后最后加载的 `tech.css` + `tech.js` 是「控制台质感」（命令面板 Ctrl/Cmd+K、`g` 快捷键、光斑、悬停高亮）；登录页是独立的 `base_landing.html` + `landing.css`；国旗在 `static/img/flags/` |
 
 ## 常用命令
 ```bash
