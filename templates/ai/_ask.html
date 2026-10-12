@@ -1,0 +1,13 @@
+{# Employee self-service assistant. Answers come from the KB and the user's own tickets (apps.ai.assistant.ask). #}
+<section class="card ai-panel" data-ai-ask data-url="{% url 'ai:ask' %}" data-ticket-url="{% url 'tickets:create' %}">
+  {% csrf_token %}
+  <div class="ai-head">
+    <span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>Helply Assistant</span>
+    <small class="muted">Answers from our knowledge base and your own past tickets. Please don't paste passwords.</small>
+  </div>
+  <form class="ai-form">
+    <textarea rows="2" maxlength="500" placeholder="Describe your problem, e.g. “my VPN disconnects every few minutes”" aria-label="Ask the assistant"></textarea>
+    <button class="btn primary" type="submit">Ask</button>
+  </form>
+  <div class="ai-out" aria-live="polite" hidden></div>
+</section>

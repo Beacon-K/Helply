@@ -1,0 +1,47 @@
+{% load helply %}
+{# Administrator-only: recurring problems found in recent tickets (apps.ai.insights). #}
+<section class="card ins" id="ai-insights">
+  <div class="panel-head">
+    <h2><span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>AI insights</span></h2>
+    <span class="ins-meta">
+      {% if insights %}Last {{ insights.stats.days }} days · updated {{ insights.report.created_at|ago }}{% endif %}
+      <button type="button" class="btn small-btn" data-ai-insights-refresh data-url="{% url 'ai:insights_refresh' %}">{% if insights %}Refresh{% else %}Analyse tickets{% endif %}</button>
+    </span>
+  </div>
+  {% csrf_token %}
+  {% if not insights %}
+    <p class="muted">No analysis yet. It runs automatically once a day, or press the button to run it now.</p>
+  {% elif not insights.enough_data %}
+    <p class="muted">Only {{ insights.stats.tickets }} ticket{{ insights.stats.tickets|pluralize }} in the last {{ insights.stats.days }} days. The analysis starts once there are a few more to compare.</p>
+  {% else %}
+    <div class="ins-stats">
+      <span><b>{{ insights.stats.tickets }}</b> tickets{% if insights.change_pct is not None %} <em class="{% if insights.change_pct > 0 %}t-warn{% else %}t-ok{% endif %}">{% if insights.change_pct > 0 %}+{% endif %}{{ insights.change_pct }}% vs previous</em>{% endif %}</span>
+      <span><b>{{ insights.stats.open_over_7d }}</b> open over 7 days</span>
+      <span><b>{{ insights.stats.reopened }}</b> reopened</span>
+      <span><b>{{ insights.stats.sla_breached }}</b> SLA breaches</span>
+    </div>
+    {% if insights.headline %}<p class="ins-headline">{{ insights.headline }}</p>{% endif %}
+    {% if not insights.ai %}<p class="muted small">The AI explanation is not available right now, so only measured patterns are shown.</p>{% endif %}
+    {% for r in insights.rows %}
+    <article class="ins-item sev-{{ r.severity }}">
+      <div class="ins-top">
+        <span class="ins-sev">{{ r.severity }}</span>
+        <b class="ins-title">{{ r.label }}</b>
+        <span class="ins-count">{{ r.count }} tickets · {{ r.people }} {{ r.people|pluralize:"person,people" }}{% if r.open %} · {{ r.open }} open{% endif %}</span>
+      </div>
+      {% if r.likely_cause %}<p><b>Likely cause</b> {{ r.likely_cause }}</p>{% endif %}
+      {% if r.prevention %}<p><b>Prevent it</b> {{ r.prevention }}</p>{% endif %}
+      <p class="ins-links">
+        {% for t in r.refs %}<a href="{% url 'tickets:detail' t.id %}">{{ t.ref }}</a>{% endfor %}
+        {% if r.assets %}<span class="muted">· {{ r.assets|join:", " }}</span>{% endif %}
+        <button type="button" class="ai-chip" data-ai-ask-about="Tell me more about this recurring problem and what to do: {{ r.label }}">Ask the assistant</button>
+      </p>
+    </article>
+    {% empty %}
+      <p class="muted">No problem has repeated three or more times in this period. 🎉</p>
+    {% endfor %}
+    {% if insights.watchlist %}
+    <div class="ins-watch"><b>Worth watching</b><ul>{% for w in insights.watchlist %}<li>{{ w }}</li>{% endfor %}</ul></div>
+    {% endif %}
+  {% endif %}
+</section>

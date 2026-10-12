@@ -5,6 +5,7 @@
   <h1>Knowledge base</h1>
   <a class="btn" href="{% url 'tickets:create' %}">Can't find an answer? Open a ticket</a>
 </div>
+{% include "ai/_ask.html" %}
 <form class="search" method="get" action="{% url 'kb:list' %}">
   <input name="q" value="{{ q }}" placeholder="Describe your problem, e.g. &quot;printer offline&quot; or &quot;outlook keeps asking for password&quot;" autofocus>
   <button class="btn primary">Search</button>

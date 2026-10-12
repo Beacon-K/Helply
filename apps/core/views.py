@@ -13,6 +13,7 @@ from django.shortcuts import render
 from django.utils import timezone
 
 from apps.accounts.models import User
+from apps.ai import insights
 from apps.ai.models import AISuggestion
 from apps.kb.models import Article
 from apps.sla.services import SLAState, sla_state
@@ -107,6 +108,7 @@ def administrator_context(user, now):
         "servers": overview.server_health(),
         "people": overview.people_overview(),
         "renewals": overview.renewals_and_assets(),
+        "insights": insights.present(insights.latest()),
     }
 
 

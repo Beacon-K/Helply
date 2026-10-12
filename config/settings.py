@@ -11,6 +11,7 @@ HELPLY_ENVIRONMENT selects the mode:
                that loads or wipes demo data refuses to run
 """
 import os
+import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -192,6 +193,21 @@ HELPLY_CF_ACCOUNT_ID = os.environ.get("HELPLY_CF_ACCOUNT_ID", "")
 HELPLY_CF_API_TOKEN = os.environ.get("HELPLY_CF_API_TOKEN", "")
 HELPLY_CF_AI_MODEL = os.environ.get("HELPLY_CF_AI_MODEL", "@cf/meta/llama-3.1-8b-instruct")
 HELPLY_CF_AI_TIMEOUT = float(os.environ.get("HELPLY_CF_AI_TIMEOUT", "6"))
+HELPLY_CF_ASSISTANT_TIMEOUT = float(os.environ.get("HELPLY_CF_ASSISTANT_TIMEOUT", "25"))  # answers are longer than a label
+# The conversational assistant uses a stronger model than the classifier: it follows the thread and sounds natural
+# (about 15 neurons per short turn, so the free 10,000/day still covers hundreds). Empty = same model as the classifier.
+HELPLY_CF_CHAT_MODEL = os.environ.get("HELPLY_CF_CHAT_MODEL", "@cf/meta/llama-3.3-70b-instruct-fp8-fast")
+# Assistant (employee Q&A + technician copilot): per-user hourly cap protects the Workers AI free quota.
+HELPLY_AI_ASSISTANT_PER_HOUR = int(os.environ.get("HELPLY_AI_ASSISTANT_PER_HOUR", "20"))
+# Admin insights: how far back to look, how often the scheduled job refreshes, and the manual-refresh cooldown.
+HELPLY_AI_INSIGHTS_DAYS = int(os.environ.get("HELPLY_AI_INSIGHTS_DAYS", "30"))
+HELPLY_AI_INSIGHTS_HOURS = int(os.environ.get("HELPLY_AI_INSIGHTS_HOURS", "24"))
+HELPLY_AI_INSIGHTS_COOLDOWN_MIN = int(os.environ.get("HELPLY_AI_INSIGHTS_COOLDOWN_MIN", "10"))
+# `manage.py test` must never reach Cloudflare: it would spend the free quota, make the suite slow and
+# let a developer's .env change test outcomes. Tests that need a model use a fake backend.
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    HELPLY_AI_BACKEND = "apps.ai.backends.keyword.KeywordBackend"
+    HELPLY_CF_ACCOUNT_ID = HELPLY_CF_API_TOKEN = ""
 # Share of the resolution window elapsed after which a ticket is flagged "at risk".
 HELPLY_SLA_AT_RISK_RATIO = float(os.environ.get("HELPLY_SLA_AT_RISK_RATIO", "0.75"))
 

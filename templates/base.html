@@ -25,6 +25,7 @@
 <div class="app-main">
 <header class="topbar">
   <button type="button" class="cmdk-trigger" data-cmdk aria-label="Open the command palette"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="label">Search or jump to…</span><kbd>Ctrl K</kbd></button>
+  <button type="button" class="ai-launch" data-ai-open aria-label="Open the Helply Assistant" title="Helply Assistant (Ctrl J)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg><span class="label">Assistant</span></button>
   <div class="who">
     {% include "partials/theme_toggle.html" %}
     <a class="bell" href="{% url 'notifications:list' %}" data-bell data-url="{% url 'notifications:unread' %}"
@@ -46,8 +47,9 @@
 </div>
 </div>
 {% endif %}
+{% if user.is_authenticated %}{% include "ai/_drawer.html" %}{% endif %}
 <script src="{% static 'js/theme.js' %}?v={{ asset_version }}" defer></script>
-{% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/tech.js' %}?v={{ asset_version }}" defer></script>{% endif %}
+{% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/tech.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/assistant.js' %}?v={{ asset_version }}" defer></script>{% endif %}
 {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -111,7 +111,10 @@ var searchPanel = overlay.querySelector(".tc-palette"), sheetPanel = overlay.que
     var pages = nav.filter(function (n) { return !lower || n.label.toLowerCase().indexOf(lower) >= 0; })
       .map(function (n) { return { group: "Go to", label: n.label, href: n.href, icon: n.icon, key: chordFor(n.href) }; });
     out = out.concat(pages);
+    var ai = window.HelplyAssistant;
+    if (ai && q.length >= 3) out.push({ group: "Assistant", label: "Ask the assistant: " + q.slice(0, 80), run: function () { ai.ask(q); }, icon: '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>' });
     var actions = [
+      { group: "Actions", label: "Open the assistant", run: function () { if (ai) ai.open(); }, icon: '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>' },
       { group: "Actions", label: "Switch light / dark theme", run: function () { var b = document.querySelector("[data-theme-toggle]"); if (b) b.click(); }, icon: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>' },
       { group: "Actions", label: "Notifications", href: "/notifications/", icon: '<svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7 2.5 7h-17S6 15 6 9Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>' },
       { group: "Actions", label: "Change password", href: "/accounts/password_change/", icon: '<svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' },

@@ -18,6 +18,8 @@
       {% if ticket.resolution_note %}<h3>Resolution</h3><p class="pre">{{ ticket.resolution_note }}</p>{% endif %}
     </section>
 
+    {% if user.is_agent %}{% include "ai/_copilot.html" %}{% endif %}
+
     {% if actions %}
     <section class="card">
       <h2>Actions</h2>

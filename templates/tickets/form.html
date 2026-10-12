@@ -2,6 +2,7 @@
 {% block title %}New ticket{% endblock %}
 {% block content %}
 <h1>Report an IT issue</h1>
+<div class="narrow">{% include "ai/_ask.html" %}</div>
 <div class="card narrow">
   <form method="post">{% csrf_token %}
     {{ form.as_p }}

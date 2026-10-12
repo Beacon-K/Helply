@@ -34,16 +34,16 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 | `apps/sla` | SLA 策略：暂停/恢复、即将超时、已超时；`/sla/` 设置页（时间写成 `30m`、`4h`、`1d 2h`） |
 | `apps/assets` | 资产台账，`live.py` 提供实时版本号 |
 | `apps/kb` | 知识库（Markdown，数据库为准；`seed_kb` 只新增，`--overwrite` 才覆盖） |
-| `apps/ai` | 关键词基线分类器（可替换后端；`backends/cloudflare.py` 可选接 Cloudflare Workers AI，失败自动退回关键词）、AISuggestion 反馈、准确率 |
+| `apps/ai` | 关键词基线分类器（可替换后端；`backends/cloudflare.py` 可选接 Cloudflare Workers AI，失败自动退回关键词；`assistant.py` 是 Helply Assistant：员工在工单创建页/知识库页提问（只依据知识库和本人历史工单），技术员在工单详情页用 copilot；`chat.py` 是主窗口右侧的助手抽屉（Ctrl/Cmd+J，多轮真实对话，默认用 `HELPLY_CF_CHAT_MODEL` 的 70B 模型；三种角色；公司事实只依据传入的数据，模型回复末尾的 BASIS/SOURCES 标记由代码校验，一般 IT 常识会标注「不是知识库」）；`insights.py` 是管理员的工单分析（代码统计数字、模型只解释原因和预防，仪表盘卡片，`ai_insights` 命令每天由 run_jobs 刷新）；接口在 `/ai/`，每人每小时有次数上限）、AISuggestion 反馈、准确率 |
 | `apps/notifications` | 站内铃铛 + 邮件，按「工单 + 类型」节流 |
 | `apps/monitoring` | 云服务器监控：模型、上报 API、告警转工单、`presenters.py`（页面和 JSON 数据）、`geo.py`（按 IP 在本地查国家，数据库在 `data/`）、`countries.py` |
 | `apps/core` | 仪表盘（`views.py`；公司概况数据在 `overview.py`：未分配工单、人员、云服务器、续费）、演示数据（`demo/`）、生产运维命令 |
 | `agent/` | 监控 agent（`helply_agent.py`）和 `install.sh` / `install.ps1` |
-| `templates/`, `static/css`, `static/js` | 模板、样式和脚本；监控模块用 `monitoring.css`、`fleet.js`、`fleet-detail.js`；白天/夜间主题是 `theme.css` + `theme.js`（颜色一律用变量，不要写死）；登录后的整体质感（毛玻璃栏、大字标题、圆角卡片、药丸按钮、分段筛选）在 `apple.css`；其后最后加载的 `tech.css` + `tech.js` 是「控制台质感」（命令面板 Ctrl/Cmd+K、`g` 快捷键、光斑、悬停高亮）；登录页是独立的 `base_landing.html` + `landing.css`；国旗在 `static/img/flags/` |
+| `templates/`, `static/css`, `static/js` | 模板、样式和脚本；监控模块用 `monitoring.css`、`fleet.js`、`fleet-detail.js`；白天/夜间主题是 `theme.css` + `theme.js`（颜色一律用变量，不要写死）；登录后的整体质感（毛玻璃栏、大字标题、圆角卡片、药丸按钮、分段筛选）在 `apple.css`；其后最后加载的 `tech.css` + `tech.js`（助手面板样式也在 tech.css，脚本是 `assistant.js`） 是「控制台质感」（命令面板 Ctrl/Cmd+K、`g` 快捷键、光斑、悬停高亮）；登录页是独立的 `base_landing.html` + `landing.css`；国旗在 `static/img/flags/` |
 
 ## 常用命令
 ```bash
-python manage.py test                     # 全部测试（目前 238 项）
+python manage.py test                     # 全部测试（目前 273 项）
 python manage.py seed_demo               # 只补缺少的演示数据，已有的一律不动（生产环境下拒绝执行）
 python manage.py seed_demo --reset --overwrite  # 有意重置演示：删全部工单、演示人员/SLA/资产恢复原值（或运行 reset-demo.bat）
 python manage.py demo_passwords --rotate # 有意给全部演示账号换一批随机密码

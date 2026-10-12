@@ -1,0 +1,37 @@
+{# Helply Assistant: the chat drawer available on every signed-in page (apps.ai.chat). #}
+<aside class="ai-drawer" id="ai-drawer" hidden aria-label="Helply Assistant" data-url="{% url 'ai:chat' %}"
+       data-feedback="{% url 'ai:feedback' 0 %}" data-ticket-url="{% url 'tickets:create' %}">
+  {% csrf_token %}
+  <header class="aid-head">
+    <span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>Helply Assistant</span>
+    <span class="aid-actions">
+      <button type="button" class="aid-icon" data-aid-new title="New chat" aria-label="Start a new chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button type="button" class="aid-icon" data-aid-close title="Close" aria-label="Close the assistant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </span>
+  </header>
+  <div class="aid-log" role="log" aria-live="polite">
+    <div class="aid-welcome">
+      <p class="aid-hello">{% if user.is_administrator %}What should we look at today?{% elif user.is_technician %}How can I help with your queue?{% else %}How can I help with IT today?{% endif %}</p>
+      <p class="muted small">{% if user.is_agent %}I can use your tickets, the knowledge base and internal runbooks{% if user.is_administrator %}, and the latest ticket analysis{% endif %}.{% else %}I answer from our knowledge base and your own tickets.{% endif %} Please don't paste passwords.</p>
+      <div class="aid-starters">
+        {% if user.is_administrator %}
+        <button type="button" data-prompt="What problems keep recurring, and what is the likely cause?">What keeps recurring?</button>
+        <button type="button" data-prompt="Which open tickets should I look at first and why?">What needs attention first?</button>
+        <button type="button" data-prompt="What could turn into a bigger incident if we do nothing?">What could get worse?</button>
+        {% elif user.is_technician %}
+        <button type="button" data-prompt="Summarise my open tickets and tell me what to work on first.">Plan my queue</button>
+        <button type="button" data-prompt="Which of my tickets are closest to breaching their SLA?">SLA risks</button>
+        <button type="button" data-prompt="Help me write a reply to a user whose VPN keeps disconnecting.">Draft a reply</button>
+        {% else %}
+        <button type="button" data-prompt="My VPN keeps disconnecting. What can I try?">VPN keeps disconnecting</button>
+        <button type="button" data-prompt="What is the status of my open tickets?">Status of my tickets</button>
+        <button type="button" data-prompt="Help me write a clear ticket about my problem.">Help me write a ticket</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <form class="aid-form">
+    <textarea rows="1" maxlength="800" placeholder="Ask anything about IT or your tickets…" aria-label="Message the assistant"></textarea>
+    <button class="btn primary" type="submit" aria-label="Send">Send</button>
+  </form>
+</aside>
