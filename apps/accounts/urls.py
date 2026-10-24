@@ -14,7 +14,8 @@ urlpatterns = [
     path("teams/new/", views.team_create, name="team_create"),
     path("teams/<int:pk>/", views.team_edit, name="team_edit"),
     path("teams/<int:pk>/delete/", views.team_delete, name="team_delete"),
-    path("<int:pk>/", views.people_edit, name="edit"),
+    path("<int:pk>/", views.people_profile, name="profile"),
+    path("<int:pk>/edit/", views.people_edit, name="edit"),
     path("<int:pk>/toggle/", views.people_toggle, name="toggle"),
     path("<int:pk>/reset/", views.people_reset, name="reset"),
 ]

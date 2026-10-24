@@ -1,0 +1,35 @@
+{% extends "base.html" %}{% load static helply %}
+{% block title %}{{ person }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <nav class="fx-crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'people:list' %}">People</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    <span aria-current="page">{{ person }}</span>
+  </nav>
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">{{ person.get_role_display }}{% if person.department %} · {{ person.department }}{% endif %}</p>
+      <h1 class="fx-title">{{ person.get_full_name|default:person.username }}{% if not person.is_active %} <i class="fx-off">Turned off</i>{% endif %}</h1>
+      <p class="fx-lede">{{ person.email|default:person.username }}{% if person.phone %} · {{ person.phone }}{% endif %} · {% if person.last_login %}last signed in {{ person.last_login|ago }}{% else %}has not signed in yet{% endif %}</p>
+    </div>
+    <div class="fx-actions">
+      {% if user.is_administrator %}<a class="fx-btn" href="{% url 'people:edit' person.pk %}">Edit person</a>{% endif %}
+      {% if person.is_active %}<a class="fx-btn fx-btn-primary" href="{% url 'tickets:create_for' person.pk %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Submit a ticket for {{ person.first_name|default:person.username }}</a>{% endif %}
+    </div>
+  </header>
+
+  <section class="fx-fieldset">
+    <div><h2>Their tickets</h2><p>{{ open_requested }} open. Newest first.</p></div>
+    <div class="fx-fields">
+      {% for t in recent %}
+        <p class="full"><a href="{{ t.get_absolute_url }}"><b>{{ t.reference }}</b> {{ t.title }}</a> <small class="muted">{{ t.get_status_display }} · {{ t.created_at|date:"M j" }}</small></p>
+      {% empty %}
+        <p class="full muted">They have not raised any tickets.</p>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}New ticket for {{ person }}{% endblock %}
+{% block content %}
+<h1>Submit a ticket for {{ person.get_full_name|default:person.username }}</h1>
+<p class="muted narrow">{{ person.email|default:person.username }} will be the requester and gets the confirmation and every update. The history records that you filed it.</p>
+<div class="card narrow">
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn primary">Submit ticket</button>
+    <a class="btn" href="{% url 'people:profile' person.pk %}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

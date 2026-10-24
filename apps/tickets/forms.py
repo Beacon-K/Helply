@@ -3,6 +3,7 @@ from django import forms
 from apps.accounts.models import User
 from apps.assets.models import Asset
 
+from .choices import Channel
 from .models import Category, Ticket
 
 
@@ -23,6 +24,16 @@ class TicketCreateForm(forms.ModelForm):
         self.fields["category"].empty_label = "Not sure - let Helply decide"
         self.fields["asset"].queryset = Asset.objects.filter(owner=user)
         self.fields["asset"].empty_label = "None / not listed"
+
+
+class TicketOnBehalfForm(TicketCreateForm):
+    """IT staff filing for someone else: same fields, plus how the request reached IT. Devices are the requester's."""
+    channel = forms.ChoiceField(
+        choices=[(c, l) for c, l in Channel.choices if c != Channel.MONITORING], initial=Channel.PHONE,
+        label="How did they contact you?")
+
+    class Meta(TicketCreateForm.Meta):
+        fields = TicketCreateForm.Meta.fields
 
 
 class CommentForm(forms.Form):

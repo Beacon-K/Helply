@@ -16,7 +16,7 @@ from django.views.decorators.http import require_POST
 from apps.notifications.services import deliver, email_is_blocked
 from apps.tickets.choices import OPEN_STATUSES
 
-from .decorators import role_required
+from .decorators import agent_required, role_required
 from .forms import DepartmentForm, TeamForm, UserForm, last_admin_guard
 from .models import Department, SupportGroup, User
 
@@ -50,7 +50,7 @@ def _department_menu(everyone, status):
     return {"total": sum(d["n"] for d in depts), "depts": depts}
 
 
-@admin_only
+@agent_required
 def people_list(request):
     role = request.GET.get("role", "")
     status = "inactive" if request.GET.get("status") == "inactive" else "active"  # only these two views exist
@@ -82,6 +82,16 @@ def people_list(request):
         "roles": User.Role.choices, "counts": counts, "active_total": sum(counts.values()),
         "inactive_total": everyone.filter(is_active=False).count(),
     })
+
+
+@agent_required
+def people_profile(request, pk):
+    """Read-only card for any IT person: who they are, their recent tickets, and the way to file one for them."""
+    person = get_object_or_404(User.objects.select_related("department"), pk=pk)
+    recent = person.requested_tickets.order_by("-created_at")[:5]
+    return render(request, "people/profile.html", {
+        "person": person, "recent": recent,
+        "open_requested": person.requested_tickets.filter(status__in=OPEN_STATUSES).count()})
 
 
 @admin_only

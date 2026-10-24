@@ -33,8 +33,7 @@ class PeopleBase(TestCase):
 
 class PeopleAccessTests(PeopleBase):
     def test_only_administrators_get_in(self):
-        urls = [reverse("people:list"), reverse("people:create"), reverse("people:edit", args=[self.emp.pk]),
-                reverse("sla:settings")]
+        urls = [reverse("people:create"), reverse("people:edit", args=[self.emp.pk]), reverse("sla:settings")]
         for user, expected in ((self.emp, 403), (self.tech, 403), (self.admin, 200)):
             self.client.force_login(user)
             for url in urls:
@@ -42,14 +41,31 @@ class PeopleAccessTests(PeopleBase):
         self.client.logout()
         self.assertEqual(self.client.get(urls[0]).status_code, 302)  # sent to sign in
 
+    def test_it_staff_can_browse_but_employees_cannot(self):
+        urls = [reverse("people:list"), reverse("people:profile", args=[self.emp.pk])]
+        for user, expected in ((self.emp, 403), (self.tech, 200), (self.admin, 200)):
+            self.client.force_login(user)
+            for url in urls:
+                self.assertEqual(self.client.get(url).status_code, expected, (user.username, url))
+
+    def test_technician_list_has_no_management_buttons(self):
+        self.client.force_login(self.tech)
+        page = self.client.get(reverse("people:list"))
+        self.assertNotContains(page, reverse("people:create"))
+        self.assertContains(page, reverse("people:profile", args=[self.emp.pk]))
+
     def test_actions_need_post_and_admin(self):
         self.client.force_login(self.tech)
         self.assertEqual(self.client.post(reverse("people:toggle", args=[self.emp.pk])).status_code, 403)
         self.client.force_login(self.admin)
         self.assertEqual(self.client.get(reverse("people:toggle", args=[self.emp.pk])).status_code, 405)
 
-    def test_sidebar_links_are_for_administrators_only(self):
+    def test_sidebar_links(self):
         self.client.force_login(self.tech)
+        page = self.client.get(reverse("core:dashboard"))
+        self.assertContains(page, reverse("people:list"))
+        self.assertNotContains(page, reverse("sla:settings"))
+        self.client.force_login(self.emp)
         self.assertNotContains(self.client.get(reverse("core:dashboard")), reverse("people:list"))
         self.client.force_login(self.admin)
         page = self.client.get(reverse("core:dashboard"))
@@ -694,3 +710,34 @@ class AdminHeaderTests(PeopleBase):
         self.assertIn("Change my password", page)
         done = self.client.get("/accounts/password_change/done/").content.decode()
         self.assertIn("Password changed", done)
+
+
+class TicketOnBehalfTests(PeopleBase):
+    def payload_for_ticket(self):
+        return {"title": "Printer jammed", "description": "Paper stuck", "impact": 3, "urgency": 3, "channel": "phone"}
+
+    def test_profile_offers_the_ticket_entry_and_it_files_for_the_employee(self):
+        from apps.tickets.models import Ticket, TicketEvent
+        self.client.force_login(self.tech)
+        profile = self.client.get(reverse("people:profile", args=[self.emp.pk]))
+        self.assertContains(profile, reverse("tickets:create_for", args=[self.emp.pk]))
+        response = self.client.post(reverse("tickets:create_for", args=[self.emp.pk]), self.payload_for_ticket())
+        ticket = Ticket.objects.get()
+        self.assertRedirects(response, ticket.get_absolute_url())
+        self.assertEqual(ticket.requester, self.emp)
+        self.assertEqual(ticket.channel, "phone")
+        event = TicketEvent.objects.get(ticket=ticket, kind=TicketEvent.Kind.CREATED)
+        self.assertEqual(event.actor, self.tech)
+        self.assertIn("on behalf of", event.note)
+
+    def test_employees_cannot_file_for_others(self):
+        other = User.objects.create_user("omar", password="x")
+        self.client.force_login(self.emp)
+        url = reverse("tickets:create_for", args=[other.pk])
+        self.assertEqual(self.client.get(url).status_code, 403)
+        self.assertEqual(self.client.post(url, self.payload_for_ticket()).status_code, 403)
+
+    def test_turned_off_accounts_get_no_ticket(self):
+        gone = User.objects.create_user("gone", password="x", is_active=False)
+        self.client.force_login(self.admin)
+        self.assertEqual(self.client.get(reverse("tickets:create_for", args=[gone.pk])).status_code, 404)

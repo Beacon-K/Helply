@@ -4,12 +4,14 @@ from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from apps.accounts.decorators import agent_required
+from apps.accounts.models import User
 from apps.ai import services as ai
 from apps.sla.services import sla_state
 
 from . import services, workflow
 from .choices import DEFAULT_LIST_FILTER, LIST_FILTERS, Status
-from .forms import AssignForm, CategoryForm, CommentForm, SurveyForm, TicketCreateForm
+from .forms import AssignForm, CategoryForm, CommentForm, SurveyForm, TicketCreateForm, TicketOnBehalfForm
 from .selectors import visible_tickets
 
 
@@ -49,6 +51,19 @@ def ticket_create(request):
         messages.success(request, f"Ticket {ticket.reference} submitted.")
         return redirect(ticket)
     return render(request, "tickets/form.html", {"form": form})
+
+
+@agent_required
+def ticket_create_for(request, user_id):
+    """IT staff submit a ticket for an employee (reached from People). The employee is the requester and is notified."""
+    person = get_object_or_404(User, pk=user_id, is_active=True)
+    initial = {key: request.GET[key] for key in ("category", "asset") if request.GET.get(key, "").isdigit()}
+    form = TicketOnBehalfForm(request.POST or None, user=person, initial=initial)
+    if request.method == "POST" and form.is_valid():
+        ticket = services.create_ticket(requester=person, created_by=request.user, **form.cleaned_data)
+        messages.success(request, f"Ticket {ticket.reference} submitted for {person}.")
+        return redirect(ticket)
+    return render(request, "tickets/form_for.html", {"form": form, "person": person})
 
 
 @login_required

@@ -7,13 +7,13 @@
 <div class="fx">
   <header class="fx-head">
     <div>
-      <p class="fx-eyebrow">Administration</p>
+      <p class="fx-eyebrow">{% if user.is_administrator %}Administration{% else %}Directory{% endif %}</p>
       <h1 class="fx-title">People</h1>
       <p class="fx-lede">{{ active_total }} active · {{ counts.administrator }} administrator{{ counts.administrator|pluralize }}, {{ counts.technician }} technician{{ counts.technician|pluralize }}, {{ counts.employee }} employee{{ counts.employee|pluralize }}</p>
     </div>
     <div class="fx-actions">
-      <a class="fx-btn" href="{% url 'people:organization' %}">Departments and teams</a>
-      <a class="fx-btn fx-btn-primary" href="{% url 'people:create' %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add person</a>
+      {% if user.is_administrator %}<a class="fx-btn" href="{% url 'people:organization' %}">Departments and teams</a>
+      <a class="fx-btn fx-btn-primary" href="{% url 'people:create' %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add person</a>{% endif %}
     </div>
   </header>
 
@@ -51,8 +51,8 @@
       <thead><tr><th>Person</th><th>Role</th><th>Department</th><th>Teams</th><th class="r" title="Open tickets: assigned to them (technicians) or raised by them (employees)">Tickets</th><th>Last sign-in</th></tr></thead>
       <tbody>
       {% for p in people %}
-        <tr data-href="{% url 'people:edit' p.pk %}"{% if not p.is_active %} class="is-off"{% endif %}>
-          <td><a class="srv" href="{% url 'people:edit' p.pk %}"><span class="fx-avatar is-{{ p.role }}" aria-hidden="true">{{ p.first_name|slice:":1"|default:p.username|slice:":1"|upper }}{{ p.last_name|slice:":1"|upper }}</span><span><b>{{ p.get_full_name|default:p.username }}{% if not p.is_active %} <i class="fx-off">Turned off</i>{% endif %}</b><small>{{ p.email|default:p.username }}</small></span></a></td>
+        <tr data-href="{% url 'people:profile' p.pk %}"{% if not p.is_active %} class="is-off"{% endif %}>
+          <td><a class="srv" href="{% url 'people:profile' p.pk %}"><span class="fx-avatar is-{{ p.role }}" aria-hidden="true">{{ p.first_name|slice:":1"|default:p.username|slice:":1"|upper }}{{ p.last_name|slice:":1"|upper }}</span><span><b>{{ p.get_full_name|default:p.username }}{% if not p.is_active %} <i class="fx-off">Turned off</i>{% endif %}</b><small>{{ p.email|default:p.username }}</small></span></a></td>
           <td><span class="fx-role is-{{ p.role }}">{{ p.get_role_display }}</span></td>
           <td>{{ p.department|default:"–" }}</td>
           <td>{% for g in p.support_groups.all %}<span class="fx-tag">{{ g.name }}</span>{% empty %}–{% endfor %}</td>

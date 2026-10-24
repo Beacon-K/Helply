@@ -10,8 +10,11 @@ from .models import Satisfaction, Ticket, TicketComment, TicketEvent
 
 
 def create_ticket(*, requester, title, description, impact, urgency,
-                  category=None, asset=None, channel=Channel.PORTAL):
-    """Submit a ticket: save it, let AI triage it if needed, start the SLA clock."""
+                  category=None, asset=None, channel=Channel.PORTAL, created_by=None):
+    """Submit a ticket: save it, let AI triage it if needed, start the SLA clock.
+
+    `created_by` is the IT person who filed it for someone else (phone call, walk-up); the history records them.
+    """
     from apps.ai import services as ai
 
     with transaction.atomic():
@@ -19,8 +22,10 @@ def create_ticket(*, requester, title, description, impact, urgency,
             requester=requester, title=title, description=description,
             impact=impact, urgency=urgency, category=category, asset=asset, channel=channel,
         )
-        TicketEvent.objects.create(ticket=ticket, actor=requester, kind=TicketEvent.Kind.CREATED,
-                                   to_status=ticket.status)
+        on_behalf = created_by is not None and created_by.pk != requester.pk
+        TicketEvent.objects.create(ticket=ticket, actor=created_by if on_behalf else requester,
+                                   kind=TicketEvent.Kind.CREATED, to_status=ticket.status,
+                                   note=f"Submitted by {created_by} on behalf of {requester}" if on_behalf else "")
         if category is not None:
             ticket.support_group = category.default_group
         else:
