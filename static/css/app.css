@@ -296,3 +296,13 @@ tr.just-updated td, .just-updated { animation: row-flash 4s ease-out; }
 .bar-row .bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .card .attn-row + .ov-stats { margin-top: .6rem; }
 .ov-card .bar-row { grid-template-columns: 8.4rem minmax(0, 1fr) 2.2rem; }  /* long department names ("Customer Service") fit */
+
+/* Assets: bulk Excel import / export */
+.dash-head .head-actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+.bulk-import { margin-bottom: 1rem; }
+.bulk-import > summary { cursor: pointer; font-weight: 500; }
+.bulk-import-form { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+.bulk-import-form input[type=file] { flex: 1; min-width: 220px; max-width: 100%; }
+.bulk-actions { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+.bulk-actions form { margin: 0; }
+.bulk-actions .btn[disabled] { opacity: .5; cursor: not-allowed; }

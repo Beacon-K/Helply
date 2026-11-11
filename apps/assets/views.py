@@ -2,14 +2,19 @@ from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.contrib import messages
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 
+from apps.accounts.decorators import agent_required
 from apps.sla.services import sla_state
 from apps.tickets.choices import OPEN_STATUSES
 from apps.tickets.selectors import visible_tickets
 
+from . import bulk
 from .live import detail_version, list_version
 from .models import Asset
 
@@ -41,6 +46,20 @@ def with_ticket_counts(qs):
     )
 
 
+def filter_assets(assets, type_filter="", status_filter="", q=""):
+    """The register's search/filter rules, shared by the list page and the Excel export."""
+    shown = assets
+    if type_filter:
+        shown = [a for a in shown if a.type == type_filter]
+    if status_filter == "warranty":
+        shown = [a for a in shown if a.warranty_state in ("expired", "expiring") and a.status != Asset.Status.RETIRED]
+    elif status_filter:
+        shown = [a for a in shown if a.status == status_filter]
+    if q:
+        shown = [a for a in shown if matches_search(a, q)]
+    return shown
+
+
 @login_required
 def asset_list(request):
     assets = with_ticket_counts(visible_assets(request.user))
@@ -53,15 +72,7 @@ def asset_list(request):
     status_filter = request.GET.get("status", "")
     q = request.GET.get("q", "").strip().lower()
 
-    shown = everything
-    if type_filter:
-        shown = [a for a in shown if a.type == type_filter]
-    if status_filter == "warranty":
-        shown = [a for a in shown if a.warranty_state in ("expired", "expiring") and a.status != Asset.Status.RETIRED]
-    elif status_filter:
-        shown = [a for a in shown if a.status == status_filter]
-    if q:
-        shown = [a for a in shown if matches_search(a, q)]
+    shown = filter_assets(everything, type_filter, status_filter, q)
 
     type_counts = {}
     for a in everything:
@@ -118,3 +129,90 @@ def asset_list_version(request):
 def asset_detail_version(request, pk):
     asset = get_object_or_404(visible_assets(request.user), pk=pk)
     return JsonResponse({"version": detail_version(asset)})
+
+
+# ---------------------------------------------------------------- bulk Excel export / import
+
+XLSX_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+IMPORT_SESSION_KEY = "asset_import"
+
+
+def _xlsx_response(content, filename):
+    response = HttpResponse(content, content_type=XLSX_TYPE)
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
+@agent_required
+def asset_export(request):
+    """All assets matching the list page's current search/filter, as one .xlsx."""
+    assets = filter_assets(list(visible_assets(request.user)), request.GET.get("type", ""),
+                           request.GET.get("status", ""), request.GET.get("q", "").strip().lower())
+    return _xlsx_response(bulk.export_bytes(assets), f"helply-assets-{timezone.localdate().isoformat()}.xlsx")
+
+
+@agent_required
+def asset_import_template(request):
+    return _xlsx_response(bulk.template_bytes(), "helply-assets-template.xlsx")
+
+
+@agent_required
+@require_POST
+def asset_import(request):
+    """Step 1: read and validate the upload, keep only the cleaned cell text in the session, show a preview."""
+    upload = request.FILES.get("file")
+    if upload is None:
+        messages.error(request, "Choose an .xlsx file to import.")
+        return redirect("assets:list")
+    try:
+        parsed = bulk.read_upload(upload)
+    except bulk.SheetError as exc:
+        messages.error(request, f"Import rejected: {exc}")
+        return redirect("assets:list")
+    request.session[IMPORT_SESSION_KEY] = {"rows": [[n, d, e] for n, d, e in parsed],
+                                           "token": get_random_string(24)}
+    return redirect("assets:import_preview")
+
+
+def _pending_plan(request):
+    pending = request.session.get(IMPORT_SESSION_KEY)
+    if not pending:
+        return None, None
+    # Classified again on every request: the database may have changed since the file was uploaded.
+    return pending, bulk.classify([(n, d, e) for n, d, e in pending["rows"]])
+
+
+@agent_required
+def asset_import_preview(request):
+    pending, plan = _pending_plan(request)
+    if plan is None:
+        messages.info(request, "There is no import waiting. Upload a file first.")
+        return redirect("assets:list")
+    return render(request, "assets/import_preview.html", {
+        "plan": plan, "token": pending["token"],
+        "can_apply": bool(plan["create"] or plan["update"]),
+    })
+
+
+@agent_required
+@require_POST
+def asset_import_confirm(request):
+    """Step 2: apply the valid rows in one transaction. Rows with errors are skipped, nothing is deleted."""
+    pending, plan = _pending_plan(request)
+    if plan is None or request.POST.get("token") != pending["token"]:
+        messages.error(request, "That import has expired. Upload the file again.")
+        return redirect("assets:list")
+    del request.session[IMPORT_SESSION_KEY]
+    created, updated = bulk.apply_plan(plan)
+    skipped = len(plan["errors"])
+    messages.success(request, f"Import done: {created} created, {updated} updated, "
+                              f"{len(plan['unchanged'])} unchanged, {skipped} skipped because of errors.")
+    return redirect("assets:list")
+
+
+@agent_required
+@require_POST
+def asset_import_cancel(request):
+    request.session.pop(IMPORT_SESSION_KEY, None)
+    return redirect("assets:list")

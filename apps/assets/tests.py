@@ -215,3 +215,213 @@ class RenewalReminderTests(TestCase):
             call_command("renewal_reminders", stdout=__import__("io").StringIO())
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("web-1 renews in 3 days", mail.outbox[0].subject)
+
+
+class AssetBulkExcelTests(TestCase):
+    """Bulk .xlsx export / import (apps/assets/bulk.py, xlsx.py)."""
+
+    def setUp(self):
+        import io
+        from apps.accounts.models import Department
+        from . import bulk, xlsx
+        self.io, self.bulk, self.xlsx = io, bulk, xlsx
+        self.emp = User.objects.create_user("emp", password="x", email="emp@example.com")
+        self.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
+        self.dept = Department.objects.create(name="Finance")
+        self.laptop = Asset.objects.create(asset_tag="LT-1", name="Laptop", type="laptop", status="in_use",
+                                           owner=self.emp, notes='=HYPERLINK("http://evil")', location="HQ")
+        self.printer = Asset.objects.create(asset_tag="PR-1", name="Printer", type="printer", status="in_repair")
+        self.client.force_login(self.tech)
+
+    def sheet(self, rows, header=None):
+        data = self.xlsx.write_workbook([("Assets", [header or self.bulk.HEADERS] + rows, [])])
+        f = self.io.BytesIO(data)
+        f.name = "assets.xlsx"
+        return f
+
+    def row(self, **kw):
+        base = {k: "" for k in self.bulk.KEYS}
+        base.update(kw)
+        return [base[k] for k in self.bulk.KEYS]
+
+    def upload(self, fileobj):
+        return self.client.post(reverse("assets:import"), {"file": fileobj})
+
+    def confirm(self):
+        return self.client.post(reverse("assets:import_confirm"),
+                                {"token": self.client.session["asset_import"]["token"]})
+
+    def read_back(self, response):
+        return self.xlsx.read_rows(self.io.BytesIO(response.content))
+
+    # --- export / template
+    def test_export_has_every_asset_and_strips_formulas(self):
+        r = self.client.get(reverse("assets:export"))
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("spreadsheetml.sheet", r["Content-Type"])
+        self.assertIn("attachment", r["Content-Disposition"])
+        rows = self.read_back(r)
+        self.assertEqual(rows[0][1], self.bulk.HEADERS)
+        self.assertEqual(len(rows), 3)
+        by_tag = {cells[0]: cells for _, cells in rows[1:]}
+        self.assertEqual(by_tag["LT-1"][5], "emp")
+        self.assertFalse(by_tag["LT-1"][12].startswith(("=", "+", "-", "@")))
+
+    def test_export_honours_filters(self):
+        rows = self.read_back(self.client.get(reverse("assets:export"), {"status": "in_repair"}))
+        self.assertEqual([c[0] for _, c in rows[1:]], ["PR-1"])
+        rows = self.read_back(self.client.get(reverse("assets:export"), {"q": "laptop"}))
+        self.assertEqual([c[0] for _, c in rows[1:]], ["LT-1"])
+
+    def test_safe_text(self):
+        for raw in ("=1+1", "+1", "-1", "@SUM(A1)", "  =x", "\t=x"):
+            self.assertFalse(self.bulk.safe_text(raw).lstrip().startswith(("=", "+", "-", "@")), raw)
+        self.assertEqual(self.bulk.safe_text("Dell XPS"), "Dell XPS")
+
+    def test_template_has_headers_and_instructions(self):
+        import zipfile
+        r = self.client.get(reverse("assets:import_template"))
+        self.assertEqual(self.read_back(r)[0][1], self.bulk.HEADERS)
+        workbook = zipfile.ZipFile(self.io.BytesIO(r.content)).read("xl/workbook.xml").decode()
+        self.assertIn("Instructions", workbook)
+
+    def test_exported_file_reimports_without_creating_anything(self):
+        data = self.client.get(reverse("assets:export")).content
+        plan = self.bulk.classify(self.bulk.read_upload(self.io.BytesIO(data)))
+        self.assertEqual(plan["create"], [])
+        self.assertEqual(plan["errors"], [])
+        # Only the formula-looking note differs (export stripped its leading "=").
+        self.assertEqual([i["tag"] for i in plan["update"]], ["LT-1"])
+
+    # --- preview classification
+    def test_preview_classifies_rows(self):
+        r = self.upload(self.sheet([
+            self.row(asset_tag="NEW-1", name="Monitor", type="Monitor", owner="emp@example.com", department="Finance",
+                     purchase_date="2025-01-31", purchase_cost="199.5"),
+            self.row(asset_tag="PR-1", status="In use"),
+            self.row(asset_tag="LT-1", name="Laptop"),
+            self.row(asset_tag="BAD-1", name="X", type="spaceship"),
+            self.row(asset_tag="BAD-2", name="X", type="laptop", owner="nobody"),
+            self.row(asset_tag="BAD-3", name="X", type="laptop", purchase_date="31/01/2025"),
+            self.row(asset_tag="BAD-4", name="X", type="laptop", department="Nope"),
+            self.row(asset_tag="NEW-1", name="Dup", type="laptop"),
+            self.row(asset_tag="BAD-5", type="laptop"),
+        ]))
+        self.assertRedirects(r, reverse("assets:import_preview"))
+        page = self.client.get(reverse("assets:import_preview"))
+        plan = page.context["plan"]
+        self.assertEqual([i["tag"] for i in plan["create"]], ["NEW-1"])
+        self.assertEqual([i["tag"] for i in plan["update"]], ["PR-1"])
+        self.assertEqual([i["tag"] for i in plan["unchanged"]], ["LT-1"])
+        self.assertEqual(len(plan["errors"]), 6)
+        text = " ".join(e for i in plan["errors"] for e in i["errors"])
+        self.assertIn("Duplicate of row 2", text)
+        self.assertIn("nobody", text)
+        self.assertEqual(Asset.objects.count(), 2)  # the preview saves nothing
+
+    # --- confirm
+    def test_confirm_applies_valid_rows_and_deletes_nothing(self):
+        rows = [
+            self.row(asset_tag="NEW-1", name="Monitor", type="monitor", owner="emp", purchase_cost="10"),
+            self.row(asset_tag="PR-1", status="retired", location="Store"),
+            self.row(asset_tag="BAD", name="x", type="zzz"),
+        ]
+        self.upload(self.sheet(rows))
+        self.client.post(reverse("assets:import_confirm"), {"token": "wrong"})
+        self.assertEqual(Asset.objects.count(), 2)
+        self.confirm()
+        self.assertEqual(Asset.objects.count(), 3)
+        new = Asset.objects.get(asset_tag="NEW-1")
+        self.assertEqual((new.owner, str(new.purchase_cost), new.status), (self.emp, "10.00", "in_stock"))
+        self.printer.refresh_from_db()
+        self.assertEqual((self.printer.status, self.printer.location, self.printer.name),
+                         ("retired", "Store", "Printer"))
+        self.laptop.refresh_from_db()  # absent from the file: untouched
+        self.assertEqual((self.laptop.owner, self.laptop.status), (self.emp, "in_use"))
+        self.assertNotIn("asset_import", self.client.session)
+
+    def test_empty_cell_never_clears_existing_value(self):
+        self.upload(self.sheet([self.row(asset_tag="LT-1", status="in_stock")]))
+        self.confirm()
+        self.laptop.refresh_from_db()
+        self.assertEqual((self.laptop.status, self.laptop.owner, self.laptop.location), ("in_stock", self.emp, "HQ"))
+
+    # --- bad files
+    def test_bad_files_are_rejected(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        ok_row = self.row(asset_tag="A", name="n", type="laptop")
+        xlsx_mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        bad = [
+            SimpleUploadedFile("a.xlsx", b"not a workbook", content_type=xlsx_mime),
+            SimpleUploadedFile("a.xlsx", b""),
+            SimpleUploadedFile("a.xlsx", b"PK\x03\x04garbage"),
+            SimpleUploadedFile("a.xlsx", b"asset_tag,name\nA,b\n", content_type="text/csv"),
+            self.sheet([ok_row], header=["Tag", "Name"]),
+            self.sheet([ok_row], header=self.bulk.HEADERS + ["Extra"]),
+            self.sheet([ok_row], header=self.bulk.HEADERS[1:]),
+            self.sheet([]),
+        ]
+        for f in bad:
+            r = self.upload(f)
+            self.assertRedirects(r, reverse("assets:list"), fetch_redirect_response=False)
+            self.assertNotIn("asset_import", self.client.session)
+        self.assertEqual(self.client.post(reverse("assets:import"), {}).status_code, 302)
+
+    def test_row_limit_and_size_limit(self):
+        rows = [self.row(asset_tag=f"T{i}", name="n", type="laptop") for i in range(self.bulk.MAX_ROWS + 1)]
+        with self.assertRaises(self.bulk.SheetError):
+            self.bulk.read_upload(self.sheet(rows))
+        big = self.io.BytesIO(b"PK\x03\x04" + b"0" * (self.xlsx.MAX_FILE_BYTES + 1))
+        with self.assertRaises(self.bulk.SheetError):
+            self.bulk.read_upload(big)
+
+    def _patched(self, fileobj, part, fn):
+        import zipfile
+        out = self.io.BytesIO()
+        with zipfile.ZipFile(self.io.BytesIO(fileobj.getvalue())) as zin, zipfile.ZipFile(out, "w") as zout:
+            for item in zin.namelist():
+                data = zin.read(item)
+                zout.writestr(item, fn(data) if item == part else data)
+        out.seek(0)
+        return out
+
+    def test_formula_cells_are_refused_not_evaluated(self):
+        f = self.sheet([self.row(asset_tag="F-1", name="n", type="laptop")])
+        patched = self._patched(f, "xl/worksheets/sheet1.xml", lambda d: d.replace(
+            b'<c r="B2" s="0" t="inlineStr"><is><t xml:space="preserve">n</t></is></c>',
+            b'<c r="B2"><f>1+1</f><v>2</v></c>'))
+        plan = self.bulk.classify(self.bulk.read_upload(patched))
+        self.assertEqual(len(plan["errors"]), 1)
+        self.assertIn("formulas", " ".join(plan["errors"][0]["errors"]))
+
+    def test_xml_entities_rejected(self):
+        patched = self._patched(self.sheet([]), "xl/workbook.xml", lambda d: (
+            b'<?xml version="1.0"?><!DOCTYPE x [<!ENTITY a "aaaa">]>' + d.split(b"?>", 1)[1]))
+        with self.assertRaises(self.bulk.SheetError):
+            self.bulk.read_upload(patched)
+
+    def test_dates_and_numbers_are_understood(self):
+        import datetime
+        data = self.xlsx.write_workbook([("Assets", [self.bulk.HEADERS, [
+            "D-2", "n", "laptop", "", 12345, "", "", "", "", datetime.date(2025, 3, 4), 5.5, "", ""]], [])])
+        values = self.bulk.read_upload(self.io.BytesIO(data))[0][1]
+        self.assertEqual((values["serial_number"], values["purchase_date"], values["purchase_cost"]),
+                         ("12345", "2025-03-04", "5.5"))
+
+    # --- permissions
+    def test_employees_and_anonymous_are_blocked(self):
+        gets = ["assets:export", "assets:import_template", "assets:import_preview"]
+        posts = ["assets:import", "assets:import_confirm", "assets:import_cancel"]
+        self.client.force_login(self.emp)
+        for n in gets:
+            self.assertEqual(self.client.get(reverse(n)).status_code, 403, n)
+        for n in posts:
+            self.assertEqual(self.client.post(reverse(n), {}).status_code, 403, n)
+        self.client.logout()
+        for n in gets:
+            self.assertEqual(self.client.get(reverse(n)).status_code, 302, n)
+
+    def test_list_page_shows_bulk_tools_to_staff_only(self):
+        self.assertContains(self.client.get(reverse("assets:list")), reverse("assets:export"))
+        self.client.force_login(self.emp)
+        self.assertNotContains(self.client.get(reverse("assets:list")), reverse("assets:export"))

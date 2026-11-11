@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Review asset import{% endblock %}
+{% block content %}
+<div class="dash-head">
+  <div>
+    <h1>Review asset import</h1>
+    <p class="muted">Nothing has been saved yet. Check the lists below, then confirm. Assets that are not in the file are left untouched.</p>
+  </div>
+</div>
+
+<section class="kpis">
+  <div class="kpi"><span class="kpi-label">Will be created</span><span class="kpi-value">{{ plan.create|length }}</span></div>
+  <div class="kpi"><span class="kpi-label">Will be updated</span><span class="kpi-value">{{ plan.update|length }}</span></div>
+  <div class="kpi"><span class="kpi-label">Unchanged</span><span class="kpi-value">{{ plan.unchanged|length }}</span></div>
+  <div class="kpi {% if plan.errors %}kpi-danger{% endif %}"><span class="kpi-label">Rows with errors</span><span class="kpi-value">{{ plan.errors|length }}</span><span class="kpi-sub">skipped on import</span></div>
+</section>
+
+<div class="card bulk-actions">
+  <form method="post" action="{% url 'assets:import_confirm' %}">
+    {% csrf_token %}<input type="hidden" name="token" value="{{ token }}">
+    <button class="btn primary" {% if not can_apply %}disabled{% endif %}>Confirm import ({{ plan.create|length }} new, {{ plan.update|length }} updated)</button>
+  </form>
+  <form method="post" action="{% url 'assets:import_cancel' %}">{% csrf_token %}<button class="btn">Cancel</button></form>
+  {% if plan.errors %}<span class="muted small">Rows with errors are skipped. Fix them in the file and import again if you need them.</span>{% endif %}
+</div>
+
+{% if plan.errors %}
+<div class="card">
+  <h2>Rows with errors</h2>
+  <div class="table-wrap"><table class="asset-table">
+    <tr><th>Row</th><th>Asset tag</th><th>Problem</th></tr>
+    {% for r in plan.errors %}<tr><td>{{ r.row }}</td><td>{{ r.tag|default:"–" }}</td><td>{% for e in r.errors %}<span class="chip chip-danger">{{ e }}</span> {% endfor %}</td></tr>{% endfor %}
+  </table></div>
+</div>
+{% endif %}
+
+{% if plan.create %}
+<div class="card">
+  <h2>New assets</h2>
+  <div class="table-wrap"><table class="asset-table">
+    <tr><th>Row</th><th>Asset tag</th><th>Name</th><th>Type</th><th>Status</th><th>Owner</th></tr>
+    {% for r in plan.create %}<tr><td>{{ r.row }}</td><td>{{ r.tag }}</td><td>{{ r.name }}</td><td>{{ r.values.type }}</td><td>{{ r.values.status|default:"in_stock" }}</td><td>{{ r.values.owner.username|default:"Shared" }}</td></tr>{% endfor %}
+  </table></div>
+</div>
+{% endif %}
+
+{% if plan.update %}
+<div class="card">
+  <h2>Existing assets that will change</h2>
+  <div class="table-wrap"><table class="asset-table">
+    <tr><th>Row</th><th>Asset</th><th>Changes</th></tr>
+    {% for r in plan.update %}<tr><td>{{ r.row }}</td><td><b>{{ r.name }}</b><br><small class="muted">{{ r.tag }}</small></td>
+      <td>{% for field, old, new in r.changes %}<div class="small"><b>{{ field }}</b>: <span class="muted">{{ old }}</span> → {{ new }}</div>{% endfor %}</td></tr>{% endfor %}
+  </table></div>
+</div>
+{% endif %}
+
+{% if plan.unchanged %}
+<p class="muted small">{{ plan.unchanged|length }} row{{ plan.unchanged|length|pluralize }} match existing assets exactly and need no change.</p>
+{% endif %}
+<p><a class="small" href="{% url 'assets:list' %}">← Back to assets</a></p>
+{% endblock %}
