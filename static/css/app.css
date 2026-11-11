@@ -306,3 +306,18 @@ tr.just-updated td, .just-updated { animation: row-flash 4s ease-out; }
 .bulk-actions { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
 .bulk-actions form { margin: 0; }
 .bulk-actions .btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* Assets: bulk Excel import / export */
+.dash-head .head-actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+.bulk-import { margin-bottom: 1rem; }
+.bulk-import > summary { cursor: pointer; font-weight: 500; }
+.bulk-import-form { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+.bulk-import-form input[type=file] { flex: 1; min-width: 220px; max-width: 100%; }
+.bulk-actions { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+.bulk-actions form { margin: 0; }
+.bulk-actions .btn[disabled] { opacity: .5; cursor: not-allowed; }
+.bulk-import h2 { margin: 0 0 .25rem; font-size: 1.05rem; }
+.bulk-import-head { display: flex; gap: 1rem; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; margin-bottom: .75rem; }
+.bulk-import-head p { margin: 0; max-width: 60ch; }
+.bulk-import[hidden] { display: none; }
+.bulk-import-buttons { display: flex; gap: .75rem; align-items: center; }

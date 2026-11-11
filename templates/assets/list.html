@@ -1,7 +1,18 @@
 {% extends "base.html" %}{% load static helply %}
 {% block title %}Assets{% endblock %}
 
-{% block scripts %}<script src="{% static 'js/live.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+{% block scripts %}<script src="{% static 'js/live.js' %}?v={{ asset_version }}" defer></script>
+<script>
+// "Import from Excel" shows the upload panel; "Close" (or the same button again) hides it.
+document.addEventListener("click", function (e) {
+  var t = e.target.closest("[data-bulk-toggle]");
+  if (!t) return;
+  var panel = document.getElementById("bulk-import");
+  panel.hidden = !panel.hidden;
+  document.querySelectorAll("[data-bulk-toggle][aria-controls]").forEach(function (b) { b.setAttribute("aria-expanded", String(!panel.hidden)); });
+  if (!panel.hidden) { panel.scrollIntoView({block: "nearest"}); }
+});
+</script>{% endblock %}
 {% block content %}
 <div hidden data-live data-live-url="{% url 'assets:live' %}" data-live-version="{{ live_version }}" data-live-interval="15"></div>
 <div class="dash-head">
@@ -11,21 +22,29 @@
       <span class="live-badge" data-live-status aria-live="polite">Live</span></p>
   </div>
   <div class="head-actions">
+    <button type="button" class="btn" data-bulk-toggle aria-controls="bulk-import" aria-expanded="false">Import from Excel</button>
     <a class="btn" id="asset-export" href="{% url 'assets:export' %}?type={{ type_filter|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;q={{ q|urlencode }}" download>Export to Excel{% if q or status_filter or type_filter %} (filtered){% endif %}</a>
     {% if user.is_staff %}<a class="btn primary" href="{% url 'admin:assets_asset_add' %}">+ Add asset</a>{% endif %}
   </div>
 </div>
 
-<details class="card bulk-import"{% if request.GET.import %} open{% endif %}>
-  <summary>Import assets from Excel</summary>
-  <p class="muted small">Upload an .xlsx file to add or update assets in bulk. You see a preview first and nothing changes until you confirm. Assets are matched on their asset tag; assets missing from the file are never deleted.</p>
+<section class="card bulk-import" id="bulk-import" hidden>
+  <div class="bulk-import-head">
+    <div>
+      <h2>Import assets from Excel</h2>
+      <p class="muted small">1. Download the template and fill in one row per asset. 2. Upload it here. 3. Review the preview, then confirm. Existing assets are matched on their asset tag; nothing is deleted.</p>
+    </div>
+    <span class="bulk-import-buttons">
+      <a class="btn" href="{% url 'assets:import_template' %}" download>Download Excel template</a>
+      <button type="button" class="btn" data-bulk-toggle>Close</button>
+    </span>
+  </div>
   <form method="post" action="{% url 'assets:import' %}" enctype="multipart/form-data" class="bulk-import-form">
     {% csrf_token %}
     <input type="file" name="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required aria-label="Excel file (.xlsx)">
-    <button class="btn primary">Preview import</button>
-    <a class="small" href="{% url 'assets:import_template' %}" download>Download blank template</a>
+    <button class="btn primary">Upload &amp; preview</button>
   </form>
-</details>
+</section>
 
 <section class="kpis kpis-6" id="asset-kpis" data-live-region>
   <a class="kpi" href="?status=in_use"><span class="kpi-label">In use</span><span class="kpi-value">{{ kpi.in_use }}</span><span class="kpi-sub">with people, rooms or in the cloud</span></a>
