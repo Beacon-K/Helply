@@ -21,6 +21,31 @@
     });
   }
 
+  // Install box: Windows / Linux tabs (the one that matches the visitor's computer opens first) and a copy button.
+  document.querySelectorAll("[data-term]").forEach(function (term) {
+    var tabs = term.querySelectorAll("[data-os]");
+    var panels = term.querySelectorAll("[data-os-panel]");
+    function show(os) {
+      tabs.forEach(function (t) { t.setAttribute("aria-selected", t.dataset.os === os ? "true" : "false"); });
+      panels.forEach(function (p) { p.hidden = p.dataset.osPanel !== os; });
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { show(t.dataset.os); }); });
+    var linux = /linux|x11|cros/i.test((navigator.userAgent || "") + (navigator.platform || "")) && !/android/i.test(navigator.userAgent || "");
+    if (linux) show("linux");
+    var copy = term.querySelector("[data-copy]");
+    if (copy) copy.addEventListener("click", function () {
+      var panel = term.querySelector("[data-os-panel]:not([hidden])");
+      var text = panel ? panel.dataset.copyText : "";
+      var label = copy.querySelector("span");
+      function done(ok) { label.textContent = ok ? "Copied" : "Press Ctrl+C"; setTimeout(function () { label.textContent = "Copy"; }, 1800); }
+      if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); }); return; }
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e) { /* ignored */ }
+      document.body.removeChild(ta); done(ok);
+    });
+  });
+
   if (!deck || slides.length < 2 || !root.classList.contains("lp-deck-on")) {
     root.classList.remove("lp-deck-on");
     return;

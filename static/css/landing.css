@@ -530,3 +530,26 @@ html.lp-deck-on:not([data-theme="dark"]) .lp-top:hover { background: #ececef; }
   .lp-deck-on .lp-cta .lp-pill.big { margin-top: 1rem; }
   .lp-deck-on .lp-trust-inline { margin-top: 1.2rem; }
 }
+
+/* ---------- Install box on the first page: GitHub link and Windows / Linux commands ---------- */
+.lp-install { margin-top: clamp(1.1rem, 3vh, 1.8rem); display: grid; gap: .8rem; max-width: 34rem; }
+.lp-term { border-radius: 12px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(8, 9, 12, .86); overflow: hidden; font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+.lp-term-bar { display: flex; align-items: center; gap: .8rem; padding: .45rem .55rem .45rem .8rem; border-bottom: 1px solid rgba(255, 255, 255, .1); background: rgba(255, 255, 255, .03); }
+.lp-term-dots { display: inline-flex; gap: .3rem; } .lp-term-dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, .18); }
+.lp-term-tabs { display: inline-flex; gap: .2rem; padding: .15rem; border-radius: 8px; background: rgba(255, 255, 255, .06); margin-right: auto; }
+.lp-term-tabs button { display: inline-flex; align-items: center; gap: .4rem; height: 26px; padding: 0 .65rem; border: 0; border-radius: 6px; background: transparent; color: rgba(245, 245, 247, .62); font: 500 .78rem var(--font); cursor: pointer; }
+.lp-term-tabs button:hover { color: #fff; } .lp-term-tabs button[aria-selected="true"] { background: rgba(255, 255, 255, .14); color: #fff; }
+.lp-copy { display: inline-flex; align-items: center; gap: .4rem; height: 28px; padding: 0 .65rem; border: 1px solid rgba(255, 255, 255, .16); border-radius: 7px; background: transparent; color: rgba(245, 245, 247, .85); font: 500 .76rem var(--font); cursor: pointer; }
+.lp-copy:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+.lp-term-body { margin: 0; padding: .75rem 1rem .6rem; font: inherit; font-size: .86rem; line-height: 1.75; color: #e7e9ee; overflow-x: auto; white-space: pre; }
+.lp-term-body[hidden] { display: none; } .lp-term-body code { font: inherit; }
+.lp-term-body .l { display: inline; } .lp-term-body .pr { font-style: normal; color: #7ea6ff; margin-right: .7rem; user-select: none; }
+.lp-term-note { margin: 0; padding: .4rem 1rem .6rem; font: 400 .74rem var(--font); color: rgba(245, 245, 247, .45); }
+.lp-gh { display: inline-flex; align-items: center; gap: .8rem; justify-self: start; padding: .55rem .9rem .55rem .75rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .18); background: rgba(255, 255, 255, .06); color: #f5f5f7; transition: background-color .15s, border-color .15s; }
+.lp-gh:hover { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .32); }
+.lp-gh-text { display: grid; line-height: 1.2; } .lp-gh-text b { font-size: .95rem; font-weight: 600; } .lp-gh-text small { font-size: .76rem; color: rgba(245, 245, 247, .6); }
+.lp-gh-arrow { color: rgba(245, 245, 247, .6); transition: transform .15s, color .15s; } .lp-gh:hover .lp-gh-arrow { transform: translate(2px, -2px); color: #fff; }
+.lp-deck-on .lp-hero .lp-lede { margin-top: 1rem; }
+@media (max-height: 800px) { .lp-term-note { display: none; } .lp-term-body { line-height: 1.55; padding-block: .55rem .5rem; } }
+@media (max-height: 700px), (max-width: 980px) { .lp-term { display: none; } .lp-install { margin-top: .9rem; } }
+@media (max-height: 800px) { .lp-deck-on .lp-hero .lp-scrollcue { display: none; } }  /* the dots and the pager already say there is more */

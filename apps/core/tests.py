@@ -408,6 +408,16 @@ class LandingDeckTests(TestCase):
         self.assertNotIn('name="username"', html[html.index('data-id="tickets"'):])  # only one sign-in form
         self.assertIn("js/landing.js", html)
 
+    def test_first_page_links_the_repository_and_has_install_commands_for_both_systems(self):
+        html = self.client.get("/accounts/login/").content.decode()
+        first = html[html.index('data-id="welcome"'):html.index('data-id="tickets"')]
+        self.assertIn('href="https://github.com/Beacon-K/Helply"', first)
+        self.assertIn('rel="noopener noreferrer"', first)
+        self.assertIn("setup.bat", first)
+        self.assertIn("bash setup.sh", first)
+        self.assertIn('data-os="win"', first)
+        self.assertIn('data-os="linux"', first)
+
     def test_each_slide_has_a_unique_id_and_title(self):
         import re
         html = self.client.get("/accounts/login/").content.decode()
