@@ -3,6 +3,8 @@ from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 
 from . import throttle
+from apps.tickets.models import Category
+
 from .models import Department, SupportGroup, User
 
 
@@ -155,3 +157,35 @@ class TeamForm(forms.ModelForm):
 def last_admin_guard(user):
     """True when `user` is not the only active administrator (so it is safe to remove their access)."""
     return User.objects.filter(role=User.Role.ADMINISTRATOR, is_active=True).exclude(pk=user.pk).exists()
+
+
+class CategoryForm(forms.ModelForm):
+    """A ticket category: its default team decides whose queue new tickets land in."""
+
+    class Meta:
+        model = Category
+        fields = ["name", "parent", "default_group", "keywords", "is_active"]
+        widgets = {"keywords": forms.Textarea(attrs={"rows": 3})}
+        labels = {"parent": "Parent category", "default_group": "Default team", "is_active": "In use"}
+        help_texts = {"is_active": "Untick to stop offering it on new tickets. Existing tickets keep it."}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        parents = Category.objects.filter(parent__isnull=True)
+        if self.instance.pk:
+            parents = parents.exclude(pk=self.instance.pk)  # a category cannot be its own parent
+        self.fields["parent"].queryset = parents
+        self.fields["parent"].empty_label = "None (top level)"
+        self.fields["default_group"].empty_label = "No team"
+
+    def clean_name(self):
+        name = " ".join(self.cleaned_data["name"].split())
+        if Category.objects.filter(name__iexact=name).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError(f"A category called {name} already exists.")
+        return name
+
+    def clean_parent(self):
+        parent = self.cleaned_data.get("parent")
+        if parent and self.instance.pk and self.instance.children.exists():
+            raise forms.ValidationError("This category has sub-categories, so it cannot sit under another one.")
+        return parent

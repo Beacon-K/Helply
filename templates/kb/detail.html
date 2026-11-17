@@ -44,6 +44,20 @@
     </div>
   </article>
   <aside>
+    {% if user.is_agent %}
+    <section class="card" id="suggestions">
+      <h2>Reader suggestions</h2>
+      {% for s in suggestions %}
+        <div class="kb-suggestion{% if s.status == 'done' %} is-done{% endif %}">
+          <p class="pre small">{{ s.text }}</p>
+          <p class="muted small">{{ s.user|default:"Someone" }} · {{ s.created_at|date:"M j, Y" }}</p>
+          <form method="post" action="{% url 'kb:suggestion_done' article.slug s.pk %}">{% csrf_token %}
+            <button class="btn small-btn">{% if s.status == 'done' %}Addressed · reopen{% else %}Mark addressed{% endif %}</button>
+          </form>
+        </div>
+      {% empty %}<p class="muted">Nobody has suggested changes to this article.</p>{% endfor %}
+    </section>
+    {% endif %}
     <section class="card">
       <h2>Still stuck?</h2>
       <p>Open a ticket and tell us which steps you already tried — it saves time for everyone.</p>

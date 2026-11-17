@@ -15,9 +15,10 @@ from django.views.decorators.http import require_POST
 
 from apps.notifications.services import deliver, email_is_blocked
 from apps.tickets.choices import OPEN_STATUSES
+from apps.tickets.models import Category
 
 from .decorators import role_required
-from .forms import DepartmentForm, TeamForm, UserForm, last_admin_guard
+from .forms import CategoryForm, DepartmentForm, TeamForm, UserForm, last_admin_guard
 from .models import Department, SupportGroup, User
 
 log = logging.getLogger(__name__)
@@ -96,6 +97,8 @@ def organization(request):
     unassigned = User.objects.filter(is_active=True, department__isnull=True).count()
     return render(request, "people/organization.html", {
         "departments": departments, "teams": teams, "no_department": unassigned,
+        "categories": Category.objects.select_related("parent", "default_group")
+                      .annotate(ticket_count=Count("tickets", distinct=True)).order_by("name"),
         "new_department": DepartmentForm(prefix="new")})
 
 
@@ -174,6 +177,46 @@ def team_delete(request, pk):
         return redirect("people:team_edit", pk=team.pk)
     team.delete()
     messages.success(request, f"Removed the {team} team.")
+    return redirect("people:organization")
+
+
+@admin_only
+def category_create(request):
+    form = CategoryForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        category = form.save()
+        messages.success(request, f"Added the {category} category.")
+        return redirect("people:organization")
+    return render(request, "people/category_form.html", {"form": form, "category": None})
+
+
+@admin_only
+def category_edit(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    form = CategoryForm(request.POST or None, instance=category)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, f"Saved the {category} category.")
+        return redirect("people:organization")
+    return render(request, "people/category_form.html", {
+        "form": form, "category": category, "ticket_count": category.tickets.count(),
+        "can_delete": _category_can_go(category)})
+
+
+def _category_can_go(category):
+    """Deleting would blank the category on past tickets and drop sub-categories, so only an unused one may go."""
+    return not (category.tickets.exists() or category.children.exists())
+
+
+@admin_only
+@require_POST
+def category_delete(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if not _category_can_go(category):
+        messages.error(request, f"{category} is used by tickets or has sub-categories. Untick “In use” instead.")
+        return redirect("people:category_edit", pk=category.pk)
+    category.delete()
+    messages.success(request, f"Removed the {category} category.")
     return redirect("people:organization")
 
 

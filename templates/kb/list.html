@@ -24,6 +24,7 @@
           <div class="kb-item">
             <a href="{{ a.get_absolute_url }}"><b>{{ a.title }}</b></a>
             {% if a.is_internal %}<span class="badge internal-badge">IT only</span>{% endif %}
+            {% if a.open_suggestions %}<span class="badge">{{ a.open_suggestions }} suggestion{{ a.open_suggestions|pluralize }}</span>{% endif %}
             {% if a.status == "draft" %}<span class="badge">Draft</span>{% endif %}
             <p class="muted">{{ a.summary }}</p>
           </div>

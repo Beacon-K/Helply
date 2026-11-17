@@ -25,6 +25,9 @@ def article_list(request):
     if category_id.isdigit():
         visible = visible.filter(category_id=category_id)
     groups = {}
+    if request.user.is_agent:
+        visible = visible.annotate(open_suggestions=Count(
+            "suggestions", filter=Q(suggestions__status=ArticleSuggestion.Status.OPEN)))
     for article in visible.order_by(F("category__name").asc(nulls_last=True), "title"):
         groups.setdefault(article.category, []).append(article)
     return render(request, "kb/list.html", {
@@ -47,7 +50,9 @@ def article_detail(request, slug):
         if article.category_id else []
     )
     my_vote = article.votes.filter(user=request.user).values_list("value", flat=True).first()
-    return render(request, "kb/detail.html", {"article": article, "related": related, "my_vote": my_vote})
+    suggestions = article.suggestions.select_related("user") if request.user.is_agent else []
+    return render(request, "kb/detail.html", {"article": article, "related": related, "my_vote": my_vote,
+                                              "suggestions": suggestions})
 
 
 VOTE_VALUES = {"up": ArticleVote.Value.HELPFUL, "down": ArticleVote.Value.NOT_HELPFUL}
@@ -145,3 +150,15 @@ def article_delete(request, slug):
         messages.success(request, f"Deleted “{article.title}”.")
         return redirect("kb:list")
     return render(request, "kb/confirm_delete.html", {"article": article})
+
+
+@login_required
+@require_POST
+def suggestion_done(request, slug, pk):
+    """IT staff mark a reader's suggestion as dealt with (or reopen it)."""
+    _require_agent(request.user)
+    suggestion = get_object_or_404(ArticleSuggestion, pk=pk, article__slug=slug)
+    reopened = suggestion.status == ArticleSuggestion.Status.DONE
+    suggestion.status = ArticleSuggestion.Status.OPEN if reopened else ArticleSuggestion.Status.DONE
+    suggestion.save(update_fields=["status"])
+    return redirect(f"{suggestion.article.get_absolute_url()}#suggestions")

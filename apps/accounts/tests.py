@@ -694,3 +694,44 @@ class AdminHeaderTests(PeopleBase):
         self.assertIn("Change my password", page)
         done = self.client.get("/accounts/password_change/done/").content.decode()
         self.assertIn("Password changed", done)
+
+
+class CategoryManagementTests(PeopleBase):
+    def payload(self, **over):
+        data = {"name": "Printing", "parent": "", "default_group": str(self.team.pk), "keywords": "printer, toner", "is_active": "on"}
+        data.update(over)
+        return data
+
+    def test_administrator_creates_edits_and_removes_an_unused_category(self):
+        from apps.tickets.models import Category
+        self.client.force_login(self.admin)
+        self.assertEqual(self.client.post(reverse("people:category_create"), self.payload()).status_code, 302)
+        cat = Category.objects.get(name="Printing")
+        self.assertEqual(cat.default_group, self.team)
+        self.client.post(reverse("people:category_edit", args=[cat.pk]), self.payload(name="Printers", is_active=""))
+        cat.refresh_from_db()
+        self.assertEqual((cat.name, cat.is_active), ("Printers", False))
+        self.client.post(reverse("people:category_delete", args=[cat.pk]))
+        self.assertFalse(Category.objects.filter(pk=cat.pk).exists())
+
+    def test_category_in_use_cannot_be_removed(self):
+        from apps.tickets.models import Category, Ticket
+        cat = Category.objects.create(name="Email")
+        Ticket.objects.create(title="t", description="d", requester=self.emp, category=cat)
+        self.client.force_login(self.admin)
+        self.client.post(reverse("people:category_delete", args=[cat.pk]))
+        self.assertTrue(Category.objects.filter(pk=cat.pk).exists())
+
+    def test_duplicate_name_and_non_admins(self):
+        from apps.tickets.models import Category
+        Category.objects.create(name="Printing")
+        self.client.force_login(self.admin)
+        self.assertEqual(self.client.post(reverse("people:category_create"), self.payload(name="printing")).status_code, 200)
+        self.client.force_login(self.tech)
+        self.assertEqual(self.client.get(reverse("people:category_create")).status_code, 403)
+
+    def test_organization_page_lists_categories(self):
+        from apps.tickets.models import Category
+        Category.objects.create(name="Telephony")
+        self.client.force_login(self.admin)
+        self.assertContains(self.client.get(reverse("people:organization")), "Telephony")

@@ -15,6 +15,7 @@ from apps.tickets.choices import OPEN_STATUSES
 from apps.tickets.selectors import visible_tickets
 
 from . import bulk
+from .forms import AssetForm
 from .live import detail_version, list_version
 from .models import Asset
 
@@ -215,4 +216,44 @@ def asset_import_confirm(request):
 @require_POST
 def asset_import_cancel(request):
     request.session.pop(IMPORT_SESSION_KEY, None)
+    return redirect("assets:list")
+
+
+# ---------------------------------------------------------------- create / edit / delete
+
+@agent_required
+def asset_create(request):
+    form = AssetForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        asset = form.save()
+        messages.success(request, f"Added {asset.asset_tag}.")
+        return redirect(asset.get_absolute_url())
+    return render(request, "assets/form.html", {"form": form, "asset": None})
+
+
+@agent_required
+def asset_edit(request, pk):
+    asset = get_object_or_404(Asset, pk=pk)
+    form = AssetForm(request.POST or None, instance=asset)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, f"Saved {asset.asset_tag}.")
+        return redirect(asset.get_absolute_url())
+    return render(request, "assets/form.html", {
+        "form": form, "asset": asset, "ticket_count": asset.tickets.count(),
+        "can_delete": not hasattr(asset, "server")})
+
+
+@agent_required
+@require_POST
+def asset_delete(request, pk):
+    """Tickets keep their history (the link is just cleared). An asset created by a monitored server is
+    removed together with that server instead, so it cannot be deleted here."""
+    asset = get_object_or_404(Asset, pk=pk)
+    if hasattr(asset, "server"):
+        messages.error(request, f"{asset.asset_tag} belongs to a monitored cloud server. Remove the server instead.")
+        return redirect("assets:edit", pk=asset.pk)
+    tag = asset.asset_tag
+    asset.delete()
+    messages.success(request, f"Deleted {tag}.")
     return redirect("assets:list")

@@ -208,3 +208,7 @@ input:focus, select:focus, textarea:focus, :root[data-theme="dark"] input:focus,
 /* The assistant glyph stays on the launcher and in the drawer; panel titles are plain text. */
 .ai-badge svg { display: none; }
 .ai-panel, .ins, .usage-card { margin-bottom: 1rem; }
+
+/* KB: a reader's suggestion shown to IT staff; addressed ones fade back. */
+.kb-suggestion { padding: .7rem 0; border-top: 1px solid var(--line); } .kb-suggestion:first-of-type { border-top: 0; }
+.kb-suggestion.is-done p { opacity: .55; }

@@ -24,7 +24,7 @@ document.addEventListener("click", function (e) {
   <div class="head-actions">
     <button type="button" class="btn" data-bulk-toggle aria-controls="bulk-import" aria-expanded="false">Import from Excel</button>
     <a class="btn" id="asset-export" href="{% url 'assets:export' %}?type={{ type_filter|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;q={{ q|urlencode }}" download>Export to Excel{% if q or status_filter or type_filter %} (filtered){% endif %}</a>
-    {% if user.is_staff %}<a class="btn primary" href="{% url 'admin:assets_asset_add' %}">+ Add asset</a>{% endif %}
+    <a class="btn primary" href="{% url 'assets:create' %}">+ Add asset</a>
   </div>
 </div>
 

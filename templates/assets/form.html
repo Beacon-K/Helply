@@ -1,0 +1,70 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}{% if asset %}Edit {{ asset.asset_tag }}{% else %}Add asset{% endif %}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <nav class="fx-crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'assets:list' %}">Asset register</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    {% if asset %}<a href="{{ asset.get_absolute_url }}">{{ asset.asset_tag }}</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>{% endif %}
+    <span aria-current="page">{% if asset %}Edit{% else %}Add asset{% endif %}</span>
+  </nav>
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">{% if asset %}Edit asset{% else %}New asset{% endif %}</p>
+      <h1 class="fx-title">{% if asset %}{{ asset.name }}{% else %}Add an asset{% endif %}</h1>
+      <p class="fx-lede">{% if asset %}{{ ticket_count }} ticket{{ ticket_count|pluralize }} linked to this asset.{% else %}Laptops, network equipment, licences and anything else IT looks after.{% endif %}</p>
+    </div>
+  </header>
+
+  {% for message in messages %}<div class="fx-callout{% if message.tags == 'error' %} is-bad{% endif %}" role="status">{{ message }}</div>{% endfor %}
+
+  <form method="post" class="fx-form" novalidate>{% csrf_token %}
+    {% if form.non_field_errors %}<div class="fx-callout is-bad">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+    <section class="fx-fieldset">
+      <div><h2>Asset</h2><p>What it is and what state it is in.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.asset_tag %}
+        {% include "monitoring/_field.html" with f=form.name %}
+        {% include "monitoring/_field.html" with f=form.type %}
+        {% include "monitoring/_field.html" with f=form.status %}
+        {% include "monitoring/_field.html" with f=form.serial_number full=True %}
+      </div>
+    </section>
+    <section class="fx-fieldset">
+      <div><h2>Assignment</h2><p>Who has it and where it is.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.owner %}
+        {% include "monitoring/_field.html" with f=form.department %}
+        {% include "monitoring/_field.html" with f=form.location full=True %}
+      </div>
+    </section>
+    <section class="fx-fieldset">
+      <div><h2>Purchase and warranty</h2><p>For subscriptions, the cost is per year and the date is the renewal.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.supplier %}
+        {% include "monitoring/_field.html" with f=form.purchase_date %}
+        {% include "monitoring/_field.html" with f=form.purchase_cost %}
+        {% include "monitoring/_field.html" with f=form.warranty_expiry %}
+      </div>
+    </section>
+    <section class="fx-fieldset">
+      <div><h2>Notes</h2><p>Only IT staff see these.</p></div>
+      <div class="fx-fields">{% include "monitoring/_field.html" with f=form.notes full=True %}</div>
+    </section>
+    <div class="fx-form-actions">
+      <a class="fx-btn fx-btn-ghost" href="{% if asset %}{{ asset.get_absolute_url }}{% else %}{% url 'assets:list' %}{% endif %}">Cancel</a>
+      <button class="fx-btn fx-btn-primary">{% if asset %}Save changes{% else %}Add asset{% endif %}</button>
+    </div>
+  </form>
+
+  {% if asset %}
+  <section class="fx-danger">
+    <div><h2>Delete asset</h2><p>{% if can_delete %}Linked tickets keep their history but lose the link to this asset. This cannot be undone.{% else %}This asset belongs to a monitored cloud server, so it is removed together with that server and cannot be deleted here.{% endif %}</p></div>
+    <form method="post" action="{% url 'assets:delete' asset.pk %}">{% csrf_token %}<button class="fx-btn fx-btn-danger"{% if not can_delete %} disabled{% endif %}>Delete asset</button></form>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

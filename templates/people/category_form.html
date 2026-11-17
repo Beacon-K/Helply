@@ -1,0 +1,52 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}{% if category %}{{ category }}{% else %}Add category{% endif %}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <nav class="fx-crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'people:organization' %}">Departments and teams</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    <span aria-current="page">{% if category %}{{ category }}{% else %}Add category{% endif %}</span>
+  </nav>
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">{% if category %}Edit category{% else %}New category{% endif %}</p>
+      <h1 class="fx-title">{% if category %}{{ category }}{% else %}Add a ticket category{% endif %}</h1>
+      <p class="fx-lede">{% if category %}{{ ticket_count }} ticket{{ ticket_count|pluralize }} use this category.{% else %}Categories sort tickets and decide which team receives them.{% endif %}</p>
+    </div>
+  </header>
+
+  {% for message in messages %}<div class="fx-callout{% if message.tags == 'error' %} is-bad{% endif %}" role="status">{{ message }}</div>{% endfor %}
+
+  <form method="post" class="fx-form" novalidate>{% csrf_token %}
+    {% if form.non_field_errors %}<div class="fx-callout is-bad">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+    <section class="fx-fieldset">
+      <div><h2>Category</h2><p>The name people see when they raise or sort a ticket.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.name full=True %}
+        {% include "monitoring/_field.html" with f=form.parent %}
+        {% include "monitoring/_field.html" with f=form.default_group %}
+      </div>
+    </section>
+    <section class="fx-fieldset">
+      <div><h2>Automatic sorting</h2><p>Words that point the AI classifier at this category.</p></div>
+      <div class="fx-fields">
+        {% include "monitoring/_field.html" with f=form.keywords full=True %}
+        <div class="fx-field full"><label for="{{ form.is_active.id_for_label }}">{{ form.is_active }} {{ form.is_active.label }}</label><span class="help">{{ form.is_active.help_text }}</span></div>
+      </div>
+    </section>
+    <div class="fx-form-actions">
+      <a class="fx-btn fx-btn-ghost" href="{% url 'people:organization' %}">Cancel</a>
+      <button class="fx-btn fx-btn-primary">{% if category %}Save changes{% else %}Create category{% endif %}</button>
+    </div>
+  </form>
+
+  {% if category %}
+  <section class="fx-danger">
+    <div><h2>Remove category</h2><p>{% if can_delete %}Nothing uses it, so it can be removed.{% else %}Tickets or sub-categories still use it, so it cannot be removed. Untick “In use” to retire it.{% endif %}</p></div>
+    <form method="post" action="{% url 'people:category_delete' category.pk %}">{% csrf_token %}<button class="fx-btn fx-btn-danger"{% if not can_delete %} disabled{% endif %}>Remove category</button></form>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

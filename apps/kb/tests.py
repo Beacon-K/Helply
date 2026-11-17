@@ -163,3 +163,26 @@ class ArticleManagementTests(TestCase):
         self.client.force_login(self.emp)
         self.assertNotContains(self.client.get(reverse("kb:list")), "Draft one")
         self.assertEqual(self.client.get("/kb/draft-one/").status_code, 404)
+
+
+class SuggestionReviewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.emp = User.objects.create_user("emp", password="x")
+        cls.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
+        cls.article = Article.objects.create(title="A", slug="a", body="b", status=Article.Status.PUBLISHED)
+        cls.suggestion = ArticleSuggestion.objects.create(article=cls.article, user=cls.emp, text="Step 3 is wrong")
+
+    def test_it_staff_see_and_toggle_suggestions_employees_do_not(self):
+        self.client.force_login(self.emp)
+        self.assertNotContains(self.client.get(self.article.get_absolute_url()), "Step 3 is wrong")
+        self.assertEqual(self.client.post(reverse("kb:suggestion_done", args=["a", self.suggestion.pk])).status_code, 403)
+        self.client.force_login(self.tech)
+        self.assertContains(self.client.get(self.article.get_absolute_url()), "Step 3 is wrong")
+        self.assertContains(self.client.get(reverse("kb:list")), "1 suggestion")
+        self.client.post(reverse("kb:suggestion_done", args=["a", self.suggestion.pk]))
+        self.suggestion.refresh_from_db()
+        self.assertEqual(self.suggestion.status, "done")
+        self.client.post(reverse("kb:suggestion_done", args=["a", self.suggestion.pk]))
+        self.suggestion.refresh_from_db()
+        self.assertEqual(self.suggestion.status, "open")

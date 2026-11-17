@@ -68,5 +68,25 @@
       </ul>
     </section>
   </div>
+
+  <div class="fx-org is-single">
+    <section class="fx-panel" aria-labelledby="cat-h">
+      <div class="fx-panel-head">
+        <h2 id="cat-h">Ticket categories</h2>
+        <a class="fx-btn fx-btn-primary" href="{% url 'people:category_create' %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add category</a>
+      </div>
+      <ul class="fx-rows">
+        {% for c in categories %}
+        <li class="fx-row">
+          <a href="{% url 'people:category_edit' c.pk %}"><b>{% if c.parent %}{{ c.parent.name }} / {% endif %}{{ c.name }}</b></a>
+          <span class="muted">{% if c.default_group %}{{ c.default_group }}{% else %}No team{% endif %}{% if not c.is_active %} · not in use{% endif %}</span>
+          <span class="fx-count"><b>{{ c.ticket_count }}</b> ticket{{ c.ticket_count|pluralize }}</span>
+        </li>
+        {% empty %}
+        <li class="fx-empty">No categories yet. New tickets cannot be sorted without them.</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
 </div>
 {% endblock %}

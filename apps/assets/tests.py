@@ -425,3 +425,54 @@ class AssetBulkExcelTests(TestCase):
         self.assertContains(self.client.get(reverse("assets:list")), reverse("assets:export"))
         self.client.force_login(self.emp)
         self.assertNotContains(self.client.get(reverse("assets:list")), reverse("assets:export"))
+
+
+class AssetManagementTests(TestCase):
+    """Every IT staff member adds, edits and deletes assets in the app itself (no Django Admin needed)."""
+
+    def setUp(self):
+        self.emp = User.objects.create_user("emp", password="x")
+        self.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
+        self.asset = Asset.objects.create(asset_tag="LT-9", name="Laptop", type="laptop", status="in_use")
+
+    def payload(self, **over):
+        data = {"asset_tag": "MN-1", "name": "Monitor", "type": "monitor", "status": "in_stock"}
+        data.update(over)
+        return data
+
+    def test_technician_creates_edits_and_deletes(self):
+        self.client.force_login(self.tech)
+        response = self.client.post(reverse("assets:create"), self.payload())
+        created = Asset.objects.get(asset_tag="MN-1")
+        self.assertRedirects(response, created.get_absolute_url(), fetch_redirect_response=False)
+        self.client.post(reverse("assets:edit", args=[created.pk]), self.payload(name="Big monitor", status="in_use"))
+        created.refresh_from_db()
+        self.assertEqual((created.name, created.status), ("Big monitor", "in_use"))
+        self.client.post(reverse("assets:delete", args=[created.pk]))
+        self.assertFalse(Asset.objects.filter(asset_tag="MN-1").exists())
+
+    def test_duplicate_tag_is_rejected(self):
+        self.client.force_login(self.tech)
+        response = self.client.post(reverse("assets:create"), self.payload(asset_tag="lt-9"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Asset.objects.count(), 1)
+
+    def test_employee_is_refused(self):
+        self.client.force_login(self.emp)
+        for url in (reverse("assets:create"), reverse("assets:edit", args=[self.asset.pk])):
+            self.assertEqual(self.client.get(url).status_code, 403)
+        self.assertEqual(self.client.post(reverse("assets:delete", args=[self.asset.pk])).status_code, 403)
+        self.assertTrue(Asset.objects.filter(pk=self.asset.pk).exists())
+
+    def test_asset_of_a_monitored_server_cannot_be_deleted_here(self):
+        from apps.monitoring.models import Server
+        server = Server.objects.create(name="web", asset=self.asset)
+        self.client.force_login(self.tech)
+        self.client.post(reverse("assets:delete", args=[self.asset.pk]))
+        self.assertTrue(Asset.objects.filter(pk=self.asset.pk).exists())
+        self.assertTrue(Server.objects.filter(pk=server.pk).exists())
+
+    def test_no_admin_links_on_asset_pages(self):
+        self.client.force_login(self.tech)
+        self.assertNotContains(self.client.get(reverse("assets:list")), "/admin/")
+        self.assertNotContains(self.client.get(self.asset.get_absolute_url()), "/admin/")
