@@ -55,7 +55,7 @@
 |---|---|---|
 | 1 | ~~让 helply.work 能从公网访问~~ **已完成（2026-10-03）**；cloudflared 用 --protocol http2；www 子域名未配置 | 在 Cloudflare Zero Trust 建隧道 `helply`，Public Hostname 设为 `helply.work`，指向 `HTTP localhost:8000`（DNS 里有旧记录要先删）；Kevin 把令牌写进 `.env` 的 `CLOUDFLARE_TUNNEL_TOKEN`；关掉 `start-demo.bat`，运行 `start-online.bat`。已按此完成 |
 | 2 | 在真实服务器上实测 agent | 计划接入的机器见第 6 节，实测云服务商识别 |
-| 3 | 推送代码 | 10-05 前的提交已推送；之后的提交由 Kevin 手动执行 `git push origin main`（仓库保持 Private） |
+| 3 | 推送代码 | 10-05 前的提交已推送；之后的提交由 Kevin 手动执行 `git push origin main`（仓库当前是 Public） |
 | 4 | 学校服务器迁移 | 在等学校确认：能否长期运行网站、能否用 Cloudflare 隧道、机器能用多久。确认后要写开机自启的安装脚本（计划任务或 Windows 服务）和迁移步骤清单 |
 | 5 | 监控第 2 阶段剩余部分 | 费用汇总报表、访问登记（堡垒机暂缓） |
 | 6 | 邮件转工单 | 收信：用 Cloudflare Email Routing 把 `support@helply.work` 转进 Helply，解析成工单（发件人对应用户、回复邮件接到原工单）。**只列待办，还没做**；目前 Email Routing 只计划转发到个人邮箱 |

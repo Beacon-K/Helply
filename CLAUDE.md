@@ -14,7 +14,7 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 - 展示用户真实资源的页面（例如 Cloud servers）**绝不放假数据**。
 - 安全：
   - 密钥、令牌、密码不出现在聊天里，也不写进代码。Cloudflare 隧道令牌由 Kevin 自己粘贴进 `.env`。
-  - 仓库保持 **Private**；`.env`、`db.sqlite3*`、`tools/cloudflared*`、`backups/`、`logs/` 不提交。
+  - 仓库当前是 **Public**（Kevin 2026-11-16 决定保持公开）：不要提交个人评审、有版权的图片等不适合公开的内容；`.env`、`db.sqlite3*`、`tools/cloudflared*`、`backups/`、`logs/` 不提交。
   - 下载任何东西前，先说明文件名、来源和大小。
   - 监控 agent 必须**只读**，永远不接受远程命令。
 - **数据库是唯一的事实来源**：启动脚本、种子命令、迁移都不能覆盖或重置已有数据（人员、角色、密码、SLA、工单、资产）。重置只能由 Kevin 明确触发（`reset-demo.bat`）。密码只在账号创建时设置一次，之后归用户所有，不得自动重置。
