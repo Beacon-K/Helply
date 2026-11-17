@@ -16,6 +16,12 @@ class ArticleQuerySet(models.QuerySet):
             qs = qs.filter(audience=Article.Audience.EVERYONE)
         return qs
 
+    def for_user(self, user):
+        """What the user can browse. IT staff also get drafts, so they can finish and publish them."""
+        if user is not None and user.is_agent:
+            return self.all()
+        return self.visible_to(user)
+
 
 class Article(models.Model):
     class Status(models.TextChoices):

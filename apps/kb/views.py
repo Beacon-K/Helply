@@ -1,4 +1,6 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, F, Q
 from django.http import HttpResponseBadRequest, JsonResponse
@@ -7,12 +9,13 @@ from django.views.decorators.http import require_POST
 
 from apps.tickets.models import Category
 
+from .forms import ArticleForm
 from .models import Article, ArticleSuggestion, ArticleVote
 
 
 @login_required
 def article_list(request):
-    visible = Article.objects.visible_to(request.user).select_related("category")
+    visible = Article.objects.for_user(request.user).select_related("category")
     category_id = request.GET.get("category", "")
 
     categories = Category.objects.annotate(
@@ -35,10 +38,10 @@ def article_list(request):
 
 @login_required
 def article_detail(request, slug):
-    article = get_object_or_404(Article.objects.visible_to(request.user), slug=slug)
+    article = get_object_or_404(Article.objects.for_user(request.user), slug=slug)
     Article.objects.filter(pk=article.pk).update(views=F("views") + 1)
     related = (
-        Article.objects.visible_to(request.user)
+        Article.objects.for_user(request.user)
         .filter(category=article.category)
         .exclude(pk=article.pk)[:5]
         if article.category_id else []
@@ -99,3 +102,46 @@ def article_suggest(request, slug):
     if request.headers.get("X-Requested-With") != "fetch":
         return redirect(f"{article.get_absolute_url()}#feedback")
     return JsonResponse({"ok": True})
+
+
+def _require_agent(user):
+    # Every IT staff member (technician or administrator) maintains the knowledge base.
+    if not user.is_agent:
+        raise PermissionDenied
+
+
+@login_required
+def article_create(request):
+    _require_agent(request.user)
+    form = ArticleForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        article = form.save(commit=False)
+        article.author = request.user
+        article.save()
+        messages.success(request, "Article created.")
+        return redirect(article)
+    return render(request, "kb/form.html", {"form": form, "article": None})
+
+
+@login_required
+def article_edit(request, slug):
+    _require_agent(request.user)
+    article = get_object_or_404(Article, slug=slug)
+    form = ArticleForm(request.POST or None, instance=article)
+    if request.method == "POST" and form.is_valid():
+        article = form.save()
+        messages.success(request, "Article saved.")
+        return redirect(article)
+    return render(request, "kb/form.html", {"form": form, "article": article})
+
+
+@login_required
+def article_delete(request, slug):
+    """Asks first, then deletes. Votes and suggestions go with the article."""
+    _require_agent(request.user)
+    article = get_object_or_404(Article, slug=slug)
+    if request.method == "POST":
+        article.delete()
+        messages.success(request, f"Deleted “{article.title}”.")
+        return redirect("kb:list")
+    return render(request, "kb/confirm_delete.html", {"article": article})

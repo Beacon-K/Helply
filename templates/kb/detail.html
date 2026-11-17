@@ -4,8 +4,12 @@
 <p><a href="{% url 'kb:list' %}">← Knowledge base</a>{% if article.category %} / <a href="{% url 'kb:list' %}?category={{ article.category_id }}">{{ article.category }}</a>{% endif %}</p>
 <div class="grid-detail">
   <article class="card kb-article">
-    <h1>{{ article.title }}</h1>
+    <div class="row-between">
+      <h1>{{ article.title }}</h1>
+      {% if user.is_agent %}<div><a class="btn small-btn" href="{% url 'kb:edit' article.slug %}">Edit</a> <a class="btn small-btn" href="{% url 'kb:delete' article.slug %}">Delete</a></div>{% endif %}
+    </div>
     <p class="muted small">
+      {% if article.status == "draft" %}<span class="badge">Draft</span> · {% endif %}
       {% if article.is_internal %}<span class="badge internal-badge">IT staff only</span> · {% endif %}
       Updated {{ article.updated_at|date:"M j, Y" }} · {{ article.views }} views
     </p>

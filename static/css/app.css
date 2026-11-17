@@ -136,8 +136,11 @@ dl { display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; margin: 0
 .suggest-actions a { margin-left: auto; }
 .suggest p { margin: 0; }
 [hidden] { display: none !important; }
-.inline-form { display: flex; gap: .4rem; align-items: center; }
-.inline-form select { padding: .25rem .4rem; }
+/* Wraps instead of squeezing: when the page is zoomed the Save button drops below the select,
+   and the select never shrinks below a readable width. */
+dd:has(> .inline-form) { min-width: 0; }
+.inline-form { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; min-width: 0; }
+.inline-form select { padding: .25rem .4rem; flex: 1 1 9rem; min-width: 0; max-width: 100%; text-overflow: ellipsis; }
 .small-btn { padding: .25rem .6rem; font-size: .85rem; }
 .stars { color: var(--brand-orange); letter-spacing: .05em; font-size: 1.05rem; }
 .filter-count { display: inline-block; min-width: 1.5em; padding: 0 .4em; margin-left: .15rem; border-radius: 999px; background: var(--soft); color: var(--muted); font-size: .8em; text-align: center; font-weight: 600; }

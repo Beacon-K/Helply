@@ -33,7 +33,7 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 | `apps/tickets` | 工单；状态机 `workflow.py`；ITIL 优先级矩阵 `choices.py` |
 | `apps/sla` | SLA 策略与 `/sla/` 设置页 |
 | `apps/assets` | 资产台账（`live.py` 实时版本号） |
-| `apps/kb` | 知识库（`seed_kb` 只新增，`--overwrite` 才覆盖） |
+| `apps/kb` | 知识库；所有 IT 人员（技术员和管理员）可在站内增删改文章，员工只读（`seed_kb` 只新增，`--overwrite` 才覆盖） |
 | `apps/ai` | 分类后端（关键词基线；`backends/` 下可选 Cloudflare、OpenAI/Anthropic，失败退回关键词）、`assistant.py`、`chat.py`（Ctrl/Cmd+J 抽屉）、`insights.py`、`metering.py`；接口 `/ai/`；`python manage.py ai_status --test` 检查。密钥只放 `.env` |
 | `apps/notifications` | 站内铃铛 + 邮件，按「工单 + 类型」节流 |
 | `apps/monitoring` | 云服务器监控：上报 API、告警转工单、`presenters.py`、`geo.py` |

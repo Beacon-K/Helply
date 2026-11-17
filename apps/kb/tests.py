@@ -113,3 +113,53 @@ class KnowledgeBaseTests(TestCase):
     def test_list_page_renders(self):
         self.client.force_login(self.emp)
         self.assertContains(self.client.get(reverse("kb:list")), "Recover a deleted or overwritten file")
+
+
+class ArticleManagementTests(TestCase):
+    """Every IT staff member can create, edit and delete articles; employees cannot."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.emp = User.objects.create_user("emp", password="x")
+        cls.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
+        cls.admin = User.objects.create_user("boss", password="x", role=User.Role.ADMINISTRATOR)
+        cls.article = Article.objects.create(title="Old", slug="old", body="b", status=Article.Status.PUBLISHED)
+
+    def test_technician_and_administrator_can_create_with_generated_slug(self):
+        for user in (self.tech, self.admin):
+            self.client.force_login(user)
+            response = self.client.post(reverse("kb:create"), {
+                "title": "Reset a password", "body": "Steps", "audience": "everyone", "status": "draft"})
+            self.assertEqual(response.status_code, 302)
+        slugs = set(Article.objects.filter(title="Reset a password").values_list("slug", flat=True))
+        self.assertEqual(slugs, {"reset-a-password", "reset-a-password-2"})
+        self.assertEqual(Article.objects.get(slug="reset-a-password").author, self.tech)
+
+    def test_technician_can_edit_and_delete(self):
+        self.client.force_login(self.tech)
+        self.client.post(reverse("kb:edit", args=["old"]), {
+            "title": "New title", "slug": "old", "body": "b", "audience": "internal", "status": "published"})
+        self.article.refresh_from_db()
+        self.assertEqual((self.article.title, self.article.audience), ("New title", "internal"))
+        self.assertEqual(self.client.get(reverse("kb:delete", args=["old"])).status_code, 200)
+        self.assertTrue(Article.objects.filter(slug="old").exists())  # GET only asks
+        self.client.post(reverse("kb:delete", args=["old"]))
+        self.assertFalse(Article.objects.filter(slug="old").exists())
+
+    def test_employee_is_refused(self):
+        self.client.force_login(self.emp)
+        self.assertEqual(self.client.get(reverse("kb:create")).status_code, 403)
+        self.assertEqual(self.client.post(reverse("kb:edit", args=["old"]), {"title": "x"}).status_code, 403)
+        self.assertEqual(self.client.post(reverse("kb:delete", args=["old"])).status_code, 403)
+        self.assertTrue(Article.objects.filter(slug="old").exists())
+
+    def test_reserved_slug_rejected_and_drafts_only_for_it_staff(self):
+        self.client.force_login(self.tech)
+        response = self.client.post(reverse("kb:create"), {
+            "title": "x", "slug": "new", "body": "b", "audience": "everyone", "status": "draft"})
+        self.assertEqual(response.status_code, 200)
+        Article.objects.create(title="Draft one", slug="draft-one", body="b")
+        self.assertContains(self.client.get(reverse("kb:list")), "Draft one")
+        self.client.force_login(self.emp)
+        self.assertNotContains(self.client.get(reverse("kb:list")), "Draft one")
+        self.assertEqual(self.client.get("/kb/draft-one/").status_code, 404)
