@@ -5,7 +5,6 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from apps.ai.services import related_articles
 from apps.tickets.models import Category
 
 from .models import Article, ArticleSuggestion, ArticleVote
@@ -14,16 +13,11 @@ from .models import Article, ArticleSuggestion, ArticleVote
 @login_required
 def article_list(request):
     visible = Article.objects.visible_to(request.user).select_related("category")
-    q = request.GET.get("q", "").strip()
     category_id = request.GET.get("category", "")
 
     categories = Category.objects.annotate(
         n=Count("articles", filter=Q(articles__in=visible))
     ).filter(n__gt=0)
-
-    if q:
-        results = related_articles(q, user=request.user, limit=15, min_score=0.05)
-        return render(request, "kb/list.html", {"q": q, "results": results, "categories": categories})
 
     if category_id.isdigit():
         visible = visible.filter(category_id=category_id)

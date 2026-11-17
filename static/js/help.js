@@ -48,7 +48,7 @@
     ] },
     { id: "kb", title: "Knowledge base", desc: "Step-by-step answers written by IT.", roles: ["employee", "technician", "administrator"], steps: [
       { target: nav("/kb/"), click: true, title: "Open the knowledge base", body: "Click \"Knowledge base\"." },
-      { path: "/kb/", target: "form.search", title: "Search for a fix", body: "Try searching before opening a ticket: many problems (Wi-Fi, VPN, printers, passwords) already have a guide." },
+      { path: "/kb/", target: "[data-ai-ask]", title: "Ask the Assistant", body: "Describe your problem in your own words before opening a ticket: the Assistant answers from the knowledge base. Many problems (Wi-Fi, VPN, printers, passwords) already have a guide." },
       { path: "/kb/", target: ".filters", title: "Browse by category", body: "Pick a category to narrow the list. On an article, use the helpful / not helpful buttons: it improves the Assistant's answers." }
     ] },
     { id: "assets", title: isAgent ? "Asset register" : "My devices", desc: isAgent ? "Every laptop, phone and licence in one place." : "See the devices assigned to you.", roles: ["employee", "technician", "administrator"], steps: [

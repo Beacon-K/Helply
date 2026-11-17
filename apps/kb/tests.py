@@ -113,4 +113,3 @@ class KnowledgeBaseTests(TestCase):
     def test_list_page_renders(self):
         self.client.force_login(self.emp)
         self.assertContains(self.client.get(reverse("kb:list")), "Recover a deleted or overwritten file")
-        self.assertContains(self.client.get(reverse("kb:list"), {"q": "paper jam"}), "Print quality problems")
