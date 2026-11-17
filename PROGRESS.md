@@ -1,90 +1,82 @@
-# Helply 项目进度与交接（截至 2026-11-16）
+# Helply 进度与交接（截至 2026-11-17）
 
-## 1. 需求总览
+## 1. 需求
 | 类别 | 要求 |
 |---|---|
-| 目标用户 | 10–100 人的中小企业；IT 团队 1–5 人 |
-| 核心 | ITSM 服务台：工单、SLA、资产、知识库、通知、仪表盘 |
-| AI | 嵌入流程：自动分类和分派、相似工单推荐、知识库建议、监控告警自动建工单 |
-| 质量 | 能直接用于生产；数据库是唯一的事实来源；UI 达到获奖水准 |
-| 部署 | 演示：外接硬盘（D:）+ SQLite，不用 Docker，可在两台电脑间切换；公网：https://helply.work，通过 Cloudflare Tunnel |
-| 短期不做 | Microsoft 365 登录、真实用户数据导入、堡垒机 |
+| 用户 | 10–100 人中小企业；IT 团队 1–5 人 |
+| 核心 | 工单、SLA、资产、知识库、通知、仪表盘 |
+| AI | 嵌入流程：自动分类分派、相似工单、知识库建议、监控告警建工单 |
+| 质量 | 可上生产；数据库是唯一事实来源；UI 获奖水准 |
+| 部署 | 演示：外接硬盘 + SQLite，两台电脑切换；公网 https://helply.work（Cloudflare Tunnel） |
+| 不做 | Microsoft 365 登录、真实用户数据导入、堡垒机 |
 
 ## 2. 已完成
 | 模块 | 内容 |
 |---|---|
-| 工单 | 状态机（新建 → 已分诊 → 已分派 → 处理中 ⇄ 挂起 → 已解决 → 已关闭 / 已取消）、ITIL 优先级矩阵、评论（公开回复和内部备注）、审计记录、满意度评价、超时未确认自动关闭 |
-| SLA | 按优先级的策略、暂停/恢复、即将超时提醒、超时标记（`check_sla`） |
-| AI | 关键词基线分类器、自动分诊和分派（给工作量最少的技术员）、相似工单、反馈与准确率统计 |
-| 知识库 | 44 篇 Markdown 文章；投票（AJAX、可撤销）；提单时推荐相关文章 |
-| 通知 | 站内铃铛 + 邮件，按「工单 + 类型」节流；`ticket_followups` 负责提醒和自动关闭 |
-| 资产 | 106 条真实感数据（笔记本、显示器、网络设备、软件订阅等十多种类型）；位置、供应商、费用、保修和续费；搜索覆盖类型、负责人等字段；页面实时刷新；重复故障提示 |
-| 界面 | 左侧带图标的导航；仪表盘；角色名 Supervisor 已改为 **Administrator** |
-| 生产化 | 三种运行模式、演示数据保护、`init_helply`、`backup_db`、`run_jobs`、`tools/make_secret.py`、部署检查 `helply.W001–W003` |
-| 便携运行 | 每台机器独立虚拟环境；`tools/start-db.bat` 在 PostgreSQL 和 SQLite 之间自动选择；演示密码放在 `.env`（`demo_passwords` 命令） |
-| **云服务器监控** | 见下面第 3 节 |
-| 主题 | 白天/夜间切换（右上角按钮，记住选择，首次跟随系统）；夜间为深蓝黑 + 青/紫的科技感配色；列表行、导航、按钮、卡片悬停有渐变扫过效果；颜色全部走变量（`app.css`、`monitoring.css`），夜间配色集中在 `theme.css` |
-| 服务器国家和国旗 | agent 上报时按公网 IP 在本地查国家（DB-IP country lite，CC BY 4.0，总览页底部有署名；国旗为 flag-icons，MIT）；编辑页可手动改国家，手动值不会被覆盖；内网地址不显示旗帜；只到国家，地区文字来自云厂商元数据 |
-| 仪表盘概况 | 管理员：新增「Unassigned」指标（未分配给技术员的未结工单，可点进去只看这些）、团队负载里加「Unassigned」一行、**Company overview** 三张卡：云服务器（健康度条、平均 CPU、未处理告警、月费用、最需要处理的 5 台，带国旗）、人员（在职总数、角色分布、各部门人数，点部门进 People 筛选）、续费与资产（30 天内到期和刚过期的订阅、过期保修数、维修中数）。技术员：同样的「Unassigned」指标和待领取列表，加云服务器、续费两张卡。数据全部来自实时数据，没有服务器或续费时显示空状态；技术员只看到自己支持组可见的未分配工单 |
-| 人员管理（`/people/`） | 仅管理员；搜索，按角色、状态、部门筛选（点角色按钮弹出部门下拉并显示人数）；新增、编辑、关闭或恢复登录；角色卡片选择，保存后立即生效；新人收到一次性设置密码链接（页面显示一次并发邮件）；保护：不能降级或关闭自己，系统始终保留一个有效管理员；不删除用户 |
-| SLA 设置（`/sla/`） | 仅管理员；P1–P4 的名称、首次响应时间、解决时间、是否启用，一次保存；只影响新建工单，已有工单保持原到期时间 |
-| 邮件发送（Brevo）和收信转发 | **2026-10-03 已验证**：经 Brevo（`smtp-relay.brevo.com:587`）发出的测试邮件，经 Cloudflare Email Routing（3 条 MX + Catch-all 转发到管理员真实邮箱）成功收到。helply.work 的 DNS 齐全（DKIM、DMARC、品牌链接、Cloudflare 收信记录）；SMTP 配置在 `.env`（模板 `.env.example`，凭据由 Kevin 自己填）。Brevo 的「授权 IP」限制已对 SMTP 关闭。**Brevo 会自动拉黑出现过硬退信的地址**（日志 `blacklist user`），新增收件域名前先确认它能收信。SMTP key 约 2027-10-03 到期，连续 90 天不用也会失效。**不往保留的假域名发信**（`example.com/.org/.net`、`*.example/.test/.invalid/.localhost`，可用 `HELPLY_EMAIL_BLOCKED_DOMAINS` 追加）：站内通知照常，日志记一行；People 页对这类地址也不发设置密码邮件，仍显示一次性链接。详见 README「邮件发送（Brevo）」。演示账号邮箱统一为 `用户名@helply.work`，邮件通知默认关闭，只给 alice、tom、tina、sam 打开（转发后都进管理员的一个邮箱）；`demo_emails` 命令可把旧的 `@example.com` 账号改过来 |
-| 续费提醒 | 订阅和云服务器在到期前 30/14/7 天及到期当天提醒（站内 + 邮件，发给管理员和资产负责人），同一续费日期每档只发一次，由 un_jobs 触发；超期 14 天后不再提醒 |
-| 登录与后台安全（10-10） | 登录和重置密码限流、本地登录记录；Django Admin 外观与主站一致；部门和团队管理页（从 Admin 迁到主站）；邮件改后台发送并加超时 |
-| 界面重做（10-10 至今） | 登录页改为产品介绍页；登录后整体改成「控制台质感」（命令面板 Ctrl/Cmd+K、`g` 快捷键）；最后加载的 `calm.css` 收敛为一套中性色阶 + 单一强调色，无渐变和光斑；侧栏底部 Help 按钮，分角色互动引导教程（`help.js`） |
-| AI 扩展 | Cloudflare Workers AI 可选分类后端（失败退回关键词）；Helply Assistant（工单创建页、知识库页、技术员 copilot、Ctrl/Cmd+J 助手抽屉）；管理员工单分析卡片；`backends/external.py` 可选接 OpenAI / Anthropic（密钥只放 `.env`，`ai_status --test` 检查）；`metering.py` 记录 Cloudflare 每日额度（用 Cloudflare 自己返回的 neurons，80% 和 100% 提醒管理员）；已登录页面不缓存，浏览器暂存的对话和草稿带用户 id |
-| 资产批量导入导出（11-11） | 资产台账支持 Excel 导出和批量导入（先预览再确认），导入面板默认收起 |
-| 报告 | 已交过 5 页英文报告（之前会话里输出的 Word 文件，不在仓库里） |
+| 工单 | 状态机、ITIL 优先级矩阵、公开回复/内部备注、审计、满意度、超时自动关闭 |
+| SLA | 按优先级策略、暂停/恢复、提醒、超时；`/sla/` 设置页（只影响新工单） |
+| AI | 关键词分类 + 自动分派（最少工作量）、相似工单、反馈准确率；可选 Cloudflare / OpenAI / Anthropic 后端；Assistant、Ctrl/Cmd+J 助手抽屉、管理员工单分析、Cloudflare 额度统计与提醒 |
+| 知识库 | 44 篇文章、投票、提单时推荐 |
+| 通知 | 站内铃铛 + 邮件（Brevo），按「工单 + 类型」节流；续费提醒 30/14/7 天和当天 |
+| 资产 | 106 条数据；Excel 导出和批量导入（先预览）；实时刷新；重复故障提示 |
+| 人员 | `/people/` 仅管理员：搜索筛选、新增编辑、关闭登录、一次性设密码链接；不能降级或关闭自己，始终保留一个管理员 |
+| 仪表盘 | 管理员和技术员的未分配工单、Company overview（云服务器、人员、续费与资产） |
+| 界面 | 登录页是产品介绍页；控制台质感（Ctrl/Cmd+K、`g` 快捷键）；`calm.css` 统一配色；白天/夜间主题；Help 互动教程；部门和团队管理页 |
+| 安全 | 登录限流和登录记录、Admin 外观统一、邮件后台发送 |
+| 生产化 | 三种运行模式、演示数据保护、`init_helply`、`backup_db`、`run_jobs`、部署检查 `helply.W001–W003` |
+| 邮件 | 2026-10-03 验证：Brevo 发出，Cloudflare Email Routing 转发收到。SMTP 配置在 `.env`（凭据由 Kevin 填）；key 约 2027-10-03 到期。Brevo 会拉黑硬退信地址，新增收件域名前先确认能收信。**不往保留假域名发信**（`example.*`、`*.test` 等）。演示邮箱统一 `用户名@helply.work`。详见 README「邮件发送（Brevo）」 |
+| 报告 | 已交 5 页英文报告（Word，不在仓库里） |
 
 ## 3. 云服务器监控（apps/monitoring）
 | 部分 | 状态 |
 |---|---|
-| Agent | `agent/helply_agent.py` **v1.1.0**：Python + psutil，每 10 秒通过 HTTPS 上报；**只读，不接受任何命令**；能识别云服务商（读硬件厂商信息，再查询该厂商的本机元数据服务，拿到地区和机型） |
-| 安装 | Linux 装成 systemd 服务（低权限用户，限制 64 MB 内存）；Windows 装成计划任务（以 Local Service 运行）。两个平台都支持 `--uninstall` / `-Uninstall` |
-| 接入流程 | 点 **Add server**（不用填任何信息）→ 页面给出一行安装命令（令牌只显示一次）→ 首次上报时自动填好主机名、系统、CPU/内存/磁盘、公网 IP、服务商、地区和机型。费用、续费日期、负责人在接入后选填 |
-| 身份验证 | 每台服务器一个令牌，数据库只存 SHA-256；可以重新生成；上报接口 `POST /monitoring/api/report/`，令牌放在 `Authorization: Bearer` 头里 |
-| 告警 | 离线超过 2 分钟、CPU 或内存持续 5 分钟 ≥ 90%、磁盘 ≥ 90% → 自动建工单（分类 Servers & Cloud，渠道 Monitoring alert）、分派、启动 SLA；恢复后在工单里留记录（不自动关闭）；同一问题再次出现时沿用原工单；支持维护模式 |
-| 数据保留 | 原始读数 48 小时，每小时汇总保留 90 天；超过 24 小时未接入的占位服务器自动清理 |
-| 页面 | 服务器总览（概览指标、迷你曲线、卡片和表格两种视图、搜索和筛选、每 5 秒原位刷新）；详情页（4 张交互图表，悬停十字线同步，切换时间范围不刷新页面）；接入页（右侧逐项显示识别结果）；设置页 |
-| 资产联动 | 每台服务器自动生成一条 `VPS-xxxx` 资产记录，年费计入订阅 |
-| 演示数据 | **不生成任何假服务器**；`seed_demo` 会删除早期版本生成的 5 台示例服务器 |
-| 验证情况 | 自动化测试、HTTP 端到端测试、浏览器交互测试都已通过；**还没在真实 VPS 上跑过 agent** |
+| Agent | `agent/helply_agent.py` v1.1.0：Python + psutil，10 秒 HTTPS 上报；**只读**；识别云服务商、地区、机型 |
+| 安装 | Linux systemd（低权限、64 MB 限制）；Windows 计划任务（Local Service）；都支持卸载 |
+| 接入 | Add server → 一行安装命令（令牌只显示一次）→ 首次上报自动填信息；费用、续费日期、负责人选填 |
+| 身份 | 每台一个令牌，库里只存 SHA-256；`POST /monitoring/api/report/`，`Authorization: Bearer` |
+| 告警 | 离线 > 2 分钟、CPU/内存持续 5 分钟 ≥ 90%、磁盘 ≥ 90% → 自动建工单并分派、启动 SLA；恢复留记录不自动关；支持维护模式 |
+| 保留 | 原始读数 48 小时，小时汇总 90 天；24 小时未接入的占位服务器自动清理 |
+| 页面 | 总览（卡片/表格、5 秒刷新）、详情（4 张图表）、接入页、设置页；国家和国旗按 IP 本地查（DB-IP，CC BY 4.0，总览页有署名），可手动改 |
+| 资产联动 | 每台服务器自动生成 `VPS-xxxx` 资产，年费计入订阅 |
+| 演示数据 | **不生成假服务器** |
+| 验证 | 自动化、HTTP 端到端、浏览器测试已过；**还没在真实 VPS 上跑过 agent** |
 
-## 4. 待办（按优先级）
+## 4. 待办
 | # | 事项 | 说明 |
 |---|---|---|
-| 1 | ~~让 helply.work 能从公网访问~~ **已完成（2026-10-03）**；cloudflared 用 --protocol http2；www 子域名未配置 | 在 Cloudflare Zero Trust 建隧道 `helply`，Public Hostname 设为 `helply.work`，指向 `HTTP localhost:8000`（DNS 里有旧记录要先删）；Kevin 把令牌写进 `.env` 的 `CLOUDFLARE_TUNNEL_TOKEN`；关掉 `start-demo.bat`，运行 `start-online.bat`。已按此完成 |
-| 2 | 在真实服务器上实测 agent | 计划接入的机器见第 6 节，实测云服务商识别 |
-| 3 | 推送代码 | 10-05 前的提交已推送；之后的提交由 Kevin 手动执行 `git push origin main`（仓库当前是 Public） |
-| 4 | 学校服务器迁移 | 在等学校确认：能否长期运行网站、能否用 Cloudflare 隧道、机器能用多久。确认后要写开机自启的安装脚本（计划任务或 Windows 服务）和迁移步骤清单 |
-| 5 | 监控第 2 阶段剩余部分 | 费用汇总报表、访问登记（堡垒机暂缓） |
-| 6 | 邮件转工单 | 收信：用 Cloudflare Email Routing 把 `support@helply.work` 转进 Helply，解析成工单（发件人对应用户、回复邮件接到原工单）。**只列待办，还没做**；目前 Email Routing 只计划转发到个人邮箱 |
-| 7 | 可选 | agent 打包成 exe（Windows 上就不用装 Python） |
-| 8 | 测试提速 | 全部 333 项约 9 分钟，找出最慢的测试再优化 |
+| 1 | 真实服务器实测 agent | 目标机器见第 6 节 |
+| 2 | 推送代码 | Kevin 要求时再推送（仓库 Public） |
+| 3 | 学校服务器迁移 | 等学校确认能否长期运行、能否用 Cloudflare 隧道；确认后写开机自启脚本和迁移清单 |
+| 4 | 监控第 2 阶段 | 费用汇总报表、访问登记 |
+| 5 | 邮件转工单 | 用 Email Routing 把 `support@helply.work` 转进 Helply 解析成工单；**还没做** |
+| 6 | 可选 | agent 打包成 exe |
+| 7 | 测试提速 | 全部约 9 分钟，找最慢的测试 |
 
-## 5. 做过的决定（不要轻易推翻）
-- 自己写 agent，不用 Komari，也不用 SSH 轮询。原因：只读、安全、能和工单系统集成。
-- 演示和生产都优先用 SQLite；只有确实需要时才上 PostgreSQL。
-- 网站和数据库**不拆到两台 1 GB 的 VPS 上**。两台机器任何一台出问题网站都会挂，0.5 那台内存也已经很紧张。
-- 两台 OCI VPS 的用途：作为被监控的服务器，以及存放异地备份。
-- 公网访问用 Cloudflare Tunnel（只往外连，不需要开放入站端口）。
+已完成：helply.work 公网访问（2026-10-03，cloudflared 用 `--protocol http2`，www 子域名未配置）。
 
-## 6. 环境信息
+## 5. 已定的决定（不要轻易推翻）
+- 自己写 agent，不用 Komari，也不用 SSH 轮询：只读、安全、能和工单集成。
+- 演示和生产都优先 SQLite，确实需要才上 PostgreSQL。
+- 网站和数据库**不拆到两台 1 GB VPS 上**。
+- 两台 OCI VPS 用来被监控和存异地备份。
+- 公网用 Cloudflare Tunnel（只往外连）。
+
+## 6. 环境
 | 机器 | 说明 |
 |---|---|
-| KAI-ROG（Windows，Python 3.13） | 主开发机；项目在外接硬盘 `D:\6.Capston Project\helply`；虚拟环境 `.venv-KAI-ROG` |
-| 第二台 PC（Windows，用户名 Administrator，Python 3.14） | 也用外接硬盘运行 |
-| OCI VPS 40.233.75.87（Tailscale 地址 100.96.0.7:9622） | Ubuntu 24.04，1 GB 内存 + 2 GB swap；已运行 xray、AdGuard、komari agent、WARP；ufw 已开启；空目录 `/opt/helply`，可以删掉 |
-| OCI VPS（Tailscale 地址 100.96.0.5） | 1 GB 内存，swap 用得比较多 |
+| KAI-ROG（Windows，Python 3.13） | 主开发机；外接硬盘 `D:\6.Capston Project\helply`；`.venv-KAI-ROG` |
+| 第二台 PC（Windows，Administrator，Python 3.14） | 也用外接硬盘 |
+| OCI VPS 40.233.75.87（Tailscale 100.96.0.7:9622） | Ubuntu 24.04，1 GB + 2 GB swap；跑 xray、AdGuard、komari agent、WARP；空目录 `/opt/helply` 可删 |
+| OCI VPS（Tailscale 100.96.0.5） | 1 GB，swap 用得多 |
 | RackNerd 107.173.15.18 | 测试服务器 |
-| 学校 Windows Server 2025 | 2 vCPU，15.6 GB 内存；在等学校确认 |
+| 学校 Windows Server 2025 | 2 vCPU，15.6 GB；等学校确认 |
 
-## 7. 已知问题和注意事项
-- 新增依赖 `maxminddb`：其他机器要重新运行 `setup.bat`（或 `pip install -r requirements.txt`），否则国家识别静默不工作。
-- 公网站点的代码、模板和静态文件只在 `start-online.bat` 启动时加载，改完代码要重启它。
-- `docs/`（课程交付文档、个人评价、渗透测试输出）和 `Images/`（库存图片，未被代码引用）有意不提交。
-- 本机没装 psutil，所以 `AgentTests` 会被跳过。
-- 演示公司现在是 **100 人**（1 管理员、3 技术员、96 员工，10 个部门；员工用户名就是名字小写，例如 `ava`、`noah`）。名单是固定写在 `apps/core/demo/people.py` 里的，每次生成结果一致。
-- **启动不再改动任何数据**（2026-10-03 起）：`start-online.bat`、`start-demo.bat`、`setup.bat` 只在数据库没有用户时才生成演示数据；人员、角色、密码、SLA、工单、资产都不会被覆盖。演示账号的初始密码只在创建时设置一次（公网模式每人随机，记在 `demo-passwords.txt`，不提交），之后归用户所有。有意重置演示用 `reset-demo.bat`（需输入 RESET）；统一换密码用 `demo_passwords --rotate`。`start-online.bat` 现在同时运行定时任务（SLA、跟进、续费提醒、备份）。
-- 在 `127.0.0.1` 上打开 Helply 时，页面生成的安装命令服务器用不了。必须通过公网地址打开，接入页面也会提示这一点。
-- Windows 下 Git 会提示换行符转换的警告，这是正常的；`.gitattributes` 规定 `*.bat` 用 CRLF、`*.sh` 和 `agent/*.py` 用 LF。
+## 7. 注意事项
+- 新依赖 `maxminddb`：其他机器要重跑 `setup.bat`，否则国家识别静默失效。
+- 公网站点的代码和静态文件只在 `start-online.bat` 启动时加载，改完要重启。
+- `Images/`（库存图片）和个人评价、渗透测试输出有意不提交。
+- 本机没装 psutil，`AgentTests` 会被跳过。
+- 演示公司 **100 人**（1 管理员、3 技术员、96 员工，10 个部门；员工用户名是名字小写，如 `ava`），名单固定在 `apps/core/demo/people.py`。
+- **启动不改任何数据**：`start-*.bat`、`setup.bat` 只在库里没有用户时生成演示数据。演示密码只在建号时设置（公网模式随机，记在 `demo-passwords.txt`，不提交）。重置用 `reset-demo.bat`（输入 RESET）；换密码用 `demo_passwords --rotate`。`start-online.bat` 同时跑定时任务。
+- 在 `127.0.0.1` 打开时，生成的安装命令服务器用不了，必须走公网地址。
+- Windows 下 Git 的换行符警告正常；`.gitattributes` 规定 `*.bat` 用 CRLF，`*.sh` 和 `agent/*.py` 用 LF。
