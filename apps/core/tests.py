@@ -408,15 +408,17 @@ class LandingDeckTests(TestCase):
         self.assertNotIn('name="username"', html[html.index('data-id="tickets"'):])  # only one sign-in form
         self.assertIn("js/landing.js", html)
 
-    def test_first_page_links_the_repository_and_has_install_commands_for_both_systems(self):
+    def test_first_page_has_windows_and_linux_buttons_that_open_the_github_project(self):
+        import re
         html = self.client.get("/accounts/login/").content.decode()
         first = html[html.index('data-id="welcome"'):html.index('data-id="tickets"')]
-        self.assertIn('href="https://github.com/Beacon-K/Helply"', first)
-        self.assertIn('rel="noopener noreferrer"', first)
-        self.assertIn("setup.bat", first)
-        self.assertIn("bash setup.sh", first)
-        self.assertIn('data-os="win"', first)
-        self.assertIn('data-os="linux"', first)
+        for os_name in ("win", "linux"):
+            link = re.search(r'<a class="lp-os" data-os-link="%s" href="([^"]+)" target="_blank" rel="noopener noreferrer">' % os_name, first)
+            self.assertIsNotNone(link, os_name)
+            self.assertEqual(link.group(1), "https://github.com/Beacon-K/Helply")
+        self.assertEqual(first.count("Get Helply for"), 2)
+        self.assertIn("<b>Windows</b>", first)
+        self.assertIn("<b>Linux</b>", first)
 
     def test_each_slide_has_a_unique_id_and_title(self):
         import re
