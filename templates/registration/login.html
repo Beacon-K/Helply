@@ -59,122 +59,88 @@
     </div>
   </div></section>
 
-  <!-- ============ Tickets at a glance ============ -->
-  <section class="lp-slide lp-feature lp-overview" id="showcase" data-slide data-id="showcase" data-title="Tickets at a glance"><div class="lp-slide-in">
-    <div class="lp-wrap lp-ov">
-      <figure class="lp-ov-media reveal">
-        <img src="{% static 'img/landing/technician.jpg' %}" alt="A technician plugging a network cable into a switch" width="2000" height="1121" loading="lazy" decoding="async">
-        <figcaption><span>One desk for everything IT</span><b>Every request. <br>Every server. <br>One calm place.</b></figcaption>
-      </figure>
-      <div class="lp-ov-copy">
-        <p class="lp-kicker reveal">Tickets, end to end</p>
-        <h2 class="lp-h2 reveal" style="--d:.04s">From first message to a closed ticket.</h2>
-        <ul class="lp-feats">
-        <li class="reveal" style="--d:0.05s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span><b>Raised your way</b>Employees describe the problem in plain words. IT can also open a ticket for a colleague after a call or a desk visit.</span></li>
-        <li class="reveal" style="--d:0.09s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span><span><b>Sorted on arrival</b>A suggested category and, when Helply is sure, automatic triage and routing to the right team.</span></li>
-        <li class="reveal" style="--d:0.13s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>Priority that is not a guess</b>Impact and urgency feed the ITIL matrix, so P1 to P4 mean the same thing to everyone.</span></li>
-        <li class="reveal" style="--d:0.17s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/></svg></span><span><b>Replies and private notes</b>The requester sees every public reply. Internal notes stay with IT.</span></li>
-        <li class="reveal" style="--d:0.21s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2.5h6"/></svg></span><span><b>SLA clocks that pause</b>Response and resolution deadlines on every ticket, paused while you wait on someone else.</span></li>
-        <li class="reveal" style="--d:0.25s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M17 8h5m0 0-2-2m2 2-2 2"/></svg></span><span><b>Hand over in one click</b>Any technician can change the category or the owner from a dropdown when someone cannot follow up.</span></li>
-        <li class="reveal" style="--d:0.29s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6V3Z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg></span><span><b>Every change on record</b>Status, owner and category changes are logged with who did it and when.</span></li>
-        <li class="reveal" style="--d:0.33s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><b>Closed with feedback</b>Requesters rate the fix, and resolved tickets close themselves after a reminder.</span></li>
-        </ul>
-      </div>
-    </div>
-  </div></section>
-
   <!-- ============ Tickets ============ -->
   <section class="lp-slide lp-feature" id="tickets" data-slide data-id="tickets" data-title="Tickets"><div class="lp-slide-in">
-    <div class="lp-wrap lp-split">
-      <div class="lp-copy">
-        <p class="lp-kicker reveal">Tickets</p>
-        <h2 class="lp-h2 reveal" style="--d:.06s">Requests that find their own way.</h2>
-        <p class="lp-p reveal" style="--d:.12s">People describe the problem in plain words. Helply reads it, suggests the category, sends it to the right team and starts the clock. Technicians open a queue that is already in order, with the history, the device and the likely fix beside each ticket.</p>
-        <ul class="lp-list reveal" style="--d:.18s">
-          <li><b>A clear life cycle</b> from new to closed, with a note required whenever work is paused or resolved.</li>
-          <li><b>Priority from impact and urgency</b> using the same matrix IT teams already know.</li>
-          <li><b>Every change on record</b> so nobody has to ask who did what, and when.</li>
-        </ul>
-      </div>
-      <figure class="lp-media reveal" style="--d:.1s">
-        <img src="{% static 'img/landing/tickets.jpg' %}" alt="Network cables in a dark server rack with green status lights" width="1050" height="700" loading="lazy" decoding="async">
+    <div class="lp-wrap lp-fit">
+      <figure class="lp-fig reveal">
+        <img src="{% static 'img/landing/technician.jpg' %}" alt="A technician plugging a network cable into a switch" width="2000" height="1121" decoding="async">
         <figcaption class="chip c1"><i class="dot"></i>Category suggested</figcaption>
         <figcaption class="chip c2"><i class="dot teal"></i>Routed to the right team</figcaption>
         <figcaption class="chip c3"><i class="dot amber"></i>Response clock started</figcaption>
       </figure>
+      <div class="lp-copy">
+        <p class="lp-kicker reveal">Tickets</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">From first message to a closed ticket.</h2>
+        <ul class="lp-feats reveal-list">
+          <li class="reveal" style="--d:0.05s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span><b>Raised your way</b><small class="d">Employees describe the problem in plain words. IT can also open one for a colleague.</small></span></li>
+          <li class="reveal" style="--d:0.09s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span><span><b>Sorted on arrival</b><small class="d">A suggested category, then automatic triage and routing when Helply is sure.</small></span></li>
+          <li class="reveal" style="--d:0.13s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>Priority from impact and urgency</b><small class="d">The ITIL matrix, so P1 to P4 mean the same thing to everyone.</small></span></li>
+          <li class="reveal" style="--d:0.17s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2.5h6"/></svg></span><span><b>SLA clocks that pause</b><small class="d">Response and resolution deadlines, paused while you wait on someone.</small></span></li>
+          <li class="reveal opt" style="--d:0.21s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/></svg></span><span><b>Replies and private notes</b><small class="d">Requesters see every public reply. Internal notes stay with IT.</small></span></li>
+          <li class="reveal opt" style="--d:0.25s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M17 8h5m0 0-2-2m2 2-2 2"/></svg></span><span><b>Hand over in one click</b><small class="d">Any technician can change the category or the owner from a dropdown.</small></span></li>
+          <li class="reveal opt" style="--d:0.29s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6V3Z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg></span><span><b>Every change on record</b><small class="d">Who changed what, and when, on every ticket.</small></span></li>
+          <li class="reveal opt" style="--d:0.33s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><b>Closed with feedback</b><small class="d">Requesters rate the fix; resolved tickets close themselves after a reminder.</small></span></li>
+        </ul>
+      </div>
     </div>
   </div></section>
 
   <!-- ============ AI ============ -->
   <section class="lp-slide lp-ai" id="ai" data-slide data-id="ai" data-title="AI inside the workflow"><div class="lp-slide-in">
-    <div class="lp-wrap">
-      <div class="lp-ai-top">
-        <div>
-          <p class="lp-kicker reveal">Intelligence, built in</p>
-          <h2 class="lp-h2 reveal" style="--d:.06s">AI inside the workflow.<br><span class="lp-grad">Not a chat box.</span></h2>
-          <p class="lp-p reveal" style="--d:.12s">It works where the work happens: when a ticket arrives, when it needs an owner, and when someone asks &ldquo;haven&rsquo;t we solved this before?&rdquo;</p>
-        </div>
-        <figure class="lp-ai-art reveal" style="--d:.1s" aria-hidden="true"><img src="{% static 'img/landing/ai-chip.jpg' %}" alt="" width="1999" height="1400" loading="lazy" decoding="async"></figure>
+    <div class="lp-wrap lp-fit">
+      <figure class="lp-fig art reveal" aria-hidden="true"><img src="{% static 'img/landing/ai-chip.jpg' %}" alt="" width="1999" height="1400" decoding="async"></figure>
+      <div class="lp-copy">
+        <p class="lp-kicker reveal">Intelligence, built in</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">AI inside the workflow.<br><span class="lp-grad">Not a chat box.</span></h2>
+        <p class="lp-p opt reveal" style="--d:.08s">It works where the work happens: when a ticket arrives, when it needs an owner, and when someone asks &ldquo;haven&rsquo;t we solved this before?&rdquo;</p>
+        <ul class="lp-feats one">
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span><span><b>It sorts.</b><small class="d">A suggested category and a confidence level. When Helply is sure, it triages the ticket by itself.</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M17 11l2 2 3-4"/></svg></span><span><b>It routes.</b><small class="d">The ticket goes to the technician with the lightest load on the team that owns that kind of problem.</small></span></li>
+          <li class="reveal" style="--d:0.20s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H20v15H6.5A1.5 1.5 0 0 0 5 19.5Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H20M9 8h7M9 12h5"/></svg></span><span><b>It remembers.</b><small class="d">Related articles and similar past tickets appear beside the new one, so solved problems stay solved.</small></span></li>
+        </ul>
+        <p class="lp-fine opt reveal">Every correction a person makes is measured, so the dashboard shows how often the suggestion was right.</p>
       </div>
-      <div class="lp-trio">
-        <article class="lp-tile reveal" style="--d:.05s">
-          <span class="lp-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span>
-          <h3>It sorts.</h3>
-          <p>A new ticket gets a suggested category and a confidence level. When Helply is sure, it triages the ticket by itself.</p>
-        </article>
-        <article class="lp-tile reveal" style="--d:.12s">
-          <span class="lp-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M17 11l2 2 3-4"/></svg></span>
-          <h3>It routes.</h3>
-          <p>The ticket goes to the technician with the lightest load on the team that owns that kind of problem.</p>
-        </article>
-        <article class="lp-tile reveal" style="--d:.19s">
-          <span class="lp-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H20v15H6.5A1.5 1.5 0 0 0 5 19.5Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H20"/><path d="M9 8h7M9 12h5"/></svg></span>
-          <h3>It remembers.</h3>
-          <p>Related articles and similar past tickets appear beside the new one, so solved problems stay solved.</p>
-        </article>
-      </div>
-      <p class="lp-fine reveal">Every correction a person makes is measured, so the dashboard always shows how often the suggestion was right.</p>
     </div>
   </div></section>
 
   <!-- ============ SLA ============ -->
   <section class="lp-slide lp-feature alt" id="sla" data-slide data-id="sla" data-title="Service levels"><div class="lp-slide-in">
-    <div class="lp-wrap lp-split flip">
-      <div class="lp-copy">
-        <p class="lp-kicker reveal">Service levels</p>
-        <h2 class="lp-h2 reveal" style="--d:.06s">A promise you can see being kept.</h2>
-        <p class="lp-p reveal" style="--d:.12s">Set a first-response and a resolution target for each priority in plain language, like 30m or 1d 2h. Helply pauses the clock while you wait on someone else, warns before a ticket is late, and flags it the moment it is.</p>
-        <ul class="lp-list reveal" style="--d:.18s">
-          <li><b>P1 to P4</b> targets you control, changed in seconds on one page.</li>
-          <li><b>At risk</b> and <b>breached</b> tickets rise to the top of every dashboard.</li>
-        </ul>
-      </div>
+    <div class="lp-wrap lp-fit">
       <div class="lp-sla reveal" style="--d:.1s" aria-hidden="true">
         <div class="row p1"><span class="tag">P1</span><span class="name">Critical</span><span class="bar"><i style="--w:92%"></i></span></div>
         <div class="row p2"><span class="tag">P2</span><span class="name">High</span><span class="bar"><i style="--w:68%"></i></span></div>
         <div class="row p3"><span class="tag">P3</span><span class="name">Medium</span><span class="bar"><i style="--w:44%"></i></span></div>
         <div class="row p4"><span class="tag">P4</span><span class="name">Low</span><span class="bar"><i style="--w:22%"></i></span></div>
-        <p class="legend">Illustration of how SLA timers look in Helply</p>
+        <p class="legend opt">Illustration of how SLA timers look in Helply</p>
+      </div>
+      <div class="lp-copy">
+        <p class="lp-kicker reveal">Service levels</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">A promise you can see being kept.</h2>
+        <p class="lp-p reveal" style="--d:.08s">Set a first-response and a resolution target for each priority in plain language, like 30m or 1d 2h. Helply pauses the clock while you wait on someone else and warns before a ticket is late.</p>
+        <ul class="lp-feats one">
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/></svg></span><span><b>P1 to P4 targets you control</b><small class="d">Changed in seconds on one page.</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>At risk and breached tickets rise</b><small class="d">They go to the top of every dashboard.</small></span></li>
+        </ul>
       </div>
     </div>
   </div></section>
 
   <!-- ============ Servers ============ -->
   <section class="lp-slide lp-feature dark" id="servers" data-slide data-id="servers" data-title="Cloud servers"><div class="lp-slide-in">
-    <div class="lp-wrap lp-split">
-      <figure class="lp-media reveal">
-        <img src="{% static 'img/landing/switch.jpg' %}" alt="Cables and glowing ports on a network switch" width="1050" height="700" loading="lazy" decoding="async">
+    <div class="lp-wrap lp-fit">
+      <figure class="lp-fig reveal">
+        <img src="{% static 'img/landing/switch.jpg' %}" alt="Cables and glowing ports on a network switch" width="1050" height="700" decoding="async">
         <figcaption class="chip c1"><i class="dot"></i>Reporting every 10 seconds</figcaption>
         <figcaption class="chip c2"><i class="dot amber"></i>Offline for 2 minutes opens a ticket</figcaption>
       </figure>
       <div class="lp-copy">
         <p class="lp-kicker reveal">Cloud servers</p>
-        <h2 class="lp-h2 reveal" style="--d:.06s">See your servers before your users do.</h2>
-        <p class="lp-p reveal" style="--d:.12s">Install a tiny agent with one command on Linux or Windows. Helply learns the machine by itself, draws live CPU, memory, disk and network, and turns a real problem into a ticket with an owner and a clock.</p>
-        <ul class="lp-list reveal" style="--d:.18s">
-          <li><b>Read-only by design.</b> The agent only sends readings. It opens no ports and accepts no commands.</li>
-          <li><b>Where it runs, what it costs.</b> Country, provider and renewal date sit beside the graphs.</li>
-          <li><b>Recovery noted for you.</b> When the server returns, the ticket says so.</li>
+        <h2 class="lp-h2 reveal" style="--d:.04s">See your servers before your users do.</h2>
+        <p class="lp-p reveal" style="--d:.08s">Install a tiny agent with one command on Linux or Windows. Helply draws live CPU, memory, disk and network, and turns a real problem into a ticket with an owner and a clock.</p>
+        <ul class="lp-feats one">
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span><b>Read-only by design</b><small class="d">The agent only sends readings. It opens no ports and accepts no commands.</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><span><b>Where it runs, what it costs</b><small class="d">Country, provider and renewal date sit beside the graphs.</small></span></li>
+          <li class="reveal opt" style="--d:0.20s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><b>Recovery noted for you</b><small class="d">When the server returns, the ticket says so.</small></span></li>
         </ul>
       </div>
     </div>
@@ -182,35 +148,39 @@
 
   <!-- ============ Assets ============ -->
   <section class="lp-slide lp-feature" id="assets" data-slide data-id="assets" data-title="Assets and renewals"><div class="lp-slide-in">
-    <div class="lp-wrap lp-split flip">
-      <div class="lp-copy">
-        <p class="lp-kicker reveal">Assets and renewals</p>
-        <h2 class="lp-h2 reveal" style="--d:.06s">Know what you own, and when it expires.</h2>
-        <p class="lp-p reveal" style="--d:.12s">Laptops, screens, network gear, software licences and cloud servers in one register, each with an owner, a location and a warranty or renewal date. The right people hear about it at 30, 14 and 7 days, then on the day.</p>
-        <ul class="lp-list reveal" style="--d:.18s">
-          <li><b>Every device keeps its story</b>, including the tickets raised against it.</li>
-          <li><b>Repeat faults stand out</b>, so replacing a problem laptop is a decision, not a hunch.</li>
-        </ul>
-      </div>
-      <figure class="lp-media reveal" style="--d:.1s">
-        <img src="{% static 'img/landing/assets.jpg' %}" alt="Network equipment on a desk in front of a server room" width="936" height="624" loading="lazy" decoding="async">
+    <div class="lp-wrap lp-fit">
+      <figure class="lp-fig reveal">
+        <img src="{% static 'img/landing/assets.jpg' %}" alt="Network equipment on a desk in front of a server room" width="936" height="624" decoding="async">
         <figcaption class="chip c1"><i class="dot teal"></i>Renews in 14 days</figcaption>
       </figure>
+      <div class="lp-copy">
+        <p class="lp-kicker reveal">Assets and renewals</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">Know what you own, and when it expires.</h2>
+        <p class="lp-p reveal" style="--d:.08s">Laptops, screens, network gear, licences and cloud servers in one register, each with an owner, a location and a warranty or renewal date. The right people hear about it at 30, 14 and 7 days, then on the day.</p>
+        <ul class="lp-feats one">
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg></span><span><b>Every device keeps its story</b><small class="d">Including the tickets raised against it.</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>Repeat faults stand out</b><small class="d">Replacing a problem laptop becomes a decision, not a hunch.</small></span></li>
+        </ul>
+      </div>
     </div>
   </div></section>
 
   <!-- ============ Small team ============ -->
-  <section class="lp-slide lp-bento-sec" data-slide data-id="team" data-title="Made for small teams"><div class="lp-slide-in">
-    <div class="lp-wrap">
-      <p class="lp-kicker center reveal">Made for small teams</p>
-      <h2 class="lp-h2 center reveal" style="--d:.06s">Big-company discipline.<br>Small-company calm.</h2>
-      <div class="lp-bento">
-        <article class="bento b-wide reveal"><img src="{% static 'img/landing/team.jpg' %}" alt="Tiny figures plugging in a network cable" width="728" height="486" loading="lazy" decoding="async"><div class="bento-copy"><h3>One to five people in IT?</h3><p>That is exactly who Helply is for. No consultants, no month of setup, no seat-by-seat licensing.</p></div></article>
-        <article class="bento reveal" style="--d:.08s"><div class="bento-copy"><h3>Three roles, nothing extra</h3><p>Employees see their own tickets and devices. Technicians see their team&rsquo;s queue. Administrators manage people and policy.</p></div>
-          <ul class="mini mini-roles" aria-hidden="true"><li><i class="pd e"></i><b>Employee</b><span>Own tickets</span></li><li><i class="pd t"></i><b>Technician</b><span>Team queue</span></li><li><i class="pd a"></i><b>Administrator</b><span>Everything</span></li></ul></article>
-        <article class="bento reveal" style="--d:.14s"><div class="bento-copy"><h3>Fix it yourself first</h3><p>A built-in knowledge base suggests answers while people type their request, so simple problems never become tickets.</p></div>
-          <div class="mini mini-kb" aria-hidden="true"><div class="q"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>My printer will not print</div><div class="hit"><b>Reset the print spooler</b><span>Suggested article</span></div></div></article>
-        <article class="bento b-wide reveal" style="--d:.06s"><img src="{% static 'img/landing/cables.jpg' %}" alt="Colourful patch cables in a data centre rack" width="933" height="700" loading="lazy" decoding="async"><div class="bento-copy"><h3>Quiet, useful notifications</h3><p>In-app and email, only when someone has to act, and never twice for the same thing.</p></div></article>
+  <section class="lp-slide lp-feature alt" id="team" data-slide data-id="team" data-title="Made for small teams"><div class="lp-slide-in">
+    <div class="lp-wrap lp-fit">
+      <figure class="lp-fig reveal">
+        <img src="{% static 'img/landing/team.jpg' %}" alt="Tiny figures plugging in a network cable" width="728" height="486" decoding="async">
+        <figcaption class="chip c1"><i class="dot teal"></i>One to five people in IT</figcaption>
+      </figure>
+      <div class="lp-copy">
+        <p class="lp-kicker reveal">Made for small teams</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">Big-company discipline. Small-company calm.</h2>
+        <ul class="lp-feats one">
+          <li class="reveal" style="--d:0.08s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M16 5a3 3 0 0 1 0 6M18 14.5a5.5 5.5 0 0 1 3 5.5"/></svg></span><span><b>One to five people in IT?</b><small class="d">That is who Helply is for. No consultants, no month of setup, no seat-by-seat licensing.</small></span></li>
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span><b>Three roles, nothing extra</b><small class="d">Employees see their own tickets and devices, technicians their team&rsquo;s queue, administrators everything.</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span><b>Fix it yourself first</b><small class="d">A built-in knowledge base suggests answers while people type, so simple problems never become tickets.</small></span></li>
+          <li class="reveal opt" style="--d:0.20s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7ZM10 19a2 2 0 0 0 4 0"/></svg></span><span><b>Quiet, useful notifications</b><small class="d">In-app and email, only when someone has to act, and never twice for the same thing.</small></span></li>
+        </ul>
       </div>
     </div>
   </div></section>

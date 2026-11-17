@@ -398,19 +398,19 @@ class LandingDeckTests(TestCase):
 
     def test_sections_are_slides_with_controls_and_the_form_on_the_first(self):
         html = self.client.get("/accounts/login/").content.decode()
-        self.assertEqual(html.count("data-slide "), 9)
+        self.assertEqual(html.count("data-slide "), 8)
         self.assertIn("data-deck", html)
         for hook in ("data-dots", "data-prev", "data-next", "data-count", "data-top", "data-slide-link=\"tickets\""):
             self.assertIn(hook, html)
-        first = html[html.index('data-id="welcome"'):html.index('data-id="showcase"')]
+        first = html[html.index('data-id="welcome"'):html.index('data-id="tickets"')]
         self.assertIn('name="username"', first)
         self.assertIn('name="password"', first)
-        self.assertNotIn('name="username"', html[html.index('data-id="showcase"'):])  # only one sign-in form
+        self.assertNotIn('name="username"', html[html.index('data-id="tickets"'):])  # only one sign-in form
         self.assertIn("js/landing.js", html)
 
     def test_each_slide_has_a_unique_id_and_title(self):
         import re
         html = self.client.get("/accounts/login/").content.decode()
         ids = re.findall(r'data-slide data-id="([^"]+)" data-title="([^"]+)"', html)
-        self.assertEqual(len(ids), 9)
-        self.assertEqual(len({i for i, _ in ids}), 9)
+        self.assertEqual(len(ids), 8)
+        self.assertEqual(len({i for i, _ in ids}), 8)
