@@ -71,10 +71,12 @@ class WorkflowTests(TestCase):
         with self.assertRaises(workflow.TransitionError):
             workflow.perform(t, "resolve", self.sup, note="skip ahead")
 
-    def test_only_administrator_assigns(self):
+    def test_only_it_staff_assigns(self):
         t = self.make(category=self.cat)
         with self.assertRaises(workflow.TransitionError):
-            workflow.assign(t, self.tech, actor=self.tech)
+            workflow.assign(t, self.tech, actor=self.emp)
+        workflow.assign(t, self.tech, actor=self.tech)
+        self.assertEqual(t.assignee, self.tech)
 
     def test_ai_auto_triage_and_assign(self):
         t = self.make(title="Laptop and printer broken", description="My laptop cannot reach the printer")

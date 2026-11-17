@@ -75,7 +75,7 @@ def ticket_detail(request, pk):
         context["similar"] = ai.similar_tickets(ticket)
     if workflow.can_recategorize(ticket, user):
         context["category_form"] = CategoryForm(initial={"category": ticket.category})
-    if user.is_administrator and ticket.is_open:
+    if user.is_agent and ticket.is_open:
         context["assign_form"] = AssignForm(initial={"assignee": ticket.assignee or ai.suggest_assignee(ticket)})
     if ticket.requester_id == user.pk and ticket.status in (Status.RESOLVED, Status.CLOSED) \
             and not hasattr(ticket, "satisfaction"):
@@ -106,6 +106,10 @@ def ticket_assign(request, pk):
             messages.success(request, f"Assigned to {ticket.assignee}.")
         except workflow.TransitionError as e:
             messages.error(request, str(e))
+    # A technician may hand the ticket to someone outside their groups and so lose
+    # access to it; send them to the list instead of a 404.
+    if not visible_tickets(request.user).filter(pk=ticket.pk).exists():
+        return redirect("tickets:list")
     return redirect(ticket)
 
 

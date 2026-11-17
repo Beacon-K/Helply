@@ -137,8 +137,10 @@ def auto_close(ticket, days):
 
 def assign(ticket, assignee, actor=None):
     """Assign (or reassign) a ticket. actor=None means the system/AI did it."""
-    if actor is not None and not actor.is_administrator:
-        raise TransitionError("Only administrators can assign tickets.")
+    # Any IT staff member may reassign: the usual case is a technician who cannot
+    # follow up and hands the ticket to a colleague.
+    if actor is not None and not actor.is_agent:
+        raise TransitionError("Only IT staff can assign tickets.")
     if ticket.status not in OPEN_STATUSES:
         raise TransitionError("Only open tickets can be assigned.")
     if not assignee.is_agent:
