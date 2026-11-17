@@ -400,7 +400,7 @@ class LandingDeckTests(TestCase):
         html = self.client.get("/accounts/login/").content.decode()
         self.assertEqual(html.count("data-slide "), 9)
         self.assertIn("data-deck", html)
-        for hook in ("data-dots", "data-prev", "data-next", "data-count", "data-slide-link=\"tickets\""):
+        for hook in ("data-dots", "data-prev", "data-next", "data-count", "data-top", "data-slide-link=\"tickets\""):
             self.assertIn(hook, html)
         first = html[html.index('data-id="welcome"'):html.index('data-id="showcase"')]
         self.assertIn('name="username"', first)

@@ -67,6 +67,8 @@
       if (d === 0) { slide.removeAttribute("inert"); slide.removeAttribute("aria-hidden"); }
       else { slide.setAttribute("inert", ""); slide.setAttribute("aria-hidden", "true"); }
     });
+    root.classList.toggle("lp-on-hero", n === 0);       // the first page keeps its own full-screen look
+    root.classList.toggle("lp-past-first", n > 0);      // the back-to-start button only shows after it
     dots.forEach(function (dot, i) { dot.setAttribute("aria-current", i === n ? "true" : "false"); });
     navLinks.forEach(function (a) { a.setAttribute("aria-current", a.dataset.slideLink === slides[n].dataset.id ? "true" : "false"); });
     count.textContent = (n + 1) + " / " + slides.length;
@@ -137,7 +139,10 @@
   // Keyboard, except while typing in a field.
   document.addEventListener("keydown", function (e) {
     var tag = (e.target.tagName || "").toLowerCase();
-    if (tag === "input" || tag === "textarea" || tag === "select" || e.target.isContentEditable) return;
+    if (tag === "textarea" || tag === "select" || e.target.isContentEditable) return;
+    // A single-line field has no use for the up/down keys, so they still turn the page (the sign-in
+    // username is focused on arrival); every other key belongs to the field.
+    if (tag === "input" && ["ArrowDown", "ArrowUp", "PageDown", "PageUp"].indexOf(e.key) < 0) return;
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     var k = e.key;
     if (k === "ArrowDown" || k === "PageDown" || (k === " " && !e.shiftKey)) { if (innerCanScroll(1)) return; e.preventDefault(); if (!locked) step(1); }
@@ -146,6 +151,8 @@
     else if (k === "End") { e.preventDefault(); go(slides.length - 1); }
   });
 
+  var topBtn = document.querySelector("[data-top]");
+  if (topBtn) topBtn.addEventListener("click", function () { go(0); });
   prevBtn.addEventListener("click", function () { step(-1); });
   nextBtns.forEach(function (b) { b.addEventListener("click", function (e) { e.preventDefault(); step(1); }); });
   navLinks.forEach(function (a) {
