@@ -1,4 +1,4 @@
-# Helply 项目进度与交接（截至 2026-10-03）
+# Helply 项目进度与交接（截至 2026-11-16）
 
 ## 1. 需求总览
 | 类别 | 要求 |
@@ -30,6 +30,10 @@
 | SLA 设置（`/sla/`） | 仅管理员；P1–P4 的名称、首次响应时间、解决时间、是否启用，一次保存；只影响新建工单，已有工单保持原到期时间 |
 | 邮件发送（Brevo）和收信转发 | **2026-10-03 已验证**：经 Brevo（`smtp-relay.brevo.com:587`）发出的测试邮件，经 Cloudflare Email Routing（3 条 MX + Catch-all 转发到管理员真实邮箱）成功收到。helply.work 的 DNS 齐全（DKIM、DMARC、品牌链接、Cloudflare 收信记录）；SMTP 配置在 `.env`（模板 `.env.example`，凭据由 Kevin 自己填）。Brevo 的「授权 IP」限制已对 SMTP 关闭。**Brevo 会自动拉黑出现过硬退信的地址**（日志 `blacklist user`），新增收件域名前先确认它能收信。SMTP key 约 2027-10-03 到期，连续 90 天不用也会失效。**不往保留的假域名发信**（`example.com/.org/.net`、`*.example/.test/.invalid/.localhost`，可用 `HELPLY_EMAIL_BLOCKED_DOMAINS` 追加）：站内通知照常，日志记一行；People 页对这类地址也不发设置密码邮件，仍显示一次性链接。详见 README「邮件发送（Brevo）」。演示账号邮箱统一为 `用户名@helply.work`，邮件通知默认关闭，只给 alice、tom、tina、sam 打开（转发后都进管理员的一个邮箱）；`demo_emails` 命令可把旧的 `@example.com` 账号改过来 |
 | 续费提醒 | 订阅和云服务器在到期前 30/14/7 天及到期当天提醒（站内 + 邮件，发给管理员和资产负责人），同一续费日期每档只发一次，由 un_jobs 触发；超期 14 天后不再提醒 |
+| 登录与后台安全（10-10） | 登录和重置密码限流、本地登录记录；Django Admin 外观与主站一致；部门和团队管理页（从 Admin 迁到主站）；邮件改后台发送并加超时 |
+| 界面重做（10-10 至今） | 登录页改为产品介绍页；登录后整体改成「控制台质感」（命令面板 Ctrl/Cmd+K、`g` 快捷键）；最后加载的 `calm.css` 收敛为一套中性色阶 + 单一强调色，无渐变和光斑；侧栏底部 Help 按钮，分角色互动引导教程（`help.js`） |
+| AI 扩展 | Cloudflare Workers AI 可选分类后端（失败退回关键词）；Helply Assistant（工单创建页、知识库页、技术员 copilot、Ctrl/Cmd+J 助手抽屉）；管理员工单分析卡片；`backends/external.py` 可选接 OpenAI / Anthropic（密钥只放 `.env`，`ai_status --test` 检查）；`metering.py` 记录 Cloudflare 每日额度（用 Cloudflare 自己返回的 neurons，80% 和 100% 提醒管理员）；已登录页面不缓存，浏览器暂存的对话和草稿带用户 id |
+| 资产批量导入导出（11-11） | 资产台账支持 Excel 导出和批量导入（先预览再确认），导入面板默认收起 |
 | 报告 | 已交过 5 页英文报告（之前会话里输出的 Word 文件，不在仓库里） |
 
 ## 3. 云服务器监控（apps/monitoring）
@@ -51,11 +55,12 @@
 |---|---|---|
 | 1 | ~~让 helply.work 能从公网访问~~ **已完成（2026-10-03）**；cloudflared 用 --protocol http2；www 子域名未配置 | 在 Cloudflare Zero Trust 建隧道 `helply`，Public Hostname 设为 `helply.work`，指向 `HTTP localhost:8000`（DNS 里有旧记录要先删）；Kevin 把令牌写进 `.env` 的 `CLOUDFLARE_TUNNEL_TOKEN`；关掉 `start-demo.bat`，运行 `start-online.bat`。已按此完成 |
 | 2 | 在真实服务器上实测 agent | 计划接入的机器见第 6 节，实测云服务商识别 |
-| 3 | 推送代码 | 本地已提交，**还没 push** 到 `github.com/Beacon-K/Helply`（Private） |
+| 3 | 推送代码 | 10-05 前的提交已推送；之后的提交由 Kevin 手动执行 `git push origin main`（仓库保持 Private） |
 | 4 | 学校服务器迁移 | 在等学校确认：能否长期运行网站、能否用 Cloudflare 隧道、机器能用多久。确认后要写开机自启的安装脚本（计划任务或 Windows 服务）和迁移步骤清单 |
 | 5 | 监控第 2 阶段剩余部分 | 费用汇总报表、访问登记（堡垒机暂缓） |
 | 6 | 邮件转工单 | 收信：用 Cloudflare Email Routing 把 `support@helply.work` 转进 Helply，解析成工单（发件人对应用户、回复邮件接到原工单）。**只列待办，还没做**；目前 Email Routing 只计划转发到个人邮箱 |
-| 7 | 可选 | agent 打包成 exe（Windows 上就不用装 Python）；LLM 分类后端 |
+| 7 | 可选 | agent 打包成 exe（Windows 上就不用装 Python） |
+| 8 | 测试提速 | 全部 333 项约 9 分钟，找出最慢的测试再优化 |
 
 ## 5. 做过的决定（不要轻易推翻）
 - 自己写 agent，不用 Komari，也不用 SSH 轮询。原因：只读、安全、能和工单系统集成。
@@ -77,6 +82,7 @@
 ## 7. 已知问题和注意事项
 - 新增依赖 `maxminddb`：其他机器要重新运行 `setup.bat`（或 `pip install -r requirements.txt`），否则国家识别静默不工作。
 - 公网站点的代码、模板和静态文件只在 `start-online.bat` 启动时加载，改完代码要重启它。
+- `docs/`（课程交付文档、个人评价、渗透测试输出）和 `Images/`（库存图片，未被代码引用）有意不提交。
 - 本机没装 psutil，所以 `AgentTests` 会被跳过。
 - 演示公司现在是 **100 人**（1 管理员、3 技术员、96 员工，10 个部门；员工用户名就是名字小写，例如 `ava`、`noah`）。名单是固定写在 `apps/core/demo/people.py` 里的，每次生成结果一致。
 - **启动不再改动任何数据**（2026-10-03 起）：`start-online.bat`、`start-demo.bat`、`setup.bat` 只在数据库没有用户时才生成演示数据；人员、角色、密码、SLA、工单、资产都不会被覆盖。演示账号的初始密码只在创建时设置一次（公网模式每人随机，记在 `demo-passwords.txt`，不提交），之后归用户所有。有意重置演示用 `reset-demo.bat`（需输入 RESET）；统一换密码用 `demo_passwords --rotate`。`start-online.bat` 现在同时运行定时任务（SLA、跟进、续费提醒、备份）。
