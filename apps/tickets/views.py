@@ -74,9 +74,17 @@ def ticket_detail(request, pk):
     if user.is_agent:
         context["similar"] = ai.similar_tickets(ticket)
     if workflow.can_recategorize(ticket, user):
-        context["category_form"] = CategoryForm(initial={"category": ticket.category})
+        form = CategoryForm(initial={"category": ticket.category})
+        if ticket.category_id:
+            form.fields["category"].empty_label = None  # saves on change, so a blank choice would be meaningless
+        context["category_form"] = form
     if user.is_agent and ticket.is_open:
-        context["assign_form"] = AssignForm(initial={"assignee": ticket.assignee or ai.suggest_assignee(ticket)})
+        form = AssignForm(initial={"assignee": ticket.assignee})
+        if ticket.assignee_id:
+            form.fields["assignee"].empty_label = None
+        else:
+            form.fields["assignee"].empty_label = "Unassigned"
+        context["assign_form"] = form
     if ticket.requester_id == user.pk and ticket.status in (Status.RESOLVED, Status.CLOSED) \
             and not hasattr(ticket, "satisfaction"):
         context["survey_form"] = SurveyForm()

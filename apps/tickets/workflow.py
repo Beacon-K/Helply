@@ -161,13 +161,15 @@ def assign(ticket, assignee, actor=None):
 
 
 def can_recategorize(ticket, user):
-    return ticket.is_open and (user.is_administrator or (user.is_technician and ticket.assignee_id == user.pk))
+    # Any IT staff member may correct the category, not only the assignee: the person who spots a
+    # wrong category is often not the one who owns the ticket.
+    return ticket.is_open and user.is_agent
 
 
 def recategorize(ticket, category, actor):
     """Change a ticket's category (e.g. correcting the AI) and route it to that category's group."""
     if not can_recategorize(ticket, actor):
-        raise TransitionError("Only a administrator or the assigned technician can change the category.")
+        raise TransitionError("Only IT staff can change the category.")
     if ticket.category_id == category.pk:
         return ticket
     with transaction.atomic():

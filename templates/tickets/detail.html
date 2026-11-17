@@ -65,9 +65,9 @@
       <h2>Details</h2>
       <dl>
         <dt>Requester</dt><dd>{{ ticket.requester }}</dd>
-        <dt>Category</dt><dd>{% if category_form %}<form method="post" action="{% url 'tickets:categorize' ticket.pk %}" class="inline-form"{% if ticket.category_id %} data-edit-form{% endif %}>{% csrf_token %}{{ category_form.category }} {% if ticket.category_id %}<button type="button" class="btn small-btn" data-edit-btn>Edit</button> <button class="btn small-btn" data-save-btn hidden>Save</button>{% else %}<button class="btn small-btn">Save</button>{% endif %}</form>{% else %}{{ ticket.category|default:"–" }}{% endif %}</dd>
+        <dt>Category</dt><dd>{% if category_form %}<form method="post" action="{% url 'tickets:categorize' ticket.pk %}" class="inline-form" data-autosave>{% csrf_token %}{{ category_form.category }}<noscript> <button class="btn small-btn">Save</button></noscript></form>{% else %}{{ ticket.category|default:"–" }}{% endif %}</dd>
         <dt>Group</dt><dd>{{ ticket.support_group|default:"–" }}</dd>
-        <dt>Assignee</dt><dd>{% if assign_form %}<form method="post" action="{% url 'tickets:assign' ticket.pk %}" class="inline-form">{% csrf_token %}{{ assign_form.assignee }} <button class="btn small-btn">Save</button></form>{% else %}{{ ticket.assignee|default:"–" }}{% endif %}</dd>
+        <dt>Assignee</dt><dd>{% if assign_form %}<form method="post" action="{% url 'tickets:assign' ticket.pk %}" class="inline-form" data-autosave>{% csrf_token %}{{ assign_form.assignee }}<noscript> <button class="btn small-btn">Save</button></noscript></form>{% else %}{{ ticket.assignee|default:"–" }}{% endif %}</dd>
         <dt>Impact / urgency</dt><dd>{{ ticket.get_impact_display }} / {{ ticket.get_urgency_display }}</dd>
         <dt>Asset</dt><dd>{% if ticket.asset and user.is_agent %}<a href="{{ ticket.asset.get_absolute_url }}">{{ ticket.asset }}</a>{% else %}{{ ticket.asset|default:"–" }}{% endif %}</dd>
         <dt>Response due</dt><dd>{{ ticket.response_due_at|date:"M j, H:i"|default:"–" }}{% if ticket.first_response_at %}{% endif %}</dd>

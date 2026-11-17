@@ -197,3 +197,40 @@ class CreateForEmployeeTests(TestCase):
         self.client.force_login(self.emp)
         self.client.post("/tickets/new/", {**self.post, "requester": self.other.pk})
         self.assertEqual(Ticket.objects.get(title="Printer").requester, self.emp)
+
+
+class InlineEditTests(TestCase):
+    """Category and Assignee are dropdowns on the ticket page that any IT staff member can change."""
+
+    def setUp(self):
+        from django.urls import reverse
+        self.reverse = reverse
+        self.emp = User.objects.create_user("emp", password="x")
+        self.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
+        self.other = User.objects.create_user("tech2", password="x", role=User.Role.TECHNICIAN, is_active=True)
+        group = SupportGroup.objects.create(name="Desk")  # row-level scoping: both technicians share the queue
+        group.members.add(self.tech, self.other)
+        self.hw = Category.objects.create(name="Hardware", default_group=group)
+        self.net = Category.objects.create(name="Network", default_group=group)
+        SLAPolicy.objects.create(priority="P3", name="Medium", response_minutes=60, resolution_minutes=480)
+        self.t = services.create_ticket(requester=self.emp, title="x", description="y", impact=2, urgency=2,
+                                        category=self.hw)
+
+    def test_any_technician_changes_category_and_assignee_without_owning_the_ticket(self):
+        self.client.force_login(self.other)  # in the team, but not the assignee
+        workflow.assign(self.t, self.tech, actor=self.tech)
+        self.client.post(self.reverse("tickets:categorize", args=[self.t.pk]), {"category": self.net.pk})
+        self.client.post(self.reverse("tickets:assign", args=[self.t.pk]), {"assignee": self.other.pk})
+        self.t.refresh_from_db()
+        self.assertEqual((self.t.category, self.t.assignee), (self.net, self.other))
+
+    def test_page_has_autosave_dropdowns_for_it_staff_and_none_for_employees(self):
+        self.client.force_login(self.tech)
+        page = self.client.get(self.t.get_absolute_url())
+        self.assertContains(page, "data-autosave", count=2)
+        self.assertNotContains(page, "data-edit-btn")
+        self.client.force_login(self.emp)
+        self.assertNotContains(self.client.get(self.t.get_absolute_url()), "data-autosave")
+        self.client.post(self.reverse("tickets:categorize", args=[self.t.pk]), {"category": self.net.pk})
+        self.t.refresh_from_db()
+        self.assertEqual(self.t.category, self.hw)

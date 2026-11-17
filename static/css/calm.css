@@ -222,3 +222,6 @@ input:focus, select:focus, textarea:focus, :root[data-theme="dark"] input:focus,
 .pager { display: flex; align-items: center; justify-content: space-between; gap: .8rem; flex-wrap: wrap; padding: .8rem .2rem 0; }
 .pager-links { display: inline-flex; align-items: center; gap: .7rem; }
 .pager .is-disabled { opacity: .45; pointer-events: none; }
+
+/* A dropdown that saves on change: dim it for the instant between picking and the page reloading. */
+.inline-form select.is-saving { opacity: .6; }
