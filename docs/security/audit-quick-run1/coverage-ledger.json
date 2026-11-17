@@ -1,0 +1,1002 @@
+[
+  {
+    "coverage_id": "agent%2Finstall.ps1%23Windows%20agent%20installation::agent%2Finstall.ps1%23icacls%20applied%20to%20agent.conf%20only::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Resource%20and%20file%20handling",
+    "canonical_refs": {
+      "surface": "agent/install.ps1#Windows agent installation",
+      "boundary": "agent/install.ps1#icacls applied to agent.conf only",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Resource and file handling"
+    },
+    "surface": "agent/install.ps1#Windows agent installation",
+    "boundary": "agent/install.ps1#icacls applied to agent.conf only",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Resource and file handling",
+    "starting_paths": [
+      "agent/install.ps1",
+      "agent/helply_agent.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Resource and file handling",
+    "selected_companion_blocks": [
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Privileged-helper and local-file attack classes",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Universal moves",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "agent/helply_agent.py",
+      "agent/install.ps1",
+      "agent/install.sh"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "agent/install.ps1",
+          "agent/helply_agent.py",
+          "agent/install.sh"
+        ],
+        "invariant": "Code that runs as a service account is only writable by administrators.",
+        "method": "source",
+        "result": "install.ps1 creates C:\\ProgramData\\HelplyAgent without setting its ACL (line 67) and locks only agent.conf (line 99); the task runs pythonw on the script with that directory as working directory (lines 102-107), so it is sys.path[0]. A new folder under C:\\ProgramData inherits an ACE giving BUILTIN\\Users create-file and create-folder rights (observed with icacls on a probe folder).",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "agent-windows-install-dir-writable-by-users"
+    ],
+    "unresolved": [
+      "Planting and execution not demonstrated: needs a Windows test machine with a standard user."
+    ]
+  },
+  {
+    "coverage_id": "agent%2Finstall.sh%23Linux%20agent%20installation::agent%2Finstall.sh%23content%20check%20on%20the%20downloaded%20agent%20%28first%20line%20contains%20python%29::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Resource%20and%20file%20handling",
+    "canonical_refs": {
+      "surface": "agent/install.sh#Linux agent installation",
+      "boundary": "agent/install.sh#content check on the downloaded agent (first line contains python)",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Resource and file handling"
+    },
+    "surface": "agent/install.sh#Linux agent installation",
+    "boundary": "agent/install.sh#content check on the downloaded agent (first line contains python)",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Resource and file handling",
+    "starting_paths": [
+      "agent/install.sh",
+      "apps/monitoring/views.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Resource and file handling",
+    "selected_companion_blocks": [
+      "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+      "SUPPLY-CHAIN-AND-RELEASE.md#Release and update attack classes",
+      "SUPPLY-CHAIN-AND-RELEASE.md#Universal moves",
+      "SUPPLY-CHAIN-AND-RELEASE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "agent/helply_agent.py",
+      "agent/install.sh",
+      "apps/monitoring/views.py"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "agent/install.sh",
+          "apps/monitoring/views.py",
+          "agent/helply_agent.py"
+        ],
+        "invariant": "The agent is installed root-owned and runs unprivileged with a restricted unit.",
+        "method": "source",
+        "result": "Install directory root:root 755, config 640 root:helply-agent, systemd unit with NoNewPrivileges, ProtectSystem=strict, MemoryMax and CPUQuota; download path allow-list in agent_file prevents traversal.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "apps%2Faccounts%2Fforms.py%23ThrottleMixin.clean%20%28sign-in%20and%20admin%20sign-in%29::apps%2Faccounts%2Fthrottle.py%23blocked_for::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Business%20logic",
+    "canonical_refs": {
+      "surface": "apps/accounts/forms.py#ThrottleMixin.clean (sign-in and admin sign-in)",
+      "boundary": "apps/accounts/throttle.py#blocked_for",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Business logic"
+    },
+    "surface": "apps/accounts/forms.py#ThrottleMixin.clean (sign-in and admin sign-in)",
+    "boundary": "apps/accounts/throttle.py#blocked_for",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Business logic",
+    "starting_paths": [
+      "apps/accounts/forms.py",
+      "apps/accounts/throttle.py",
+      "config/urls.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Business logic",
+    "selected_companion_blocks": [
+      "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+      "WEB-PROTOCOL-AND-AUTH.md#Browser-session attack classes",
+      "WEB-PROTOCOL-AND-AUTH.md#Universal moves",
+      "WEB-PROTOCOL-AND-AUTH.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "apps/accounts/forms.py",
+      "apps/accounts/models.py",
+      "apps/accounts/throttle.py"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "apps/accounts/forms.py",
+          "apps/accounts/throttle.py",
+          "apps/accounts/models.py"
+        ],
+        "invariant": "Every guess against an account is counted under one identity, whatever spelling the attacker types.",
+        "method": "source",
+        "result": "Counters key on strip().lower() of the raw field (throttle.py:40) while sign-in authenticates the NFKC-normalised name; compatibility spellings of one username get separate counters.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "accounts-throttle-username-normalization-bypass"
+    ],
+    "unresolved": [
+      "Not reproduced: no OS sandbox to run a dummy-account check."
+    ]
+  },
+  {
+    "coverage_id": "apps%2Faccounts%2Fviews.py%23people_list%2C%20people_create%2C%20people_edit%2C%20people_toggle%2C%20people_reset%2C%20organization%2C%20team%20and%20department%20views::apps%2Faccounts%2Fdecorators.py%23role_required::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Access%20control",
+    "canonical_refs": {
+      "surface": "apps/accounts/views.py#people_list, people_create, people_edit, people_toggle, people_reset, organization, team and department views",
+      "boundary": "apps/accounts/decorators.py#role_required",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Access control"
+    },
+    "surface": "apps/accounts/views.py#people_list, people_create, people_edit, people_toggle, people_reset, organization, team and department views",
+    "boundary": "apps/accounts/decorators.py#role_required",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Access control",
+    "starting_paths": [
+      "apps/accounts/views.py",
+      "apps/accounts/decorators.py",
+      "apps/accounts/forms.py",
+      "apps/sla/views.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Access control",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "apps/accounts/decorators.py",
+      "apps/accounts/forms.py",
+      "apps/accounts/views.py",
+      "apps/sla/forms.py",
+      "apps/sla/views.py"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "apps/accounts/views.py",
+          "apps/accounts/decorators.py",
+          "apps/accounts/forms.py",
+          "apps/sla/views.py",
+          "apps/sla/forms.py"
+        ],
+        "invariant": "Account, team, department and SLA changes are administrator-only and cannot remove the last administrator or lock oneself out.",
+        "method": "source",
+        "result": "All views use role_required(ADMINISTRATOR) or require_POST on top of it; UserForm.clean blocks self-demotion and the last-administrator case; deletions of non-empty departments and category-owning teams are refused.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "apps%2Fassets%2C%20apps%2Fkb%20and%20apps%2Fsla%20Django%20admin%20registrations::django.contrib.admin%20permissions%20%28is_staff%29::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Access%20control",
+    "canonical_refs": {
+      "surface": "apps/assets, apps/kb and apps/sla Django admin registrations",
+      "boundary": "django.contrib.admin permissions (is_staff)",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Access control"
+    },
+    "surface": "apps/assets, apps/kb and apps/sla Django admin registrations",
+    "boundary": "django.contrib.admin permissions (is_staff)",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Access control",
+    "starting_paths": [
+      "apps/assets/admin.py",
+      "apps/kb/admin.py",
+      "apps/sla/admin.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Access control",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic"
+    ]
+  },
+  {
+    "coverage_id": "apps%2Fcore%2Fmanagement%2Fcommands%23run_jobs%2C%20backup_db%2C%20seed_demo%20and%20the%20demo%20guard::apps%2Fcore%2Fdemo%2Fguard.py%23refuses_non_demo_database::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Business%20logic",
+    "canonical_refs": {
+      "surface": "apps/core/management/commands#run_jobs, backup_db, seed_demo and the demo guard",
+      "boundary": "apps/core/demo/guard.py#refuses_non_demo_database",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Business logic"
+    },
+    "surface": "apps/core/management/commands#run_jobs, backup_db, seed_demo and the demo guard",
+    "boundary": "apps/core/demo/guard.py#refuses_non_demo_database",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Business logic",
+    "starting_paths": [
+      "apps/core/management/commands",
+      "apps/core/demo/guard.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Business logic",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic"
+    ]
+  },
+  {
+    "coverage_id": "apps%2Fkb%2Fmarkup.py%23render%20and%20the%20dashboards%27%20JavaScript%20renderers::apps%2Fkb%2Fmarkup.py%23_inline%20%28escape%20before%20markup%29::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Injection",
+    "canonical_refs": {
+      "surface": "apps/kb/markup.py#render and the dashboards' JavaScript renderers",
+      "boundary": "apps/kb/markup.py#_inline (escape before markup)",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Injection"
+    },
+    "surface": "apps/kb/markup.py#render and the dashboards' JavaScript renderers",
+    "boundary": "apps/kb/markup.py#_inline (escape before markup)",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Injection",
+    "starting_paths": [
+      "apps/kb/markup.py",
+      "static/js/fleet-detail.js",
+      "static/js/fleet.js",
+      "templates/monitoring/detail.html"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Injection",
+    "selected_companion_blocks": [
+      "CLIENT-SIDE.md#Core discipline",
+      "CLIENT-SIDE.md#DOM and object-state attack classes",
+      "CLIENT-SIDE.md#Universal moves",
+      "CLIENT-SIDE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "apps/kb/markup.py",
+      "static/js/fleet-detail.js",
+      "static/js/fleet.js",
+      "templates/monitoring/detail.html",
+      "templates/monitoring/list.html"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "apps/kb/markup.py",
+          "static/js/fleet-detail.js",
+          "static/js/fleet.js",
+          "templates/monitoring/detail.html",
+          "templates/monitoring/list.html"
+        ],
+        "invariant": "Untrusted text never reaches innerHTML or a raw template output.",
+        "method": "source",
+        "result": "KB text is escaped before regex markup is added; no |safe in any template; json_script carries server data; innerHTML/insertAdjacentHTML calls in fleet-detail.js use static labels, colours and number formatters only.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "apps%2Fmonitoring%2Fviews.py%23ingest::apps%2Fmonitoring%2Fmodels.py%23Server.for_token::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Injection",
+    "canonical_refs": {
+      "surface": "apps/monitoring/views.py#ingest",
+      "boundary": "apps/monitoring/models.py#Server.for_token",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Injection"
+    },
+    "surface": "apps/monitoring/views.py#ingest",
+    "boundary": "apps/monitoring/models.py#Server.for_token",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Injection",
+    "starting_paths": [
+      "apps/monitoring/views.py",
+      "apps/monitoring/services.py",
+      "apps/monitoring/models.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Injection",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "apps/monitoring/forms.py",
+      "apps/monitoring/models.py",
+      "apps/monitoring/services.py",
+      "apps/monitoring/views.py"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "apps/monitoring/views.py",
+          "apps/monitoring/services.py",
+          "apps/monitoring/models.py",
+          "apps/monitoring/forms.py"
+        ],
+        "invariant": "Agent reports are authenticated per server, size-bounded and validated before they reach storage, tickets or the asset register.",
+        "method": "source",
+        "result": "256-bit token, SHA-256 hash with compare_digest, 64 KB cap, _number/_text clamp every field, provider and OS family are allow-listed; stored text is escaped on output and embedded with json_script.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "apps%2Fnotifications%2Fviews.py%23notification_open::apps%2Fnotifications%2Fviews.py%23url_has_allowed_host_and_scheme::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Injection",
+    "canonical_refs": {
+      "surface": "apps/notifications/views.py#notification_open",
+      "boundary": "apps/notifications/views.py#url_has_allowed_host_and_scheme",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Injection"
+    },
+    "surface": "apps/notifications/views.py#notification_open",
+    "boundary": "apps/notifications/views.py#url_has_allowed_host_and_scheme",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Injection",
+    "starting_paths": [
+      "apps/notifications/views.py",
+      "apps/notifications/services.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Injection",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "apps/notifications/events.py",
+      "apps/notifications/services.py",
+      "apps/notifications/views.py"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "apps/notifications/views.py",
+          "apps/notifications/services.py",
+          "apps/notifications/events.py"
+        ],
+        "invariant": "Redirect targets and email content cannot be steered by a lower-trust user.",
+        "method": "source",
+        "result": "Notification is fetched by (pk, recipient); the stored url is checked with url_has_allowed_host_and_scheme; emails go out as plain text and test domains are blocked.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "apps%2Ftickets%2Fviews.py%23ticket_detail%20%28similar%20tickets%20panel%29::apps%2Fai%2Fservices.py%23similar_tickets::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Chained%20vulnerabilities%20and%20trust%20boundaries",
+    "canonical_refs": {
+      "surface": "apps/tickets/views.py#ticket_detail (similar tickets panel)",
+      "boundary": "apps/ai/services.py#similar_tickets",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Chained vulnerabilities and trust boundaries"
+    },
+    "surface": "apps/tickets/views.py#ticket_detail (similar tickets panel)",
+    "boundary": "apps/ai/services.py#similar_tickets",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Chained vulnerabilities and trust boundaries",
+    "starting_paths": [
+      "apps/tickets/views.py",
+      "apps/ai/services.py",
+      "templates/tickets/detail.html"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Chained vulnerabilities and trust boundaries",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "apps/ai/services.py",
+      "apps/tickets/selectors.py",
+      "apps/tickets/views.py",
+      "templates/tickets/detail.html"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "apps/tickets/views.py",
+          "apps/ai/services.py",
+          "apps/tickets/selectors.py",
+          "templates/tickets/detail.html"
+        ],
+        "invariant": "A suggestion list shows a technician only tickets that technician may open.",
+        "method": "source",
+        "result": "similar_tickets draws from every resolved or closed ticket (services.py:88) and only narrows by category when one is set (services.py:89-90); the template prints reference and title (detail.html:89).",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "ai-similar-tickets-ignore-visibility"
+    ],
+    "unresolved": [
+      "Not reproduced: no OS sandbox to run a dummy-tenant check."
+    ]
+  },
+  {
+    "coverage_id": "apps%2Ftickets%2Fviews.py%23ticket_detail%2C%20ticket_comment%2C%20ticket_action%2C%20ticket_assign%2C%20ticket_categorize%2C%20ticket_survey::apps%2Ftickets%2Fselectors.py%23visible_tickets::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Access%20control",
+    "canonical_refs": {
+      "surface": "apps/tickets/views.py#ticket_detail, ticket_comment, ticket_action, ticket_assign, ticket_categorize, ticket_survey",
+      "boundary": "apps/tickets/selectors.py#visible_tickets",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Access control"
+    },
+    "surface": "apps/tickets/views.py#ticket_detail, ticket_comment, ticket_action, ticket_assign, ticket_categorize, ticket_survey",
+    "boundary": "apps/tickets/selectors.py#visible_tickets",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Access control",
+    "starting_paths": [
+      "apps/tickets/views.py",
+      "apps/tickets/selectors.py",
+      "apps/tickets/workflow.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Access control",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "apps/tickets/forms.py",
+      "apps/tickets/selectors.py",
+      "apps/tickets/services.py",
+      "apps/tickets/views.py",
+      "apps/tickets/workflow.py"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "apps/tickets/views.py",
+          "apps/tickets/selectors.py",
+          "apps/tickets/workflow.py",
+          "apps/tickets/services.py",
+          "apps/tickets/forms.py"
+        ],
+        "invariant": "Every ticket read or write resolves the ticket through visible_tickets(user) and the workflow checks role, requester and assignee.",
+        "method": "source",
+        "result": "All six views call get_object_or_404(visible_tickets(request.user)); transitions check can_perform; internal notes are forced off for non-agents (services.py:37); the asset field is limited to the requester's own assets (forms.py:23).",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "apps%2Ftickets%2Fworkflow.py%23perform%20%28concurrent%20transitions%29::apps%2Ftickets%2Fworkflow.py%23can_perform::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Business%20logic",
+    "canonical_refs": {
+      "surface": "apps/tickets/workflow.py#perform (concurrent transitions)",
+      "boundary": "apps/tickets/workflow.py#can_perform",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Business logic"
+    },
+    "surface": "apps/tickets/workflow.py#perform (concurrent transitions)",
+    "boundary": "apps/tickets/workflow.py#can_perform",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Business logic",
+    "starting_paths": [
+      "apps/tickets/workflow.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Business logic",
+    "selected_companion_blocks": [
+      "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+      "WEB-PROTOCOL-AND-AUTH.md#Browser-session attack classes",
+      "WEB-PROTOCOL-AND-AUTH.md#Universal moves",
+      "WEB-PROTOCOL-AND-AUTH.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic"
+    ]
+  },
+  {
+    "coverage_id": "config%2Fsettings.py%20and%20start-online.bat%20%28deployment%20configuration%29::config%2Fsettings.py%23HELPLY_ENVIRONMENT::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Obvious%20things",
+    "canonical_refs": {
+      "surface": "config/settings.py and start-online.bat (deployment configuration)",
+      "boundary": "config/settings.py#HELPLY_ENVIRONMENT",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Obvious things"
+    },
+    "surface": "config/settings.py and start-online.bat (deployment configuration)",
+    "boundary": "config/settings.py#HELPLY_ENVIRONMENT",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Obvious things",
+    "starting_paths": [
+      "config/settings.py",
+      "start-online.bat",
+      "start-production.bat",
+      ".gitignore"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Obvious things",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      ".gitignore",
+      "config/settings.py",
+      "config/urls.py",
+      "start-online.bat",
+      "start-production.bat"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "config/settings.py",
+          "start-online.bat",
+          "start-production.bat",
+          ".gitignore",
+          "config/urls.py"
+        ],
+        "invariant": "Debug, secrets, cookies, redirects and sensitive files are gated correctly.",
+        "method": "source",
+        "result": "Public mode sets Secure cookies, SSL redirect, nosniff and HSTS; DEBUG and the secret come from the launcher; .env, databases, logs, backups are ignored; no secrets or secret-shaped strings in tracked files; next= redirects use Django's host check.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "config%2Furls.py%23accounts%2Fpassword_reset%2F::config%2Furls.py%23include%28django.contrib.auth.urls%29%20without%20a%20request%20limiter::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Feature%20abuse%20and%20data%20leakage",
+    "canonical_refs": {
+      "surface": "config/urls.py#accounts/password_reset/",
+      "boundary": "config/urls.py#include(django.contrib.auth.urls) without a request limiter",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Feature abuse and data leakage"
+    },
+    "surface": "config/urls.py#accounts/password_reset/",
+    "boundary": "config/urls.py#include(django.contrib.auth.urls) without a request limiter",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Feature abuse and data leakage",
+    "starting_paths": [
+      "config/urls.py",
+      "config/settings.py",
+      "apps/accounts/forms.py"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Feature abuse and data leakage",
+    "selected_companion_blocks": [
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Quota and scheduling attack classes",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Universal moves",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "No desktop app, native bridge or local IPC listener in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "hunter-1",
+    "reviewed_paths": [
+      "apps/accounts/forms.py",
+      "config/settings.py",
+      "config/urls.py"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "hunter-1",
+        "reviewed_paths": [
+          "config/urls.py",
+          "config/settings.py",
+          "apps/accounts/forms.py"
+        ],
+        "invariant": "Unauthenticated callers cannot trigger an unbounded number of outgoing emails to one address or from one source.",
+        "method": "source",
+        "result": "Only the two sign-in forms use the throttle (urls.py:15, forms.py:29-34); the stock reset view is included at urls.py:16 with no per-address or per-source limit.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "accounts-password-reset-email-flood"
+    ],
+    "unresolved": [
+      "Not reproduced under the skill's sandbox rules (earlier pentest observed 11 queued messages in a test database)."
+    ]
+  },
+  {
+    "coverage_id": "setup.bat%2C%20setup.sh%20and%20tools%2F%2A.bat%20launch%20scripts::tools%2Fhelply-env.bat%23HELPLY_PY::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Resource%20and%20file%20handling",
+    "canonical_refs": {
+      "surface": "setup.bat, setup.sh and tools/*.bat launch scripts",
+      "boundary": "tools/helply-env.bat#HELPLY_PY",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Resource and file handling"
+    },
+    "surface": "setup.bat, setup.sh and tools/*.bat launch scripts",
+    "boundary": "tools/helply-env.bat#HELPLY_PY",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Resource and file handling",
+    "starting_paths": [
+      "setup.bat",
+      "setup.sh",
+      "tools"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Resource and file handling",
+    "selected_companion_blocks": [
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Privileged-helper and local-file attack classes",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Universal moves",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "No custom HTTP parser, JWT, OAuth, SAML or MFA surface in this unit; Django sessions are covered by the ordinary classes."
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "No untrusted work amplification or queue in this unit."
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "No browser-side DOM sink fed by untrusted data in this unit."
+      },
+      {
+        "block": "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+        "reason": "No dependency resolution, CI or release pipeline in this unit."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic"
+    ]
+  }
+]

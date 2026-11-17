@@ -1,0 +1,33 @@
+{
+  "run_id": "run-1",
+  "repo": "helply",
+  "target": "C:/helply",
+  "source_ref": "3aaf54698e24ff8c4a3af28138affc045f3da6de (worktree dirty: sign-in throttle, sign-in record and login template changes are uncommitted)",
+  "profile": "quick",
+  "scope_paths": [
+    "."
+  ],
+  "budget": null,
+  "execution_policy": "sandboxed-source-and-local-only",
+  "selected_companion_files": [
+    "CLIENT-SIDE.md",
+    "DESKTOP-MOBILE-AND-LOCAL-IPC.md",
+    "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md",
+    "SUPPLY-CHAIN-AND-RELEASE.md",
+    "WEB-PROTOCOL-AND-AUTH.md"
+  ],
+  "prior_run_paths": [],
+  "shared_file_owners": {
+    "parent": [
+      "run-metadata.json",
+      "architecture.md",
+      "coverage-ledger.json",
+      "findings.json",
+      "REPORT.md",
+      "FINDINGS-DETAIL.md",
+      "NEEDS-VALIDATION.md"
+    ]
+  },
+  "run_status": "incomplete",
+  "incomplete_reason": "independent_verifiers_not_run"
+}

@@ -1,0 +1,222 @@
+[
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "accounts-password-reset-email-flood",
+    "title": "Password reset form has no per-address or per-source limit",
+    "description": "Anyone can submit the password reset form repeatedly for the same address. Each submission for a real account sends an email through the shared mail provider, which can flood a mailbox and use up the provider's daily quota that real notifications also need.",
+    "claimed_root_cause": "The stock Django reset view is included without a request limiter; the throttle was added only to the two sign-in forms.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "config/urls.py",
+        "line": 16,
+        "scope": "urlpatterns",
+        "description": "django.contrib.auth.urls exposes accounts/password_reset/ to anonymous visitors."
+      },
+      {
+        "kind": "propagation",
+        "file": "apps/accounts/forms.py",
+        "line": 29,
+        "scope": "ThrottledAuthenticationForm",
+        "description": "Throttling is attached to the sign-in forms only."
+      },
+      {
+        "kind": "sink",
+        "file": "config/settings.py",
+        "line": 191,
+        "scope": "EMAIL_BACKEND",
+        "description": "Reset messages are delivered through the configured SMTP provider."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "config/urls.py",
+        "line": 15,
+        "description": "Only the login route is wrapped with the throttled form."
+      },
+      {
+        "file": "config/settings.py",
+        "line": 191,
+        "description": "Outgoing mail uses a single shared provider account."
+      }
+    ],
+    "blockers": [
+      "The audit's sandbox rule forbids running the target here, and no provider quota fact is source-visible.",
+      "The provider's daily limit and the mailbox forwarding behind @helply.work addresses are deployment facts."
+    ],
+    "validation_plan": {
+      "local": "With the in-memory mail backend and a dummy user, post the reset form ten times for one address and count queued messages.",
+      "deployment": "The owner checks the Brevo plan's daily sending limit and whether any reset mail for the demo addresses is forwarded to a real mailbox."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "accounts-throttle-username-normalization-bypass",
+    "title": "Sign-in throttle counts compatibility spellings of a username separately",
+    "description": "The sign-in throttle keys its counters on the lower-cased raw username, but Django authenticates the NFKC-normalised username. Spellings such as fullwidth letters are different counter keys yet the same account, so the per-username limits can be dodged. Only the per-address limit remains.",
+    "claimed_root_cause": "throttle.clean_username normalises case and whitespace only, not Unicode compatibility forms, while the form field normalises with NFKC before authentication.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "apps/accounts/forms.py",
+        "line": 13,
+        "scope": "ThrottleMixin.clean",
+        "description": "The username is read from the raw POST data before the form field normalises it."
+      },
+      {
+        "kind": "propagation",
+        "file": "apps/accounts/throttle.py",
+        "line": 40,
+        "scope": "clean_username",
+        "description": "The key is strip().lower() of the raw value."
+      },
+      {
+        "kind": "propagation",
+        "file": "apps/accounts/throttle.py",
+        "line": 55,
+        "scope": "blocked_for",
+        "description": "Per-username and per-username-and-address counters filter on that key."
+      },
+      {
+        "kind": "sink",
+        "file": "apps/accounts/forms.py",
+        "line": 19,
+        "scope": "ThrottleMixin.clean",
+        "description": "super().clean() authenticates the NFKC-normalised username, so a differently spelled key still tests the same account."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "apps/accounts/throttle.py",
+        "line": 40,
+        "description": "No NFKC step in the counter key."
+      },
+      {
+        "file": "apps/accounts/forms.py",
+        "line": 13,
+        "description": "Raw self.data value is used, not cleaned_data."
+      }
+    ],
+    "blockers": [
+      "No OS-enforced sandbox is available on this Windows host, so the dummy-account check could not be run.",
+      "The NFKC behaviour of Django's UsernameField is in the installed library, outside the repository."
+    ],
+    "validation_plan": {
+      "local": "In a throw-away database create one dummy user. Send more than HELPLY_LOGIN_MAX_FAILURES wrong passwords using different compatibility spellings of that username from one address and check whether the password is still evaluated after the limit; then repeat with the exact spelling and compare."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "agent-windows-install-dir-writable-by-users",
+    "title": "Windows agent folder is not locked down, so its script directory may be writable by standard users",
+    "description": "The Windows installer creates the agent folder under C:\\ProgramData without setting its permissions and protects only the config file. A new folder there inherits rights that let standard users create files. The scheduled task runs the agent script as LOCAL SERVICE or SYSTEM with that folder as its script directory, so a file a standard user plants there with a standard-library module name could be imported first.",
+    "claimed_root_cause": "install.ps1 does not remove inherited user write rights from the agent directory, and Python puts the script directory first on its import path.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "agent/install.ps1",
+        "line": 67,
+        "scope": "directory creation",
+        "description": "New-Item creates the agent folder with the inherited ProgramData permissions."
+      },
+      {
+        "kind": "propagation",
+        "file": "agent/install.ps1",
+        "line": 99,
+        "scope": "icacls",
+        "description": "Only agent.conf receives a restricted ACL."
+      },
+      {
+        "kind": "propagation",
+        "file": "agent/install.ps1",
+        "line": 102,
+        "scope": "scheduled task action",
+        "description": "pythonw runs the script from the agent folder as the working directory."
+      },
+      {
+        "kind": "sink",
+        "file": "agent/helply_agent.py",
+        "line": 16,
+        "scope": "imports",
+        "description": "The agent imports standard-library modules; the script directory is searched before the standard library."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "agent/install.ps1",
+        "line": 99,
+        "description": "icacls is applied to the config file, not the directory or script."
+      },
+      {
+        "file": "agent/install.ps1",
+        "line": 104,
+        "description": "The task principal is LOCAL SERVICE, or SYSTEM when Python is per-user."
+      }
+    ],
+    "blockers": [
+      "The audit's sandbox rule forbids running the installer or planting files here.",
+      "A standard user on the monitored host and the effective ACL of the installed folder are deployment facts."
+    ],
+    "validation_plan": {
+      "local": "On a disposable Windows machine run the installer with a dummy token, read the folder ACL with icacls, and check whether a standard user can create a new file in it. Do not plant executable content.",
+      "deployment": "On each monitored Windows server, the owner reads the ACL of C:\\ProgramData\\HelplyAgent and lists the local users who are not administrators."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "ai-similar-tickets-ignore-visibility",
+    "title": "Similar-ticket suggestions are not limited to tickets the technician may open",
+    "description": "The panel shown to technicians lists reference and title of resolved or closed tickets chosen from the whole ticket table. When the open ticket has no category the pool is not narrowed at all, so titles from other support groups can appear.",
+    "claimed_root_cause": "similar_tickets() does not apply the viewer's visibility scope, and the category filter is skipped when the ticket has no category.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "apps/tickets/views.py",
+        "line": 71,
+        "scope": "ticket_detail",
+        "description": "Agents get context['similar'] from the viewed ticket."
+      },
+      {
+        "kind": "propagation",
+        "file": "apps/ai/services.py",
+        "line": 88,
+        "scope": "similar_tickets",
+        "description": "The candidate pool is every resolved or closed ticket."
+      },
+      {
+        "kind": "propagation",
+        "file": "apps/ai/services.py",
+        "line": 89,
+        "scope": "similar_tickets",
+        "description": "The pool is narrowed by category only when the ticket has one."
+      },
+      {
+        "kind": "sink",
+        "file": "templates/tickets/detail.html",
+        "line": 89,
+        "scope": "similar panel",
+        "description": "Reference and title of each match are rendered for the technician."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "apps/tickets/selectors.py",
+        "line": 6,
+        "description": "visible_tickets defines who may open which ticket, but the suggestion query never uses it."
+      },
+      {
+        "file": "apps/ai/services.py",
+        "line": 91,
+        "description": "Scoring runs over the first 500 unscoped candidates."
+      }
+    ],
+    "blockers": [
+      "The audit's sandbox rule forbids running the target here, so no dummy-tenant check was run.",
+      "Whether production data has uncategorised or cross-group tickets in the pool depends on live data."
+    ],
+    "validation_plan": {
+      "local": "In a throw-away database create two support groups with a resolved ticket in each, and an uncategorised open ticket assigned to a technician of the first group; open it as that technician and see whether the other group's resolved ticket title is listed.",
+      "deployment": "The owner lists open uncategorised tickets assigned to technicians to see how often the unscoped pool is used."
+    }
+  }
+]
