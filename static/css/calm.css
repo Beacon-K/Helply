@@ -212,3 +212,13 @@ input:focus, select:focus, textarea:focus, :root[data-theme="dark"] input:focus,
 /* KB: a reader's suggestion shown to IT staff; addressed ones fade back. */
 .kb-suggestion { padding: .7rem 0; border-top: 1px solid var(--line); } .kb-suggestion:first-of-type { border-top: 0; }
 .kb-suggestion.is-done p { opacity: .55; }
+
+/* Asset tables never wrap their cells: when the page is zoomed the table keeps its natural width and
+   scrolls sideways inside its card (see .table-wrap above). */
+.asset-table th, .asset-table td { white-space: nowrap; }
+.asset-table { width: 100%; }  /* nowrap cells make the table as wide as it needs; 100% fills the card when there is room */
+
+/* Pagination under a table. */
+.pager { display: flex; align-items: center; justify-content: space-between; gap: .8rem; flex-wrap: wrap; padding: .8rem .2rem 0; }
+.pager-links { display: inline-flex; align-items: center; gap: .7rem; }
+.pager .is-disabled { opacity: .45; pointer-events: none; }

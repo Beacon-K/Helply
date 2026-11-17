@@ -1,7 +1,9 @@
 from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Count, Q
+from django.http import QueryDict
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -19,6 +21,7 @@ from .forms import AssetForm
 from .live import detail_version, list_version
 from .models import Asset
 
+PAGE_SIZE = 10
 REPEAT_WINDOW_DAYS = 90
 REPEAT_THRESHOLD = 3  # this many tickets within the window flags a device with recurring problems
 
@@ -74,12 +77,20 @@ def asset_list(request):
     q = request.GET.get("q", "").strip().lower()
 
     shown = filter_assets(everything, type_filter, status_filter, q)
+    page = Paginator(shown, PAGE_SIZE).get_page(request.GET.get("page"))
+    # the filters, kept on the Previous / Next links (everything except the page number itself)
+    keep = QueryDict(mutable=True)
+    for key in ("q", "status", "type"):
+        if request.GET.get(key):
+            keep[key] = request.GET[key]
 
     type_counts = {}
     for a in everything:
         type_counts[a.type] = type_counts.get(a.type, 0) + 1
     context = {
-        "assets": shown,
+        "assets": page.object_list,
+        "page": page,
+        "pager_query": keep.urlencode(),
         "total": len(everything),
         "kpi": {
             "in_use": sum(a.status == Asset.Status.IN_USE for a in everything),

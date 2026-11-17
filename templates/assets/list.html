@@ -98,5 +98,15 @@ document.addEventListener("click", function (e) {
     {% endfor %}
   </table>
   </div>
+  <nav class="pager" id="asset-pager" data-live-region aria-label="Pages">
+    <span class="muted small">{% if page.paginator.count %}Showing {{ page.start_index }}–{{ page.end_index }} of {{ page.paginator.count }}{% else %}Nothing to show{% endif %}</span>
+    {% if page.paginator.num_pages > 1 %}
+    <span class="pager-links">
+      {% if page.has_previous %}<a class="btn small-btn" href="?{% if pager_query %}{{ pager_query }}&amp;{% endif %}page={{ page.previous_page_number }}">← Previous</a>{% else %}<span class="btn small-btn is-disabled" aria-disabled="true">← Previous</span>{% endif %}
+      <span class="small">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      {% if page.has_next %}<a class="btn small-btn" href="?{% if pager_query %}{{ pager_query }}&amp;{% endif %}page={{ page.next_page_number }}">Next →</a>{% else %}<span class="btn small-btn is-disabled" aria-disabled="true">Next →</span>{% endif %}
+    </span>
+    {% endif %}
+  </nav>
 </div>
 {% endblock %}

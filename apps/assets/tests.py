@@ -476,3 +476,34 @@ class AssetManagementTests(TestCase):
         self.client.force_login(self.tech)
         self.assertNotContains(self.client.get(reverse("assets:list")), "/admin/")
         self.assertNotContains(self.client.get(self.asset.get_absolute_url()), "/admin/")
+
+
+class AssetPaginationTests(TestCase):
+    def setUp(self):
+        self.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
+        for n in range(23):
+            Asset.objects.create(asset_tag=f"LT-{n:02d}", name=f"Laptop {n}", type="laptop", status="in_use")
+        Asset.objects.create(asset_tag="PR-1", name="Printer", type="printer", status="in_use")
+        self.client.force_login(self.tech)
+
+    def test_ten_per_page_and_pages_keep_the_filters(self):
+        url = reverse("assets:list")
+        first = self.client.get(url, {"type": "laptop"})
+        self.assertEqual(len(first.context["assets"]), 10)
+        self.assertContains(first, "Showing 1–10 of 23")
+        self.assertContains(first, "type=laptop&amp;page=2")
+        third = self.client.get(url, {"type": "laptop", "page": 3})
+        self.assertEqual(len(third.context["assets"]), 3)
+        self.assertContains(third, "Showing 21–23 of 23")
+
+    def test_bad_page_falls_back_and_few_results_show_no_pager_links(self):
+        url = reverse("assets:list")
+        self.assertEqual(self.client.get(url, {"page": "abc"}).context["page"].number, 1)
+        self.assertEqual(self.client.get(url, {"page": 999}).context["page"].number, 3)
+        few = self.client.get(url, {"q": "printer"})
+        self.assertContains(few, "Showing 1–1 of 1")
+        self.assertNotContains(few, "Next →")
+
+    def test_export_ignores_pagination(self):
+        response = self.client.get(reverse("assets:export"), {"type": "laptop", "page": 2})
+        self.assertEqual(response.status_code, 200)
