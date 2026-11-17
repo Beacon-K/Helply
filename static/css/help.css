@@ -1,0 +1,60 @@
+/* Help button, lesson menu and guided tour. Colours come from the theme variables only. */
+.side-help { margin-top: auto; padding-top: .6rem; border-top: 1px solid var(--line); }
+.side-help button { display: flex; align-items: center; gap: .75rem; width: 100%; padding: .5rem .75rem; border: 0; border-radius: 8px;
+  background: transparent; color: var(--muted); font: inherit; font-weight: 500; font-size: .95rem; cursor: pointer; text-align: left; }
+.side-help button svg { flex-shrink: 0; color: var(--muted); }
+.side-help button:hover, .side-help button[aria-expanded="true"] { background: var(--hover); color: var(--text); }
+.side-help button:hover svg, .side-help button[aria-expanded="true"] svg { color: var(--text); }
+.side-help button:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+.hp-menu { position: fixed; z-index: 410; left: 244px; bottom: 16px; width: min(360px, calc(100vw - 24px)); max-height: calc(100vh - 32px); overflow-y: auto;
+  background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 14px; padding: 1rem; box-shadow: 0 18px 50px rgba(0, 0, 0, .22); }
+.hp-menu[hidden] { display: none; }
+.hp-menu-head { display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; }
+.hp-x { border: 0; background: transparent; color: var(--muted); font-size: 1.5rem; line-height: 1; cursor: pointer; width: 32px; height: 32px; border-radius: 8px; }
+.hp-x:hover { background: var(--hover); color: var(--text); }
+.hp-sub { margin: .25rem 0 .8rem; color: var(--muted); font-size: .85rem; }
+.hp-all { display: flex; justify-content: space-between; align-items: center; gap: .6rem; width: 100%; padding: .7rem .85rem; border: 0; border-radius: 10px;
+  background: var(--primary); color: var(--primary-ink); font: inherit; cursor: pointer; text-align: left; }
+.hp-all small { display: block; opacity: .8; font-size: .8rem; margin-top: .1rem; }
+.hp-all:hover { background: var(--navy-hover); }
+.hp-list { list-style: none; margin: .7rem 0 0; padding: 0; display: grid; gap: .1rem; }
+.hp-list button { display: flex; gap: .7rem; align-items: center; width: 100%; padding: .5rem .55rem; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+.hp-list button:hover { background: var(--hover); }
+.hp-tick { flex: none; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; font-size: .72rem; color: var(--primary-ink); }
+.hp-tick.is-done { background: var(--primary); border-color: var(--primary); }
+.hp-t strong { display: block; font-weight: 600; font-size: .92rem; }
+.hp-t small { display: block; color: var(--muted); font-size: .8rem; }
+.hp-foot { margin: .9rem 0 0; color: var(--muted); font-size: .8rem; }
+.hp-foot kbd { font: inherit; font-size: .75rem; padding: 0 .35rem; border: 1px solid var(--line); border-radius: 5px; }
+
+/* Tour: the ring's giant shadow dims everything except the highlighted item (which stays clickable). */
+.hp-shade { position: fixed; inset: 0; z-index: 400; pointer-events: none; }
+.hp-shade.is-solid { background: rgba(0, 0, 0, .5); pointer-events: auto; }
+.hp-ring { position: fixed; z-index: 401; pointer-events: none; border-radius: 10px; border: 2px solid var(--primary);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, .5); transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease, opacity .2s; animation: hp-pulse 1.8s ease-in-out infinite; }
+@keyframes hp-pulse { 50% { border-color: color-mix(in srgb, var(--primary) 45%, transparent); } }
+.hp-card { position: fixed; z-index: 402; width: min(340px, calc(100vw - 16px)); background: var(--card); color: var(--text); border: 1px solid var(--line);
+  border-radius: 14px; padding: 1rem 1.1rem; box-shadow: 0 18px 50px rgba(0, 0, 0, .3); }
+.hp-card.is-center { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.hp-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: .75rem; margin-bottom: .35rem; }
+.hp-card h3 { margin: 0 0 .35rem; font-size: 1.05rem; }
+.hp-card p { margin: 0 0 .7rem; font-size: .9rem; line-height: 1.5; }
+.hp-card .hp-do { color: var(--primary); font-weight: 600; }
+.hp-card .hp-where { color: var(--muted); }
+.hp-bar { display: flex; align-items: center; gap: .4rem; }
+.hp-sp { flex: 1; }
+.hp-bar button { font: inherit; font-size: .88rem; padding: .45rem .8rem; border-radius: 10px; cursor: pointer; min-height: 36px; }
+.hp-ghost { background: transparent; border: 1px solid var(--line); color: var(--text); }
+.hp-ghost:hover { background: var(--hover); }
+.hp-primary { background: var(--primary); border: 1px solid var(--primary); color: var(--primary-ink); font-weight: 600; }
+.hp-primary:hover { background: var(--navy-hover); }
+.hp-bar button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+@media (max-width: 900px) {
+  .side-help { margin-top: 0; padding-top: 0; border-top: 0; margin-left: auto; flex-shrink: 0; }
+  .side-help button { width: auto; padding: .5rem .6rem; min-height: 44px; }
+  .side-help button span { display: none; }
+  .hp-menu { left: 8px; right: 8px; bottom: 8px; top: auto; width: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .hp-ring { animation: none; transition: none; } }

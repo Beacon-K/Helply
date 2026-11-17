@@ -48,12 +48,12 @@
     </div>
     <aside>
       <section class="card">
-        <h2>🔥 Most viewed</h2>
+        <h2>Most viewed</h2>
         {% for a in popular %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a> <small class="muted">{{ a.views }} views</small></p>
         {% empty %}<p class="muted">No views yet.</p>{% endfor %}
       </section>
       <section class="card">
-        <h2>🚨 Urgent?</h2>
+        <h2>Urgent?</h2>
         <p>If you clicked a suspicious link, lost a device, or the whole office is down, <b>don't wait</b> —
           <a href="{% url 'tickets:create' %}">open a ticket</a> with Impact and Urgency set to <b>High</b>.</p>
       </section>

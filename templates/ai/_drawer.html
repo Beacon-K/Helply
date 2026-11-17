@@ -1,9 +1,9 @@
 {# Helply Assistant: the chat drawer available on every signed-in page (apps.ai.chat). #}
-<aside class="ai-drawer" id="ai-drawer" hidden aria-label="Helply Assistant" data-url="{% url 'ai:chat' %}"
+<aside class="ai-drawer" id="ai-drawer" hidden aria-label="Helply Assistant" data-user="{{ user.pk }}" data-url="{% url 'ai:chat' %}"
        data-feedback="{% url 'ai:feedback' 0 %}" data-ticket-url="{% url 'tickets:create' %}">
   {% csrf_token %}
   <header class="aid-head">
-    <span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>Helply Assistant</span>
+    <span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Helply Assistant</span>
     <span class="aid-actions">
       <button type="button" class="aid-icon" data-aid-new title="New chat" aria-label="Start a new chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
       <button type="button" class="aid-icon" data-aid-close title="Close" aria-label="Close the assistant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>

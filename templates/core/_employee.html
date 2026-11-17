@@ -1,17 +1,19 @@
 {% load helply %}
 <section class="card self-help">
   <h2>What do you need help with?</h2>
-  <form method="get" action="{% url 'kb:list' %}" class="search">
-    <input name="q" placeholder="Describe the problem, e.g. &quot;printer offline&quot; or &quot;forgot my password&quot;">
-    <button class="btn">Search answers</button>
+  {# Hands the question to the Helply Assistant drawer (assistant.js); without JS it falls back to the knowledge base search. #}
+  <form method="get" action="{% url 'kb:list' %}" class="search" data-ai-ask-form>
+    <input name="q" required minlength="2" maxlength="800" autocomplete="off" aria-label="Ask the Helply Assistant"
+           placeholder="Ask Helply, e.g. &quot;my printer is offline&quot; or &quot;I forgot my password&quot;">
+    <button class="btn primary">Ask Helply</button>
   </form>
-  <p class="muted small">Most common problems have a step-by-step fix in the knowledge base. Can't find one?
+  <p class="muted small">Helply answers from our knowledge base and your own tickets. Not solved?
     <a href="{% url 'tickets:create' %}">Open a ticket</a>.</p>
 </section>
 
 {% if to_confirm %}
 <section class="card confirm-card">
-  <h2>✅ Please confirm these are fixed</h2>
+  <h2>Please confirm these are fixed</h2>
   {% for t in to_confirm %}
     <a class="attn-row" href="{{ t.get_absolute_url }}">
       <span class="attn-main"><span class="attn-title">{{ t.title }}</span>
@@ -47,12 +49,12 @@
 
   <div class="dash-side">
     <section class="card">
-      <h2>📚 Popular answers</h2>
+      <h2>Popular answers</h2>
       {% for a in popular %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></p>{% endfor %}
       <a class="small" href="{% url 'kb:list' %}">Browse the knowledge base →</a>
     </section>
     <section class="card">
-      <h2>🚨 Urgent?</h2>
+      <h2>Urgent?</h2>
       <p class="small">Clicked a suspicious link, lost a device, or the whole office is down? Open a ticket with Impact and Urgency set to <b>High</b> — don't wait.</p>
     </section>
   </div>

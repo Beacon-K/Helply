@@ -7,7 +7,7 @@
   <span class="badge st-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
   <span class="badge p-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
   <span class="badge sla-{{ sla }}">SLA: {{ sla }}</span>
-  {% if ticket.ai_classified %}<span class="badge">🤖 AI-classified</span>{% endif %}
+  {% if ticket.ai_classified %}<span class="badge">AI-classified</span>{% endif %}
 </p>
 
 <div class="grid-detail">
@@ -69,11 +69,11 @@
         <dt>Assignee</dt><dd>{{ ticket.assignee|default:"–" }}</dd>
         <dt>Impact / urgency</dt><dd>{{ ticket.get_impact_display }} / {{ ticket.get_urgency_display }}</dd>
         <dt>Asset</dt><dd>{% if ticket.asset and user.is_agent %}<a href="{{ ticket.asset.get_absolute_url }}">{{ ticket.asset }}</a>{% else %}{{ ticket.asset|default:"–" }}{% endif %}</dd>
-        <dt>Response due</dt><dd>{{ ticket.response_due_at|date:"M j, H:i"|default:"–" }}{% if ticket.first_response_at %} ✅{% endif %}</dd>
+        <dt>Response due</dt><dd>{{ ticket.response_due_at|date:"M j, H:i"|default:"–" }}{% if ticket.first_response_at %}{% endif %}</dd>
         <dt>Resolution due</dt><dd>{{ ticket.resolution_due_at|date:"M j, H:i"|default:"–" }}</dd>
         {% if ticket.satisfaction %}
         <dt>Satisfaction</dt>
-        <dd><span class="stars" title="{{ ticket.satisfaction.rating }} out of 5">{% for i in "12345" %}{% if forloop.counter <= ticket.satisfaction.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+        <dd><span class="stars" title="{{ ticket.satisfaction.rating }} out of 5">{{ ticket.satisfaction.rating }} / 5</span>
           {% if ticket.satisfaction.comment %}<br><small class="muted">“{{ ticket.satisfaction.comment }}”</small>{% endif %}</dd>
         {% endif %}
       </dl>
@@ -87,14 +87,14 @@
 
     {% if similar %}
     <section class="card">
-      <h2>🤖 Similar resolved tickets</h2>
+      <h2>Similar resolved tickets</h2>
       {% for score, t in similar %}<p><a href="{{ t.get_absolute_url }}">{{ t.reference }}</a> {{ t.title }} <small class="muted">({{ score }})</small></p>{% endfor %}
     </section>
     {% endif %}
 
     {% if related_articles %}
     <section class="card">
-      <h2>📚 Related articles</h2>
+      <h2>Related articles</h2>
       {% for a in related_articles %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></p>{% endfor %}
     </section>
     {% endif %}
@@ -103,7 +103,7 @@
       <h2>History</h2>
       <ul class="timeline">
       {% for e in events %}
-        <li><small class="muted">{{ e.created_at|date:"M j, H:i" }}</small> <b>{{ e.actor|default:"🤖 System" }}</b> — {{ e.get_kind_display }}
+        <li><small class="muted">{{ e.created_at|date:"M j, H:i" }}</small> <b>{{ e.actor|default:"System" }}</b> — {{ e.get_kind_display }}
           {% if e.to_status and e.from_status != e.to_status %}→ {{ e.get_to_status_display }}{% endif %}
           {% if e.note %}<br><small>{{ e.note }}</small>{% endif %}</li>
       {% endfor %}

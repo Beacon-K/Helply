@@ -349,3 +349,41 @@ class LoginLandingTests(TestCase):
         page = self.client.post("/accounts/login/", {"username": "nobody", "password": "x"})
         self.assertContains(page, 'class="lp-alert"')
         self.assertContains(page, "Please enter a correct")
+
+class TopbarLayoutTests(TestCase):
+    """The top bar keeps its two groups so it never wraps onto a second row at browser zoom levels or on phones.
+
+    The widths themselves are CSS and were checked in a browser; these tests pin the markup that CSS relies on."""
+
+    def setUp(self):
+        from apps.accounts.models import User
+
+        self.user = User.objects.create_user("zoom", password="x", role=User.Role.EMPLOYEE, first_name="Zoe")
+        self.client.force_login(self.user)
+
+    def test_search_and_assistant_sit_in_their_own_group_next_to_the_account_group(self):
+        html = self.client.get("/").content.decode()
+        tools = html.index('class="topbar-tools"')
+        who = html.index('class="who"')
+        self.assertLess(tools, html.index("cmdk-trigger"))
+        self.assertLess(html.index("ai-launch"), who)  # both tools are inside the first group, before the account group
+        self.assertIn('class="who-name"', html)
+
+    def test_password_link_has_a_long_and_a_short_label_and_the_avatar_links_to_the_same_page(self):
+        html = self.client.get("/").content.decode()
+        self.assertIn('class="long">Change password<', html)
+        self.assertIn('class="short">Password<', html)
+        self.assertEqual(html.count('href="/accounts/password_change/"'), 2)  # the name/avatar and the text link
+
+    def test_every_signed_in_page_has_the_help_button_in_the_sidebar_carrying_the_role(self):
+        html = self.client.get("/").content.decode()
+        side = html[html.index('class="sidebar"'):html.index("</aside>")]
+        self.assertIn('data-help-open data-role="employee"', side)
+        self.assertIn("js/help.js", html)
+
+    def test_signed_out_pages_do_not_load_the_help_tour(self):
+        self.client.logout()
+        self.assertNotContains(self.client.get("/accounts/login/"), "js/help.js")
+
+    def test_page_declares_a_mobile_viewport(self):
+        self.assertIn('name="viewport" content="width=device-width, initial-scale=1"', self.client.get("/").content.decode())

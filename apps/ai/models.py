@@ -54,3 +54,31 @@ class InsightReport(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+class AIUsage(models.Model):
+    """One metered model call, as reported by the provider in the response itself (never estimated).
+
+    Cloudflare returns the Neurons a request cost in `usage.neurons`; storing that gives the
+    administrator a true running total for what Helply spends of the daily allowance.
+    `neurons` stays null when a response carried no figure, so gaps are visible instead of guessed.
+    """
+
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    model = models.CharField(max_length=120)
+    prompt_tokens = models.PositiveIntegerField(default=0)
+    completion_tokens = models.PositiveIntegerField(default=0)
+    neurons = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
+class UsageAlert(models.Model):
+    """Remembers which allowance warning was already sent on which (UTC) day, so each goes out once."""
+
+    day = models.DateField()
+    level = models.CharField(max_length=10)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["day", "level"], name="one_usage_alert_per_level_and_day")]

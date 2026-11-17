@@ -4,6 +4,13 @@
 (function () {
   const DRAFT_KEY = "helply.ticketDraft";
 
+  // Who is signed in. Chat text and ticket drafts kept in the browser are tagged with this id, so on a shared
+  // computer they are never shown to the next person who signs in.
+  function me() {
+    const drawer = document.getElementById("ai-drawer");
+    return drawer ? String(drawer.dataset.user || "") : "";
+  }
+
   function el(tag, cls, text) {
     const node = document.createElement(tag);
     if (cls) node.className = cls;
@@ -108,7 +115,7 @@
       const a = el("a", "btn" + (primary ? " primary" : ""), primary ? "Still need help? Open a ticket" : "Open a ticket");
       a.href = panel.dataset.ticketUrl;
       a.addEventListener("click", (event) => {
-        try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ title: question.slice(0, 120), description: question })); } catch (e) { /* private mode */ }
+        try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ u: me(), title: question.slice(0, 120), description: question })); } catch (e) { /* private mode */ }
         if (document.getElementById("id_description")) { event.preventDefault(); fillDraft(); }
       });
       return a;
@@ -186,10 +193,12 @@
   function fillDraft() {
     const description = document.getElementById("id_description");
     const title = document.getElementById("id_title");
-    if (!description) return;
     let draft = null;
-    try { draft = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null"); sessionStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
-    if (!draft) return;
+    try { draft = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null"); } catch (e) { /* ignore */ }
+    // A draft left by someone else on this browser is deleted on any page and never used.
+    if (draft && String(draft.u) !== me()) { try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ } return; }
+    if (!description || !draft) return;  // keep our own draft until the ticket form opens
+    try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
     if (title && !title.value) title.value = String(draft.title || "").slice(0, 200);
     if (!description.value) description.value = String(draft.description || "");
     description.focus();
@@ -222,12 +231,25 @@
   let messages = [];
   let waiting = false;
 
-  try { messages = JSON.parse(sessionStorage.getItem(STORE) || "[]"); } catch (e) { messages = []; }
-  if (!Array.isArray(messages)) messages = [];
+  const owner = String(drawer.dataset.user || "");
+
+  // Only the signed-in person's own conversation is restored. Anything stored by someone else, or in the older
+  // untagged format, is thrown away rather than shown.
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(STORE) || "null");
+    if (saved && !Array.isArray(saved) && String(saved.u) === owner && Array.isArray(saved.m)) messages = saved.m;
+    else sessionStorage.removeItem(STORE);
+  } catch (e) { messages = []; }
 
   function save() {
-    try { sessionStorage.setItem(STORE, JSON.stringify(messages.slice(-30))); } catch (e) { /* private mode */ }
+    try { sessionStorage.setItem(STORE, JSON.stringify({ u: owner, m: messages.slice(-30) })); } catch (e) { /* private mode */ }
   }
+
+  function forget() {
+    try { sessionStorage.removeItem(STORE); sessionStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
+  }
+  // Signing out wipes the conversation and any ticket draft from this browser.
+  document.querySelectorAll('form[action*="logout"]').forEach((f) => f.addEventListener("submit", forget));
 
   function scrollDown() { log.scrollTop = log.scrollHeight; }
 
@@ -271,7 +293,7 @@
       a.href = drawer.dataset.ticketUrl;
       a.addEventListener("click", () => {
         const text = conversationSoFar(index);
-        try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ title: text.split("\n")[0].slice(0, 120), description: text })); } catch (e) { /* ignore */ }
+        try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ u: owner, title: text.split("\n")[0].slice(0, 120), description: text })); } catch (e) { /* ignore */ }
       });
       row.appendChild(a);
     }
@@ -341,6 +363,14 @@
     else if (event.key === "Escape" && drawer.classList.contains("open") && drawer.contains(document.activeElement)) close();
   });
 
+  // Dashboard "Ask Helply" box: the question goes straight to the assistant instead of a keyword search.
+  document.querySelectorAll("[data-ai-ask-form]").forEach((f) => f.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const field = f.querySelector("input[name=q]");
+    ask(field.value);
+    field.value = "";
+  }));
+
   // Dashboard insights card: refresh the analysis, or hand a finding to the assistant.
   document.querySelectorAll("[data-ai-ask-about]").forEach((b) => b.addEventListener("click", () => ask(b.dataset.aiAskAbout)));
   document.querySelectorAll("[data-ai-insights-refresh]").forEach((b) => b.addEventListener("click", async () => {
@@ -357,4 +387,21 @@
   }));
 
   window.HelplyAssistant = { open, close, toggle, ask };
+})();
+
+// ---------- New-ticket form for IT staff: choosing a department narrows the employee list ----------
+(function () {
+  const dept = document.getElementById("id_department");
+  const who = document.getElementById("id_requester");
+  if (!dept || !who) return;
+  function narrow() {
+    const d = dept.value;
+    Array.from(who.options).forEach((o) => {
+      const show = !o.value || !d || o.dataset.department === d;  // "Myself" always stays
+      o.hidden = !show; o.disabled = !show;
+    });
+    if (who.selectedOptions[0] && who.selectedOptions[0].disabled) who.value = "";
+  }
+  dept.addEventListener("change", narrow);
+  narrow();
 })();

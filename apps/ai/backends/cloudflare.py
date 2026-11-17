@@ -92,10 +92,21 @@ class CloudflareBackend(AIBackend):
         if not payload.get("success"):
             raise RuntimeError("Cloudflare API reported failure")
         result = payload.get("result") or {}
+        self._meter(model, result.get("usage"))
         if result.get("response") is not None:
             return result["response"]
         choices = result.get("choices") or []  # newer models answer in the OpenAI shape
         return (choices[0].get("message") or {}).get("content") if choices else None
+
+    @staticmethod
+    def _meter(model, usage):
+        """Keep the Neurons Cloudflare says this call cost. Metering must never break an answer."""
+        try:
+            from apps.ai import metering
+
+            metering.record(model, usage)
+        except Exception:  # noqa: BLE001
+            logger.exception("Could not record AI usage")
 
     def generate_text(self, system, messages, max_tokens=700, temperature=0.5):
         """A real multi-turn conversation: `messages` is the chat so far as [{role, content}].
@@ -103,10 +114,12 @@ class CloudflareBackend(AIBackend):
         Returns the reply text, or None when Cloudflare cannot answer (the caller then says so
         and shows related articles instead of pretending).
         """
+        model = settings.HELPLY_CF_CHAT_MODEL or self.model
+        self.name = f"cloudflare:{model}"  # chat runs on its own model; the audit log should say which
         try:
             text = self._post([{"role": "system", "content": system[:MAX_PROMPT_CHARS]}] + messages,
                               max_tokens=max_tokens, temperature=temperature,
-                              timeout=settings.HELPLY_CF_ASSISTANT_TIMEOUT, model=settings.HELPLY_CF_CHAT_MODEL or self.model)
+                              timeout=settings.HELPLY_CF_ASSISTANT_TIMEOUT, model=model)
         except Exception as exc:  # noqa: BLE001 - the assistant must degrade, never raise into a page
             logger.warning("Cloudflare AI chat unavailable: %s", exc)
             return None
@@ -126,19 +139,23 @@ class CloudflareBackend(AIBackend):
             return None
 
     def _parse(self, answer, categories):
-        """Validate the model output: it is external data, so range-check everything."""
-        data = _json_object(answer)
+        return parse_classification(answer, categories)
 
-        by_id = {c.pk: c for c in categories}
-        try:
-            category = by_id.get(int(data.get("category_id")))
-        except (TypeError, ValueError):
-            category = None
-        try:
-            confidence = min(1.0, max(0.0, float(data.get("confidence", 0))))
-        except (TypeError, ValueError):
-            confidence = 0.0
-        reason = str(data.get("reason", ""))[:200]
-        if category is None:
-            return Classification(None, 0.0, reason or "model chose no category")
-        return Classification(category, round(confidence, 2), reason)
+
+def parse_classification(answer, categories):
+    """Validate a model's classification: it is external data, so range-check everything."""
+    data = _json_object(answer)
+
+    by_id = {c.pk: c for c in categories}
+    try:
+        category = by_id.get(int(data.get("category_id")))
+    except (TypeError, ValueError):
+        category = None
+    try:
+        confidence = min(1.0, max(0.0, float(data.get("confidence", 0))))
+    except (TypeError, ValueError):
+        confidence = 0.0
+    reason = str(data.get("reason", ""))[:200]
+    if category is None:
+        return Classification(None, 0.0, reason or "model chose no category")
+    return Classification(category, round(confidence, 2), reason)

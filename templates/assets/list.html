@@ -69,7 +69,7 @@ document.addEventListener("click", function (e) {
   </form>
   <p class="filters type-filters" id="asset-types" data-live-region>
     <a href="?status={{ status_filter }}&q={{ q|urlencode }}" {% if not type_filter %}class="on"{% endif %}>All types <span class="filter-count">{{ total }}</span></a>
-    {% for value, label, icon, n in types %}<a href="?type={{ value }}&status={{ status_filter }}&q={{ q|urlencode }}" {% if type_filter == value %}class="on"{% endif %}>{{ icon }} {{ label }} <span class="filter-count">{{ n }}</span></a>{% endfor %}
+    {% for value, label, icon, n in types %}<a href="?type={{ value }}&status={{ status_filter }}&q={{ q|urlencode }}" {% if type_filter == value %}class="on"{% endif %}>{{ label }} <span class="filter-count">{{ n }}</span></a>{% endfor %}
   </p>
 
   <div class="table-wrap" id="asset-table" data-live-region>

@@ -26,11 +26,11 @@ class ArticleAdmin(admin.ModelAdmin):
             _down=Count("votes", filter=Q(votes__value=ArticleVote.Value.NOT_HELPFUL)),
         )
 
-    @admin.display(description="👍", ordering="_up")
+    @admin.display(description="Helpful", ordering="_up")
     def votes_up(self, obj):
         return obj._up
 
-    @admin.display(description="👎", ordering="_down")
+    @admin.display(description="Not helpful", ordering="_down")
     def votes_down(self, obj):
         return obj._down
 

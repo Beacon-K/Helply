@@ -45,8 +45,11 @@ def ticket_create(request):
     initial = {key: request.GET[key] for key in ("category", "asset") if request.GET.get(key, "").isdigit()}
     form = TicketCreateForm(request.POST or None, user=request.user, initial=initial)
     if request.method == "POST" and form.is_valid():
-        ticket = services.create_ticket(requester=request.user, **form.cleaned_data)
-        messages.success(request, f"Ticket {ticket.reference} submitted.")
+        data = {k: v for k, v in form.cleaned_data.items() if k != "department"}
+        requester = data.pop("requester", None) or request.user
+        ticket = services.create_ticket(requester=requester, created_by=request.user, **data)
+        suffix = f" for {requester}" if requester.pk != request.user.pk else ""
+        messages.success(request, f"Ticket {ticket.reference} submitted{suffix}.")
         return redirect(ticket)
     return render(request, "tickets/form.html", {"form": form})
 

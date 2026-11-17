@@ -14,7 +14,7 @@
     </div>
   </div>
   <div class="head-actions">
-    {% if a.server and user.is_agent %}<a class="btn" href="{{ a.server.get_absolute_url }}">☁️ Live monitoring</a>{% endif %}
+    {% if a.server and user.is_agent %}<a class="btn" href="{{ a.server.get_absolute_url }}">Live monitoring</a>{% endif %}
     <a class="btn primary" href="{% url 'tickets:create' %}?asset={{ a.pk }}">Report a problem</a>
     {% if user.is_staff %}<a class="btn" href="{% url 'admin:assets_asset_change' a.pk %}">Edit</a>{% endif %}
   </div>

@@ -5,7 +5,7 @@
 """
 from django.core.management.base import BaseCommand
 
-from apps.ai import insights
+from apps.ai import insights, metering
 
 
 class Command(BaseCommand):
@@ -15,6 +15,8 @@ class Command(BaseCommand):
         parser.add_argument("--force", action="store_true", help="Refresh even if the last analysis is recent.")
 
     def handle(self, *args, force=False, **options):
+        metering.check_alerts()  # every run: the allowance warning must not wait for the daily analysis
+        metering.prune()
         if not force and not insights.due():
             self.stdout.write("Ticket analysis is up to date.")
             return

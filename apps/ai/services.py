@@ -18,8 +18,19 @@ from .models import AISuggestion
 from .text import jaccard, tokenize
 
 
-def get_backend():
-    return import_string(settings.HELPLY_AI_BACKEND)()
+def get_backend(feature=None):
+    """The backend for a feature (classify, ask, copilot, chat, insights).
+
+    Features listed in HELPLY_EXT_FEATURES use the external model when one is configured, and fall back to the
+    default backend if it cannot answer; everything else uses the default backend directly.
+    """
+    default = import_string(settings.HELPLY_AI_BACKEND)()
+    if feature and feature in settings.HELPLY_EXT_FEATURES:
+        from .backends.external import ExternalBackend, WithFallback, configured
+
+        if configured() and not isinstance(default, ExternalBackend):
+            return WithFallback(ExternalBackend(), default)
+    return default
 
 
 def auto_triage(ticket):
@@ -27,7 +38,7 @@ def auto_triage(ticket):
     from apps.tickets.choices import Status
     from apps.tickets.models import Category, TicketEvent
 
-    backend = get_backend()
+    backend = get_backend("classify")
     result = backend.classify(f"{ticket.title}\n{ticket.description}", Category.objects.filter(is_active=True))
     confident = result.category is not None and result.confidence >= settings.HELPLY_AI_AUTO_TRIAGE_THRESHOLD
 

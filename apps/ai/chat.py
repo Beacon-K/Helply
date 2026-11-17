@@ -155,7 +155,7 @@ def chat(user, message, history=None):
         sections.append(f"<insights>\n{digest or '(no analysis yet)'}\n</insights>")
     system = PERSONAS[persona_key(user)] + STYLE + TRAILER + "\n\n" + "\n".join(sections)
 
-    backend = get_backend()
+    backend = get_backend("chat")
     text = backend.generate_text(system, turns + [{"role": "user", "content": message}])
 
     by_article = {a.pk: a for a in articles}

@@ -93,7 +93,7 @@ def asset_list(request):
             "subscriptions": sum(a.purchase_cost or 0 for a in everything
                                  if a.is_subscription and a.status != Asset.Status.RETIRED),
         },
-        "types": [(value, label, Asset.ICONS.get(value, ""), type_counts[value])
+        "types": [(value, label, Asset.icon_for(value), type_counts[value])
                   for value, label in Asset.Type.choices if value in type_counts],
         "statuses": Asset.Status.choices,
         "type_filter": type_filter,

@@ -6,7 +6,7 @@ from apps.sla.models import SLAPolicy
 
 from . import services, workflow
 from .choices import Priority, Status, compute_priority
-from .models import Category, TicketEvent
+from .models import Category, Ticket, TicketEvent
 
 
 class PriorityMatrixTests(TestCase):
@@ -163,3 +163,35 @@ class TicketListFilterTests(TestCase):
 
     def test_exact_status_still_works(self):
         self.assertEqual(self.titles(status="assigned"), {"assigned one"})
+
+
+class CreateForEmployeeTests(TestCase):
+    """IT staff can raise a ticket on an employee's behalf; employees cannot."""
+
+    def setUp(self):
+        from apps.accounts.models import Department, User
+        self.User = User
+        self.sales = Department.objects.create(name="Sales-t")
+        self.hr = Department.objects.create(name="HR-t")
+        self.tech = User.objects.create_user("tech-x", password="x", role="technician")
+        self.emp = User.objects.create_user("emp-x", password="x", role="employee", department=self.sales)
+        self.other = User.objects.create_user("emp-y", password="x", role="employee", department=self.hr)
+        self.post = {"title": "Printer", "description": "Offline", "impact": 3, "urgency": 3}
+
+    def test_technician_files_for_employee(self):
+        self.client.force_login(self.tech)
+        r = self.client.post("/tickets/new/", {**self.post, "department": self.sales.pk, "requester": self.emp.pk})
+        t = Ticket.objects.get(title="Printer")
+        self.assertEqual(t.requester, self.emp)
+        self.assertEqual(t.events.first().actor, self.tech)
+        self.assertRedirects(r, t.get_absolute_url(), fetch_redirect_response=False)
+
+    def test_employee_must_belong_to_department(self):
+        self.client.force_login(self.tech)
+        self.client.post("/tickets/new/", {**self.post, "department": self.sales.pk, "requester": self.other.pk})
+        self.assertFalse(Ticket.objects.filter(title="Printer").exists())
+
+    def test_employee_cannot_file_for_someone_else(self):
+        self.client.force_login(self.emp)
+        self.client.post("/tickets/new/", {**self.post, "requester": self.other.pk})
+        self.assertEqual(Ticket.objects.get(title="Printer").requester, self.emp)

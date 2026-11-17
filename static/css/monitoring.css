@@ -67,7 +67,7 @@
 
 /* ---------- Page head ---------- */
 .fx-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin: .4rem 0 1.6rem; flex-wrap: wrap; }
-.fx-eyebrow { margin: 0 0 .35rem; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.fx-eyebrow { margin: 0 0 .35rem; font-size: .72rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mute); }
 .fx-title { margin: 0; font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.35rem); line-height: 1.1; letter-spacing: -.025em; font-weight: 750; }
 .fx-lede { display: flex; align-items: center; gap: .6rem; margin: .65rem 0 0; color: var(--ink-2); font-size: .95rem; }
 .fx-lede .sep { color: var(--faint); }
@@ -79,7 +79,7 @@
            border-radius: var(--radius); box-shadow: 0 1px 2px rgba(var(--shadow-rgb),.04); margin-bottom: 1.4rem; overflow: hidden; }
 .fx-cell { padding: 1.05rem 1.25rem 1.1rem; min-width: 0; }
 .fx-cell + .fx-cell { border-left: 1px solid var(--line-2); }
-.fx-label { margin: 0 0 .5rem; font-size: .72rem; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.fx-label { margin: 0 0 .5rem; font-size: .72rem; font-weight: 650; letter-spacing: 0; text-transform: none; color: var(--mute); }
 .fx-big { display: flex; align-items: baseline; gap: .35rem; margin: 0; font-size: 1.85rem; line-height: 1; font-weight: 700; letter-spacing: -.03em; }
 .fx-big small { font-size: .95rem; font-weight: 600; color: var(--faint); letter-spacing: 0; }
 .fx-sub { margin: .5rem 0 0; font-size: .82rem; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -154,7 +154,7 @@
 
 .fx-card-foot { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; padding-top: .85rem; border-top: 1px solid var(--line-2); }
 .fx-stat { min-width: 0; }
-.fx-stat span { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); font-weight: 650; }
+.fx-stat span { display: block; font-size: .7rem; text-transform: none; letter-spacing: 0; color: var(--faint); font-weight: 650; }
 .fx-stat b { display: block; margin-top: .15rem; font-size: .86rem; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fx-alert-line { position: relative; z-index: 2; display: flex; align-items: center; gap: .5rem; margin: -.15rem 0 0; padding: .55rem .7rem; border-radius: 10px;
                  background: var(--crit-soft); color: var(--crit-ink); font-size: .8rem; font-weight: 600; }
@@ -189,7 +189,7 @@
 .fx-table-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow-x: auto; }
 .fx-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .86rem; min-width: 820px; }
 .fx-table th { position: sticky; top: 0; padding: .7rem 1rem; background: var(--sunken); border-bottom: 1px solid var(--line); text-align: left;
-               font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); font-weight: 650; }
+               font-size: .7rem; letter-spacing: 0; text-transform: none; color: var(--mute); font-weight: 650; }
 .fx-table td { padding: .8rem 1rem; border-bottom: 1px solid var(--line-2); vertical-align: middle; }
 .fx-table tr:last-child td { border-bottom: 0; }
 .fx-table tbody tr { position: relative; transition: background .15s; cursor: pointer; }
@@ -210,8 +210,7 @@
 .fx-empty { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 2rem; align-items: center;
             padding: clamp(1.5rem, 4vw, 3.25rem); background: var(--surface); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
 .fx-empty::before { content: ""; position: absolute; inset: 0; pointer-events: none;
-                    background: radial-gradient(60% 80% at 100% 0%, rgba(245,166,35,.08), transparent 60%),
-                                radial-gradient(50% 60% at 0% 100%, rgba(46,144,250,.06), transparent 60%); }
+                    }
 .fx-empty > * { position: relative; }
 .fx-empty h2 { margin: .2rem 0 .8rem; font-size: clamp(1.5rem, 1.1rem + 1.3vw, 2.1rem); line-height: 1.15; letter-spacing: -.025em; font-weight: 750; }
 .fx-empty p.lead { margin: 0 0 1.6rem; max-width: 34rem; color: var(--ink-2); font-size: 1rem; line-height: 1.6; }
@@ -259,7 +258,7 @@
 .fx-menu > summary::-webkit-details-marker { display: none; }
 .fx-menu-pop { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; min-width: 220px; padding: .35rem; background: var(--surface);
                border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 16px 40px -12px rgba(var(--shadow-rgb),.25); }
-.fx-menu-pop p { margin: .35rem .6rem .4rem; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); font-weight: 650; }
+.fx-menu-pop p { margin: .35rem .6rem .4rem; font-size: .72rem; text-transform: none; letter-spacing: 0; color: var(--faint); font-weight: 650; }
 .fx-menu-pop button { display: flex; width: 100%; padding: .5rem .6rem; border: 0; border-radius: 8px; background: transparent; font: 500 .88rem inherit; color: var(--ink); cursor: pointer; text-align: left; }
 .fx-menu-pop button:hover { background: var(--line-2); }
 
@@ -285,7 +284,7 @@
 .fx-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 1.4rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .fx-strip > div { padding: .8rem 1.15rem; min-width: 0; }
 .fx-strip > div + div { border-left: 1px solid var(--line-2); }
-.fx-strip > div > span { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); font-weight: 650; }
+.fx-strip > div > span { display: block; font-size: .7rem; text-transform: none; letter-spacing: 0; color: var(--faint); font-weight: 650; }
 .fx-strip b { display: block; margin-top: .15rem; font-size: .95rem; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .is-stale .fx-tile, .is-stale .fx-strip { opacity: .55; filter: grayscale(1); }
 .fx-stale-note { margin: -.4rem 0 .8rem; font-size: .84rem; color: var(--mute); }

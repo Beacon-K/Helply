@@ -2,7 +2,7 @@
 {# Administrator-only: recurring problems found in recent tickets (apps.ai.insights). #}
 <section class="card ins" id="ai-insights">
   <div class="panel-head">
-    <h2><span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>AI insights</span></h2>
+    <h2><span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>AI insights</span></h2>
     <span class="ins-meta">
       {% if insights %}Last {{ insights.stats.days }} days · updated {{ insights.report.created_at|ago }}{% endif %}
       <button type="button" class="btn small-btn" data-ai-insights-refresh data-url="{% url 'ai:insights_refresh' %}">{% if insights %}Refresh{% else %}Analyse tickets{% endif %}</button>
@@ -38,7 +38,7 @@
       </p>
     </article>
     {% empty %}
-      <p class="muted">No problem has repeated three or more times in this period. 🎉</p>
+      <p class="muted">No problem has repeated three or more times in this period.</p>
     {% endfor %}
     {% if insights.watchlist %}
     <div class="ins-watch"><b>Worth watching</b><ul>{% for w in insights.watchlist %}<li>{{ w }}</li>{% endfor %}</ul></div>

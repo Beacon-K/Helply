@@ -1,0 +1,201 @@
+/* Helply · calm layer
+   Loaded last. The earlier layers (app, theme, apple, tech) built a glowing "console": cyan and violet washes, an engineering grid,
+   gradient buttons, cursor spotlights, accent edges on every hover. This file replaces that with one quiet, tinted-neutral ramp and a
+   single accent. Chrome stays plain so the content (numbers, status, tickets, servers) is what has colour.
+   Everything keys off the same variables, so no page needs its own dark rules. */
+
+/* ---------- Tokens: one neutral ramp, one accent ---------- */
+:root {
+  --font: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bg: #f6f6f7; --card: #ffffff; --text: #17181b; --muted: #62656e; --line: rgba(23, 24, 27, .11);
+  --primary: #1d4fd7; --primary-ink: #ffffff; --navy-hover: #1941b3;
+  --brand-navy: #17181b; --on-navy: #ffffff;
+  --hover: rgba(23, 24, 27, .045); --hover-2: rgba(23, 24, 27, .035); --soft: rgba(23, 24, 27, .06); --sunken: #fafafa;
+  --track: rgba(23, 24, 27, .10); --ring: rgba(29, 79, 215, .22);
+  --info: #5b6270; --violet-bg: rgba(23, 24, 27, .06);
+  --hl-a: transparent; --hl-b: transparent; --hl-edge: transparent;
+  --glow-a: 23, 24, 27; --glow-b: 23, 24, 27;
+  --r-card: 14px; --r-ctl: 10px; --r-pill: 980px;
+  --shadow-card: 0 1px 2px rgba(23, 24, 27, .05);
+  --bar-fill: var(--primary);
+}
+:root[data-theme="dark"] {
+  --bg: #0f1012; --card: #16171a; --text: #ececee; --muted: #9a9ca4; --line: rgba(255, 255, 255, .09);
+  --primary: #7ea6ff; --primary-ink: #0b1020; --navy-hover: #9bb9ff;
+  --brand-navy: #ececee; --on-navy: #111214;
+  --hover: rgba(255, 255, 255, .05); --hover-2: rgba(255, 255, 255, .04); --soft: rgba(255, 255, 255, .07); --sunken: #0c0d0f;
+  --track: rgba(255, 255, 255, .12); --ring: rgba(126, 166, 255, .32);
+  --info: #aab0bd; --violet-bg: rgba(255, 255, 255, .07);
+  --glow-a: 236, 236, 238; --glow-b: 236, 236, 238;
+  --shadow-card: none;
+  --blue-bg: rgba(126, 166, 255, .14); --blue-ink: #a9c3ff; --warm-bg: rgba(255, 255, 255, .06); --callout-bg: rgba(255, 255, 255, .04);
+  --flash-from: rgba(126, 166, 255, .28); --flash-bg: rgba(126, 166, 255, .10);
+}
+.fx {
+  --ink: #17181b; --ink-2: #3d4047; --mute: #62656e; --faint: #7d808a; --line: rgba(23, 24, 27, .11); --line-2: rgba(23, 24, 27, .06); --line-3: rgba(23, 24, 27, .18);
+  --surface: #ffffff; --sunken: #f6f6f7; --navy: #17181b; --navy-hover: #2e3036; --on-navy: #ffffff; --radius: var(--r-card);
+  --row-hover: rgba(23, 24, 27, .03); --pend: #1d4fd7; --violet: #5b6270;
+}
+:root[data-theme="dark"] .fx {
+  --ink: #ececee; --ink-2: #c4c6cc; --mute: #9a9ca4; --faint: #767982; --line: rgba(255, 255, 255, .09); --line-2: rgba(255, 255, 255, .06); --line-3: rgba(255, 255, 255, .16);
+  --surface: #16171a; --sunken: #0c0d0f; --navy: #ececee; --navy-hover: #ffffff; --on-navy: #111214; --row-hover: rgba(255, 255, 255, .035);
+  --pend: #7ea6ff; --pend-soft: rgba(126, 166, 255, .12); --pend-ink: #a9c3ff; --pend-line-1: rgba(126, 166, 255, .25); --pend-line-2: rgba(126, 166, 255, .38); --pend-line-3: rgba(126, 166, 255, .6);
+  --pend-ink2: #c9d9ff; --focus-line: #7ea6ff; --focus-ring: rgba(126, 166, 255, .25); --bar-ok: #7ea6ff; --shimmer: #202226; --violet: #aab0bd; --off-bar: #3a3c42;
+}
+
+/* ---------- Canvas: no washes, no grid, no aurora ---------- */
+body, :root[data-theme="dark"] body { background: var(--bg); background-attachment: scroll; letter-spacing: 0; }
+body::before, body::after, :root[data-theme="dark"] body::before { display: none !important; content: none; }
+.brand img, :root[data-theme="dark"] .brand img, :root[data-theme="dark"] .login-logo { filter: none; }
+:root[data-theme="dark"] ::selection { background: rgba(126, 166, 255, .3); }
+:root[data-theme="dark"] * { scrollbar-color: rgba(255, 255, 255, .2) transparent; }
+
+/* ---------- Type: weights 400 to 600, sentence case, tabular figures ---------- */
+h1 { font-size: clamp(1.6rem, 1.3rem + .9vw, 2.1rem); font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
+h2 { font-size: 1.05rem; font-weight: 600; letter-spacing: -.005em; }
+.dash-head h1, .fx-title { font-size: clamp(1.6rem, 1.3rem + .9vw, 2.1rem); font-weight: 600; letter-spacing: -.02em; }
+.ov-title, .upper { font-size: 1.05rem; font-weight: 600; letter-spacing: -.005em; margin: 2rem 0 .9rem; }
+.brand { font-weight: 600; letter-spacing: -.01em; font-size: 1.1rem; }
+.kpi-value { font-size: clamp(1.7rem, 1.3rem + .8vw, 2.2rem); font-weight: 500; letter-spacing: -.02em; }
+.ov-big b, .ov-stats b, .fx-big { font-weight: 500; letter-spacing: -.02em; }
+.kpi-label { font-size: .8rem; font-weight: 500; letter-spacing: 0; }
+.attn-title { font-weight: 500; letter-spacing: 0; }
+.who .avatar { font-weight: 600; letter-spacing: 0; background: var(--soft); color: var(--text); border: 1px solid var(--line); }
+.who .role { font-weight: 500; }
+.badge, .chip, .fx-badge { font-weight: 500; letter-spacing: 0; }
+.chip-danger, .chip-warn { font-weight: 500; box-shadow: none; }
+.btn, .fx-btn { font-weight: 500; letter-spacing: 0; }
+.filters a, .fx-seg button, .fx-seg a, .side-nav a { font-weight: 500; }
+.side-nav a.active { font-weight: 500; }
+th, .fx-table th { font-weight: 500; }
+td a { font-weight: 500; }
+.fx-eyebrow, .fx-label { letter-spacing: 0; }
+a.ref, .mono, .tag-ai { font-family: var(--mono); letter-spacing: 0; }
+.tag-ai { margin-left: .4rem; font-size: .72rem; color: var(--muted); padding: .05rem .35rem; border: 1px solid var(--line); border-radius: 6px; }
+
+/* ---------- Layout: real app proportions ---------- */
+.container { max-width: 1440px; padding: 1.75rem 32px 4rem; }
+@media (max-width: 900px) { .container { padding: 1.25rem 16px 3rem; } }
+main.container > * { animation-duration: .3s; }
+main.container > *:nth-child(n) { animation-delay: 0s; }
+
+/* ---------- Shell: solid bars with a hairline, no glass ---------- */
+.sidebar, :root[data-theme="dark"] .sidebar { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; border-right: 1px solid var(--line); }
+.topbar, :root[data-theme="dark"] .topbar { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom: 1px solid var(--line); }
+.table-wrap thead th, .fx-table thead th, .flash { backdrop-filter: none; }
+.table-wrap thead th, .fx-table thead th { background: var(--card); }
+.side-nav a { padding: .5rem .75rem; border-radius: 8px; color: var(--muted); }
+.side-nav a svg { color: var(--muted); }
+.side-nav a:hover { color: var(--text); }
+.side-nav a.active, :root[data-theme="dark"] .side-nav a.active { background: var(--soft); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); border: 0; }
+.side-nav a.active svg, :root[data-theme="dark"] .side-nav a.active svg { color: var(--text); filter: none; }
+.side-nav a.active::before { display: none; }
+.cmdk-trigger { border-radius: var(--r-ctl); background: transparent; }
+.cmdk-trigger:hover { border-color: var(--line); background: var(--hover); color: var(--text); }
+kbd { background: var(--soft); box-shadow: none; border-radius: 5px; }
+.ai-launch { color: var(--text); background: transparent; border: 1px solid var(--line); border-radius: var(--r-ctl); font-weight: 500; }
+.ai-launch:hover { background: var(--hover); box-shadow: none; }
+.ai-badge { color: var(--muted); background: none; border: 0; padding: 0; font-weight: 500; gap: .4rem; }
+.theme-toggle { border-radius: var(--r-ctl); }
+
+/* ---------- Surfaces: plain raised cards with a hairline ---------- */
+.card, .kpi, .fx-card, .fx-band, .fx-panel, .fx-sla-row, .fx-teamcard, .fx-table-wrap, .fx-invite, .fx-danger, .table-wrap,
+:root[data-theme="dark"] .card, :root[data-theme="dark"] .kpi, :root[data-theme="dark"] .fx-band, :root[data-theme="dark"] .fx-panel {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow-card);
+}
+.card::before, .kpi::before, .card::after, .kpi::after, .fx-card::after, .fx-band::after, .fx-panel::after, .fx-sla-row::after, .fx-teamcard::after { display: none; }
+.card:hover, .kpi:hover, .fx-band:hover, .fx-panel:hover, :root[data-theme="dark"] .card:hover, :root[data-theme="dark"] .kpi:hover { border-color: var(--line); }
+.fx-card, :root[data-theme="dark"] .fx-card { background-image: none; }
+.fx-card:hover, :root[data-theme="dark"] .fx-card:hover, a.kpi:hover { transform: none; box-shadow: var(--shadow-card); border-color: var(--line-3, var(--line)); background-color: var(--hover); }
+.card { padding: 1.25rem 1.35rem; }
+.card.table-wrap { padding: .35rem 1rem .5rem; }
+.flash { border-radius: var(--r-ctl); animation: none; }
+.callout, .suggest { border-radius: var(--r-ctl); }
+
+/* KPI row: one strip of figures instead of a row of equal cards */
+.kpis { gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; margin-bottom: 1.25rem; }
+.kpis .kpi, :root[data-theme="dark"] .kpis .kpi { border: 0; border-radius: 0; box-shadow: none; background: var(--card); padding: 1.1rem 1.25rem 1.15rem; }
+a.kpi:hover { background: var(--hover); }
+.kpis .kpi-danger .kpi-value, .kpis .kpi-warn .kpi-value { color: var(--text); }
+.kpis .kpi-danger .kpi-value::after, .kpis .kpi-warn .kpi-value::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: .55rem; border-radius: 50%; vertical-align: middle; background: var(--danger); }
+.kpis .kpi-warn .kpi-value::after { background: var(--warn); }
+@media (max-width: 1000px) { .kpis:not(.kpis-6) > .kpi:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+.dash-grid, .ov-grid { gap: 1rem; }
+
+/* ---------- Hover, selection and focus: a quiet surface step, never an accent edge ---------- */
+.side-nav a:not(.active):hover, .attn-row:hover, .note-row:hover, .ticket-progress:hover, .filters a:not(.on):hover, .kb-item:hover, a.ov-row:hover,
+tbody tr:hover td, tbody tr[data-href]:hover td, .bar-row:hover, .device-top:hover, .fx-teamcard:hover, .bell:hover, .fx-seg button:hover, .fx-seg a:hover {
+  background-color: var(--hover); box-shadow: none; color: var(--text);
+}
+.btn:not(.primary):hover, .chip[href]:hover, a.chip:hover, .ai-chip:hover, .aid-starters button:hover { border-color: var(--line-3, rgba(128, 128, 134, .45)); background-color: var(--hover); }
+.side-nav a, .attn-row, .note-row, .ticket-progress, .filters a, .kb-item, .fx-seg button, .fx-seg a, .btn:not(.primary), .fx-btn:not(.fx-btn-primary):not(.fx-btn-ghost), .theme-toggle, .bell, tbody tr {
+  background-image: none; transition: background-color .15s, border-color .15s, color .15s;
+}
+.side-nav a:hover svg, .side-nav a:not(.active):hover svg { color: var(--text); }
+.attn-row:hover .attn-title, .kb-item:hover h3, .kb-item:hover .kb-title, .bar-row:hover .bar-label, .asset-cell:hover b, .device-top:hover b, a.srv:hover b, a.srv:hover .name,
+tbody tr:hover td a:not(.btn):not(.fx-btn), tr[data-href]:hover td:first-child, tbody tr:hover td b { color: var(--text); }
+tbody tr:hover td:first-child, tr[data-href]:hover td:first-child { box-shadow: none; }
+main a.small:hover, .panel-head a:hover, main a:not([class]):hover { color: var(--primary); }
+.bar-row:hover, .device-top:hover, .fx-teamcard:hover, .bell:hover { border-radius: 8px; }
+.theme-toggle:hover, .bell:hover { border-color: var(--line); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ---------- Buttons: 10px radius, primary is the one solid thing ---------- */
+.btn, .fx-btn { border-radius: var(--r-ctl); height: 36px; transition: background-color .15s, border-color .15s, color .15s; }
+.btn:active, .fx-btn:active { transform: none; }
+.btn.primary, .fx-btn-primary, .fx a.fx-btn-primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); box-shadow: none; filter: none; background-image: none; }
+.btn.primary:hover, .fx-btn-primary:hover, .fx a.fx-btn-primary:hover { background: var(--navy-hover); border-color: var(--navy-hover); color: var(--primary-ink); }
+:root[data-theme="dark"] .btn.primary, :root[data-theme="dark"] .fx-btn-primary, :root[data-theme="dark"] .fx a.fx-btn-primary,
+:root[data-theme="dark"] .fx-btn.fx-btn-primary:hover, :root[data-theme="dark"] .fx-btn.fx-btn-primary:focus-visible, :root[data-theme="dark"] .fx-btn.fx-btn-primary:active, :root[data-theme="dark"] .fx a.fx-btn-primary:hover {
+  background: #ececee; background-image: none; color: #111214; border-color: #ececee; box-shadow: none; filter: none;
+}
+:root[data-theme="dark"] .btn.primary:hover, :root[data-theme="dark"] .fx-btn-primary:hover, :root[data-theme="dark"] .fx a.fx-btn-primary:hover { background: #ffffff; border-color: #ffffff; }
+:root[data-theme="dark"] .btn:hover { box-shadow: none; }
+input, select, textarea { border-radius: var(--r-ctl); }
+input:focus, select:focus, textarea:focus, :root[data-theme="dark"] input:focus, :root[data-theme="dark"] select:focus, :root[data-theme="dark"] textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--ring); }
+:root[data-theme="dark"] input, :root[data-theme="dark"] select, :root[data-theme="dark"] textarea,
+:root[data-theme="dark"] .fx-field input:not([type=checkbox]), :root[data-theme="dark"] .fx-field select, :root[data-theme="dark"] .fx-field textarea { background: var(--sunken); border-color: var(--line); }
+:root[data-theme="dark"] input::placeholder, :root[data-theme="dark"] textarea::placeholder { color: var(--faint, #767982); }
+:root[data-theme="dark"] option { background: var(--card); }
+.filters, .fx-seg { border-radius: var(--r-ctl); padding: 3px; }
+.filters a, .fx-seg button, .fx-seg a { border-radius: 7px; }
+.filters a.on, .fx-seg [aria-pressed="true"], .fx-seg [aria-current="true"], :root[data-theme="dark"] .filters a.on, :root[data-theme="dark"] .fx-seg [aria-pressed="true"], :root[data-theme="dark"] .fx-seg [aria-current="true"] {
+  background: var(--card); color: var(--text); box-shadow: 0 0 0 1px var(--line); }
+.filters a.on .filter-count { background: var(--text); color: var(--card); }
+
+/* ---------- Status, bars, progress: flat, one accent ---------- */
+.badge[class*="st-"]::before, .badge[class*="sla-"]::before { box-shadow: none; }
+.badge[class*="sla-at_risk"]::before, .badge[class*="sla-breached"]::before { animation: none; }
+.bar-fill, .usage-bar span, .stage-in_progress, .stage-on_hold { background: var(--primary); }
+.stage-not_started { background: var(--stage-idle); } .stage-resolved { background: var(--ok); }
+.bar-fill.bar-warn { background: var(--warn); }
+.usage-bar span { background: var(--primary); }
+.usage.lv-warn .usage-bar span { background: var(--warn); } .usage.lv-critical .usage-bar span, .usage.lv-exhausted .usage-bar span { background: var(--danger); }
+.usage-day i { background: color-mix(in srgb, var(--text) 35%, transparent); }
+#tc-progress { background: var(--primary); box-shadow: none; }
+.fx-detect::before { background: var(--pend); }
+.fx-avatar, .fx-avatar.is-administrator, .fx-avatar.is-technician, .fx-avatar.is-employee { background: var(--soft); color: var(--text); border: 1px solid var(--line); }
+.ins-item { border-radius: var(--r-ctl); } .ins-item.sev-low { border-left-color: var(--line-3, var(--line)); }
+.usage-alert, .usage-note { border-radius: var(--r-ctl); }
+:root[data-theme="dark"] .fx-tip { background: var(--card); border: 1px solid var(--line); }
+:root[data-theme="dark"] .fx-chart .grid line { stroke: rgba(255, 255, 255, .07); }
+
+/* ---------- Command palette and drawer ---------- */
+.tc-overlay { background: rgba(0, 0, 0, .4); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.tc-palette { background: var(--card); backdrop-filter: none; -webkit-backdrop-filter: none; border-radius: var(--r-card); border: 1px solid var(--line); box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .45); animation-duration: .15s; }
+.tc-item { border-radius: 8px; }
+.tc-item[aria-selected="true"] { background: var(--soft); box-shadow: none; }
+.tc-item[aria-selected="true"] svg { color: var(--text); }
+.ai-drawer { box-shadow: -16px 0 40px -24px rgba(0, 0, 0, .4); }
+.aid-msg.user .aid-text { background: var(--text); color: var(--card); border-radius: 12px 12px 4px 12px; }
+:root[data-theme="dark"] .aid-msg.user .aid-text { color: #111214; }
+.aid-starters button, .ai-chip { border-radius: var(--r-ctl); }
+.aid-hello { font-weight: 600; font-size: 1.2rem; }
+.aid-typing, .ai-busy { animation: none; }
+
+/* ---------- Motion: nothing loops except real live indicators ---------- */
+@media (prefers-reduced-motion: no-preference) { .live-badge::before { animation: tc-pulse 2s ease-in-out infinite; } }
+
+/* The assistant glyph stays on the launcher and in the drawer; panel titles are plain text. */
+.ai-badge svg { display: none; }
+.ai-panel, .ins, .usage-card { margin-bottom: 1rem; }

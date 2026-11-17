@@ -17,11 +17,11 @@
       <span>Did this article solve your problem?</span>
       <button class="btn vote vote-up{% if my_vote == 1 %} active{% endif %}" name="vote" value="up"
               aria-pressed="{% if my_vote == 1 %}true{% else %}false{% endif %}" title="Helpful (click again to undo)">
-        👍 <span class="count" data-count="up">{{ article.helpful_yes }}</span>
+        Yes <span class="count" data-count="up">{{ article.helpful_yes }}</span>
       </button>
       <button class="btn vote vote-down{% if my_vote == -1 %} active{% endif %}" name="vote" value="down"
               aria-pressed="{% if my_vote == -1 %}true{% else %}false{% endif %}" title="Not helpful (click again to undo)">
-        👎 <span class="count" data-count="down">{{ article.helpful_no }}</span>
+        No <span class="count" data-count="down">{{ article.helpful_no }}</span>
       </button>
     </form>
 

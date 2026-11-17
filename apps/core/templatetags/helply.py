@@ -62,3 +62,11 @@ def money2(value):
         return f"{float(value):,.2f}"
     except (TypeError, ValueError):
         return "–"
+
+@register.filter
+def num(value):
+    """Whole number with comma thousands, the same in every locale (the usage card is read at a glance)."""
+    try:
+        return f"{float(value):,.0f}"
+    except (TypeError, ValueError):
+        return ""

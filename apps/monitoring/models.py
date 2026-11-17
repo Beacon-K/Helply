@@ -188,7 +188,7 @@ class Server(models.Model):
 
     @property
     def os_icon(self):
-        return "🪟" if self.os_family == "windows" else "🐧" if self.os_family == "linux" else "🖥️"
+        return self.os_family if self.os_family in ("windows", "linux") else "other"
 
 
 class Metric(models.Model):

@@ -124,17 +124,18 @@ def _severity_guess(cluster):
 
 
 def analyze(stats):
-    """Ask the model to read the counted clusters. Returns validated analysis or None."""
+    """Ask the model to read the counted clusters. Returns (validated analysis or None, name of the backend that answered)."""
     if not stats["clusters"]:
-        return None
+        return None, ""
     payload = {k: stats[k] for k in ("days", "tickets", "previous_tickets", "open_now", "open_over_7d",
                                      "sla_breached", "reopened", "monitoring_tickets", "top_categories", "hot_assets")}
     payload["clusters"] = [{k: c[k] for k in ("id", "label", "count", "open", "people", "categories", "assets",
                                               "breached", "avg_resolve_hours", "first", "last", "sample_titles")}
                            for c in stats["clusters"]]
-    data = get_backend().generate_json(SYSTEM_PROMPT, f"<DATA>\n{json.dumps(payload)}\n</DATA>", max_tokens=1100)
+    backend = get_backend("insights")
+    data = backend.generate_json(SYSTEM_PROMPT, f"<DATA>\n{json.dumps(payload)}\n</DATA>", max_tokens=1100)
     if not isinstance(data, dict):
-        return None
+        return None, ""
     ids = {c["id"] for c in stats["clusters"]}
     findings, seen = [], set()
     for f in data.get("findings") or []:
@@ -153,15 +154,14 @@ def analyze(stats):
     watch = [_clip(w, 200) for w in (data.get("watchlist") or []) if isinstance(w, str) and w.strip()][:3]
     headline = _clip(data.get("headline"), 300)
     if not findings and not headline:
-        return None
-    return {"headline": headline, "findings": findings[:MAX_CLUSTERS], "watchlist": watch}
+        return None, ""
+    return {"headline": headline, "findings": findings[:MAX_CLUSTERS], "watchlist": watch}, backend.name
 
 
 def generate(force=False):
     """Count, analyse and store one report; returns it (or None when there is too little data)."""
     stats = build_stats()
-    analysis = analyze(stats) if stats["tickets"] >= MIN_TICKETS else None
-    backend = get_backend().name if analysis else ""
+    analysis, backend = analyze(stats) if stats["tickets"] >= MIN_TICKETS else (None, "")
     report = InsightReport.objects.create(period_days=stats["days"], stats=stats, analysis=analysis, backend=backend)
     for old in InsightReport.objects.all()[KEEP_REPORTS:]:
         old.delete()

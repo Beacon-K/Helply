@@ -3,10 +3,10 @@
 {% block content %}
 <div class="dash-head">
   <div>
-    <h1>{% now "G" as hour %}{% if hour|add:0 < 12 %}Good morning{% elif hour|add:0 < 18 %}Good afternoon{% else %}Good evening{% endif %}, {{ user.first_name|default:user.username }}</h1>
-    <p class="muted">{% now "l, F j" %}</p>
+    <h1>{% now "l, F j" %}</h1>
+    <p class="muted">{{ user.get_role_display }} · {{ user }}</p>
   </div>
-  <a class="btn primary" href="{% url 'tickets:create' %}">+ New ticket</a>
+  <a class="btn primary" href="{% url 'tickets:create' %}">New ticket</a>
 </div>
 
 {% if user.is_administrator %}{% include "core/_administrator.html" %}

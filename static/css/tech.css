@@ -105,7 +105,7 @@ tr[data-href]:hover td:first-child { box-shadow: inset 2px 0 0 rgb(var(--glow-a)
 .tc-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text); font: 500 1.08rem var(--font); padding: 0; min-height: 0; box-shadow: none; }
 :root[data-theme] .tc-overlay .tc-search input, :root[data-theme] .tc-overlay .tc-search input:focus { border: 0; box-shadow: none; background: transparent; outline: none; border-radius: 0; height: auto; }
 .tc-list { overflow-y: auto; padding: .45rem; margin: 0; list-style: none; }
-.tc-group { padding: .6rem .8rem .3rem; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.tc-group { padding: .6rem .8rem .3rem; font-size: .7rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--muted); }
 .tc-item { display: flex; align-items: center; gap: .8rem; padding: .62rem .8rem; border-radius: 12px; cursor: pointer; color: var(--text); font-size: .96rem; }
 .tc-item svg { width: 18px; height: 18px; color: var(--muted); flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tc-item .tc-hint { margin-left: auto; display: inline-flex; gap: .25rem; }
@@ -167,7 +167,7 @@ a, button, [role="button"], tr[data-href], summary, label[for], select { cursor:
 .ai-answer { white-space: pre-wrap; font-size: 1.02rem; line-height: 1.55; margin: 0 0 .9rem; }
 .ai-draft { white-space: pre-wrap; margin: 0 0 .5rem; padding: .8rem 1rem; border-radius: 12px; background: var(--hover); border: 1px solid var(--line); }
 .ai-sec { margin: .9rem 0; }
-.ai-sec h4 { margin: 0 0 .35rem; font-size: .76rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+.ai-sec h4 { margin: 0 0 .35rem; font-size: .76rem; letter-spacing: 0; text-transform: none; color: var(--muted); font-weight: 650; }
 .ai-sec p { margin: 0; }
 .ai-list { margin: 0; padding-left: 1.2rem; }
 .ai-list li { margin: .2rem 0; }
@@ -232,7 +232,7 @@ body.ai-open .cmdk-trigger { opacity: .6; }
 .ins-item.sev-medium { border-left-color: #f59e0b; }
 .ins-item.sev-low { border-left-color: rgb(var(--glow-a)); }
 .ins-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem .7rem; }
-.ins-sev { font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: .1rem .5rem; border-radius: 980px; background: var(--soft); color: var(--muted); }
+.ins-sev { font-size: .7rem; font-weight: 600; letter-spacing: 0; text-transform: none; padding: .1rem .5rem; border-radius: 980px; background: var(--soft); color: var(--muted); }
 .sev-high .ins-sev { background: rgba(239, 68, 68, .15); color: #ef4444; }
 .sev-medium .ins-sev { background: rgba(245, 158, 11, .16); color: #d97706; }
 .ins-count { margin-left: auto; color: var(--muted); font-size: .85rem; }
@@ -248,3 +248,93 @@ body.ai-open .cmdk-trigger { opacity: .6; }
 .aid-form textarea::-webkit-scrollbar { display: none; }
 
 .aid-note { margin-top: .5rem; padding: .4rem .7rem; border-radius: 10px; background: var(--soft); color: var(--muted); font-size: .82rem; }
+
+/* AI usage card on the administrator dashboard. */
+.usage { margin-top: 1rem; }
+.usage-bar { height: 12px; border-radius: 980px; background: var(--soft); overflow: hidden; margin: .3rem 0 .6rem; }
+.usage-bar span { display: block; height: 100%; border-radius: 980px; background: linear-gradient(90deg, rgb(var(--glow-a)), rgb(var(--glow-b))); transition: width .4s; }
+.usage.lv-warn .usage-bar span { background: #f59e0b; }
+.usage.lv-critical .usage-bar span, .usage.lv-exhausted .usage-bar span { background: #ef4444; }
+.usage-nums { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .3rem 1rem; color: var(--muted); font-size: .9rem; }
+.usage-nums b { color: var(--text); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.usage-nums em { font-style: normal; }
+.usage-alert, .usage-note { margin: .8rem 0 0; padding: .6rem .9rem; border-radius: 12px; font-size: .92rem; }
+.usage-alert { background: rgba(239, 68, 68, .12); border: 1px solid rgba(239, 68, 68, .35); }
+.usage-note { background: rgba(245, 158, 11, .12); border: 1px solid rgba(245, 158, 11, .35); }
+.usage-table { width: 100%; margin-top: 1rem; font-size: .9rem; }
+.usage-table td:nth-child(n+2), .usage-table th:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; }
+.usage-week { display: flex; gap: .5rem; align-items: flex-end; height: 70px; margin-top: 1rem; }
+.usage-day { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: .25rem; font-size: .72rem; color: var(--muted); }
+.usage-day i { display: block; width: 100%; min-height: 2px; border-radius: 6px 6px 0 0; background: rgba(var(--glow-a), .55); }
+.usage-foot { margin: .9rem 0 0; }
+
+/* ===== Responsive: browser zoom, tablets and phones =====
+   The top bar has two groups (search + assistant on the left, account on the right). The account group never wraps:
+   instead it gives up its least important parts as the window narrows, so nothing is pushed onto a second row. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+.topbar { flex-wrap: nowrap; gap: .75rem; justify-content: space-between; }
+.topbar-tools { display: flex; align-items: center; gap: .6rem; flex: 1 1 auto; min-width: 0; }
+.cmdk-trigger { flex: 1 1 auto; min-width: 0; max-width: 340px; }
+.ai-launch { flex: 0 0 auto; }
+.who { flex: 0 0 auto; flex-wrap: nowrap; width: auto; margin-left: auto; white-space: nowrap; }
+.who-name { color: inherit; text-decoration: none; }
+.who-name:hover { text-decoration: none; }
+.who .short { display: none; }
+@media (max-width: 1279px) { .who .role { display: none; } }
+@media (max-width: 1099px) { .who-text { display: none; } }
+@media (max-width: 640px) { .who .long { display: none; } .who .short { display: inline; } }
+@media (max-width: 420px) {
+  .topbar { padding: .5rem .6rem; gap: .4rem; }
+  .topbar-tools { gap: .35rem; }
+  .who { gap: .4rem; }
+  .who a.small.pw-link { display: none; }  /* the avatar links to the same page; this selector must outrank the touch rules below */
+}
+/* Detail pages: the side column must be allowed to shrink (min-content would push the page wider than the screen). */
+.grid-detail { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+@media (max-width: 1024px) { .grid-detail { grid-template-columns: minmax(0, 1fr); } }
+.usage-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.usage-table { min-width: 280px; }
+/* Between a phone and a tablet there is room to keep the search and assistant labels. */
+@media (min-width: 521px) and (max-width: 900px) {
+  .cmdk-trigger { width: auto; padding: 0 .8rem; justify-content: flex-start; }
+  .cmdk-trigger .label { display: block; }
+  .ai-launch { padding: 0 .85rem 0 .7rem; }
+  .ai-launch .label { display: inline; }
+}
+@media (max-width: 520px) { .cmdk-trigger { flex: 0 0 36px; } }
+/* Buttons keep their label on one line; rows that hold a title and a button wrap instead of squeezing the button. */
+.btn { white-space: nowrap; flex-shrink: 0; }
+.dash-head, .row-between, .panel-head { flex-wrap: wrap; row-gap: .6rem; }
+.dash-head > :first-child, .row-between > :first-child { min-width: 0; flex: 1 1 14rem; }
+/* The icon row that replaces the sidebar on small screens scrolls by touch; the scrollbar only gets in the way. */
+@media (max-width: 900px) { .sidebar { scrollbar-width: none; } .sidebar::-webkit-scrollbar { display: none; } }
+/* Fingers need more room than a mouse pointer. */
+@media (pointer: coarse) {
+  .cmdk-trigger, .ai-launch, .theme-toggle, .bell { min-height: 40px; min-width: 40px; }
+  .side-nav a { min-height: 44px; }
+}
+/* Touch: everything you tap is at least about 36px in one direction, and checkboxes are big enough to hit. */
+@media (max-width: 600px), (pointer: coarse) {
+  .who a.small, .who button.link, .who-name { display: inline-flex; align-items: center; min-height: 36px; }
+  .who-name { justify-content: center; min-width: 36px; }
+  .who button.link, .who a.small { padding: 0 .35rem; }
+  input[type="checkbox"], input[type="radio"] { width: 1.3rem; height: 1.3rem; flex: none; }
+}
+@media (max-width: 600px), (pointer: coarse) {
+  .btn.small-btn, .ai-chip { min-height: 36px; padding-left: .9rem; padding-right: .9rem; }
+  a.small:not(.pw-link), .panel-head a { display: inline-flex; align-items: center; min-height: 36px; }
+  a.ref { display: inline-block; padding: .55rem 0; }  /* ticket numbers in table rows: grow the tap area, not the text */
+}
+@media (max-width: 600px), (pointer: coarse) {
+  .kb-item > a:first-child { display: inline-block; padding: .45rem 0; }  /* article titles in lists */
+}
+@media (max-width: 600px), (pointer: coarse) {
+  .fx-count { display: inline-block; padding: .5rem 0; }
+  main p:has(> a:only-child) > a, main p > a:first-child:last-child { display: inline-block; padding: .5rem 0; }  /* "back to ..." links */
+}
+@media (max-width: 600px), (pointer: coarse) {
+  .fx-crumbs a { display: inline-block; padding: .55rem 0; }
+}
+/* Phone browsers show and hide the address bar, so 100vh is taller than the visible area; dvh follows it. */
+@supports (min-height: 100dvh) { .app-shell { min-height: 100dvh; } }
+@media (min-width: 901px) { @supports (height: 100dvh) { .sidebar { height: 100dvh; } } }

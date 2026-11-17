@@ -161,7 +161,7 @@ def ask(user, question):
         result["answer"] = "I couldn't find anything about this in the knowledge base. Open a ticket and IT will help."
         return result
 
-    backend = get_backend()
+    backend = get_backend("ask")
     prompt = (f"<question>{question}</question>\n<knowledge_base>\n{_article_block(articles)}\n</knowledge_base>\n"
               f"<ticket_history>\n{_history_block(history)}\n</ticket_history>")
     data = backend.generate_json(EMPLOYEE_SYSTEM, prompt)
@@ -208,7 +208,7 @@ def copilot(user, ticket):
         f"<requester_history>\n{_history_block(history)}\n</requester_history>\n"
         f"<similar_resolved>\n{similar_block}\n</similar_resolved>\n<knowledge_base>\n{_article_block(articles)}\n</knowledge_base>"
     )
-    backend = get_backend()
+    backend = get_backend("copilot")
     data = backend.generate_json(COPILOT_SYSTEM, prompt, max_tokens=1000)
 
     cited_articles = _id_list((data or {}).get("article_ids"), {a.pk for a in articles})

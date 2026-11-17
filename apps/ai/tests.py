@@ -16,9 +16,18 @@ from apps.tickets.models import Ticket, TicketComment
 
 from .backends.base import AIBackend
 from .backends.cloudflare import CloudflareBackend
+from .backends.external import ExternalBackend, WithFallback
+from .services import get_backend
 from .backends.keyword import KeywordBackend
-from . import insights
-from .models import AISuggestion, InsightReport
+from datetime import timedelta
+
+from django.core.cache import cache
+from django.utils import timezone
+
+from apps.notifications.models import Notification
+
+from . import insights, metering
+from .models import AIUsage, AISuggestion, InsightReport, UsageAlert
 from .text import jaccard, tokenize
 
 
@@ -388,6 +397,46 @@ class ChatTests(TestCase):
         self.client.logout()
         self.assertEqual(self.client.post(reverse("ai:chat"), {"message": "hi there"}, content_type="application/json").status_code, 302)
 
+    def test_drawer_tells_the_script_who_is_signed_in(self):
+        # The browser tags stored chat text with this id, so it is never shown to the next person on the same computer.
+        for user in (self.emp, self.admin):
+            self.client.force_login(user)
+            self.assertContains(self.client.get(reverse("core:dashboard")), f'data-user="{user.pk}"')
+
+    def test_signed_in_pages_and_answers_are_never_cached(self):
+        FakeAI.text = "ok\nBASIS: chat\nSOURCES: none"
+        self.client.force_login(self.admin)
+        for response in (self.client.get(reverse("core:dashboard")), self.say(self.admin)):
+            header = response["Cache-Control"]
+            self.assertIn("no-store", header)
+            self.assertIn("private", header)
+
+    def test_middleware_leaves_anonymous_and_self_cached_responses_alone(self):
+        from django.contrib.auth.models import AnonymousUser
+        from django.http import HttpResponse
+        from django.test import RequestFactory
+
+        from apps.core.middleware import PrivateResponsesMiddleware
+
+        request = RequestFactory().get("/x")
+        request.user = AnonymousUser()
+        self.assertFalse(PrivateResponsesMiddleware(lambda r: HttpResponse("public")).__call__(request).has_header("Cache-Control"))
+        request.user = self.emp
+        own = HttpResponse("own")
+        own["Cache-Control"] = "max-age=60"
+        self.assertEqual(PrivateResponsesMiddleware(lambda r: own)(request)["Cache-Control"], "max-age=60")
+
+    def test_one_persons_answer_is_not_served_to_another(self):
+        FakeAI.text = "Secret admin analysis\nBASIS: chat\nSOURCES: none"
+        self.say(self.admin, "what keeps recurring?")
+        FakeAI.text = "Hello\nBASIS: chat\nSOURCES: none"
+        data = self.say(self.emp, "hello").json()
+        self.assertEqual(data["reply"], "Hello")
+        # The model only ever receives the conversation the browser sends, never another user's.
+        sent = " ".join(m["content"] for m in FakeAI.messages[-1])
+        self.assertNotIn("Secret admin analysis", sent)
+        self.assertNotIn("what keeps recurring", sent)
+
     def test_drawer_is_on_every_page_for_signed_in_users(self):
         self.client.force_login(self.emp)
         self.assertContains(self.client.get(reverse("core:dashboard")), 'id="ai-drawer"')
@@ -478,3 +527,348 @@ class InsightsTests(TestCase):
         self.assertContains(page, "VPN keeps disconnecting")
         self.client.force_login(self.tech)
         self.assertNotContains(self.client.get(reverse("core:dashboard")), "AI insights")
+
+KEY = "sk-test-SECRET-123"
+
+
+def ext_settings(**extra):
+    base = dict(HELPLY_EXT_PROVIDER="anthropic", HELPLY_EXT_API_KEY=KEY, HELPLY_EXT_MODEL="", HELPLY_EXT_BASE_URL="",
+                HELPLY_EXT_FEATURES={"insights", "copilot"}, HELPLY_AI_BACKEND="apps.ai.tests.FakeAI")
+    base.update(extra)
+    return override_settings(**base)
+
+
+class Recorder:
+    """Stands in for urllib.request.urlopen and remembers the request it was given."""
+
+    def __init__(self, payload=None, error=None):
+        self.payload, self.error, self.requests = payload, error, []
+
+    def __call__(self, request, timeout=None):
+        self.requests.append(request)
+        if self.error:
+            raise self.error
+        return io.BytesIO(json.dumps(self.payload).encode())
+
+    @property
+    def last(self):
+        return self.requests[-1]
+
+    def header(self, name):
+        return {k.lower(): v for k, v in self.last.header_items()}.get(name.lower())
+
+    def body(self):
+        return json.loads(self.last.data)
+
+
+class ExternalBackendTests(TestCase):
+    def reply_anthropic(self, text):
+        return Recorder({"content": [{"type": "text", "text": text}]})
+
+    def reply_openai(self, text):
+        return Recorder({"choices": [{"message": {"content": text}}]})
+
+    def test_anthropic_request_shape_and_default_model(self):
+        rec = self.reply_anthropic("Hello there")
+        with ext_settings(), mock.patch("urllib.request.urlopen", rec):
+            text = ExternalBackend().generate_text("be kind", [{"role": "user", "content": "hi"}])
+        self.assertEqual(text, "Hello there")
+        self.assertEqual(rec.last.full_url, "https://api.anthropic.com/v1/messages")
+        self.assertEqual(rec.header("x-api-key"), KEY)
+        self.assertEqual(rec.body()["system"], "be kind")
+        self.assertEqual(rec.body()["messages"], [{"role": "user", "content": "hi"}])
+        self.assertEqual(rec.body()["model"], "claude-sonnet-5-5")
+
+    def test_openai_request_shape(self):
+        rec = self.reply_openai("Hi!")
+        with ext_settings(HELPLY_EXT_PROVIDER="openai", HELPLY_EXT_MODEL="my-model"), mock.patch("urllib.request.urlopen", rec):
+            text = ExternalBackend().generate_text("be kind", [{"role": "user", "content": "hi"}], max_tokens=50)
+        self.assertEqual(text, "Hi!")
+        self.assertEqual(rec.last.full_url, "https://api.openai.com/v1/chat/completions")
+        self.assertEqual(rec.header("authorization"), f"Bearer {KEY}")
+        body = rec.body()
+        self.assertEqual(body["messages"][0], {"role": "system", "content": "be kind"})
+        self.assertEqual((body["model"], body["max_completion_tokens"]), ("my-model", 50))
+        self.assertNotIn("temperature", body)
+
+    def test_openai_compatible_server_uses_classic_parameters(self):
+        rec = self.reply_openai("ok")
+        with ext_settings(HELPLY_EXT_PROVIDER="openai", HELPLY_EXT_MODEL="m", HELPLY_EXT_BASE_URL="https://llm.example.com/v1/"), \
+                mock.patch("urllib.request.urlopen", rec):
+            ExternalBackend().generate_text("s", [{"role": "user", "content": "q"}])
+        self.assertEqual(rec.last.full_url, "https://llm.example.com/v1/chat/completions")
+        self.assertIn("max_tokens", rec.body())
+        self.assertIn("temperature", rec.body())
+
+    def test_plain_http_is_refused_except_for_localhost(self):
+        rec = self.reply_openai("ok")
+        with ext_settings(HELPLY_EXT_PROVIDER="openai", HELPLY_EXT_MODEL="m", HELPLY_EXT_BASE_URL="http://evil.example.com/v1"), \
+                mock.patch("urllib.request.urlopen", rec):
+            self.assertIsNone(ExternalBackend().generate_text("s", [{"role": "user", "content": "q"}]))
+        self.assertEqual(rec.requests, [])
+        with ext_settings(HELPLY_EXT_PROVIDER="openai", HELPLY_EXT_MODEL="m", HELPLY_EXT_BASE_URL="http://localhost:11434/v1"), \
+                mock.patch("urllib.request.urlopen", rec):
+            self.assertEqual(ExternalBackend().generate_text("s", [{"role": "user", "content": "q"}]), "ok")
+
+    def test_openai_needs_a_model_name(self):
+        rec = self.reply_openai("ok")
+        with ext_settings(HELPLY_EXT_PROVIDER="openai", HELPLY_EXT_MODEL=""), mock.patch("urllib.request.urlopen", rec):
+            self.assertIsNone(ExternalBackend().generate_text("s", [{"role": "user", "content": "q"}]))
+        self.assertEqual(rec.requests, [])
+
+    def test_failure_returns_none_and_never_logs_the_key(self):
+        error = urllib.error.HTTPError("https://api.anthropic.com", 401, f"bad key {KEY}", {}, io.BytesIO(KEY.encode()))
+        with ext_settings(), mock.patch("urllib.request.urlopen", Recorder(error=error)), self.assertLogs("apps.ai.backends.external", "WARNING") as logs:
+            self.assertIsNone(ExternalBackend().generate_text("s", [{"role": "user", "content": "q"}]))
+        text = "\n".join(logs.output)
+        self.assertIn("401", text)
+        self.assertNotIn(KEY, text)
+
+    def test_generate_json_parses_and_rejects_garbage(self):
+        with ext_settings(), mock.patch("urllib.request.urlopen", self.reply_anthropic('Sure: {"a": 1}')):
+            self.assertEqual(ExternalBackend().generate_json("s", "u"), {"a": 1})
+        with ext_settings(), mock.patch("urllib.request.urlopen", self.reply_anthropic("no json here")):
+            self.assertIsNone(ExternalBackend().generate_json("s", "u"))
+
+    def test_classification_through_the_external_model(self):
+        cat = Category.objects.create(name="Network", keywords="vpn")
+        with ext_settings(), mock.patch("urllib.request.urlopen", self.reply_anthropic(f'{{"category_id": {cat.pk}, "confidence": 0.9, "reason": "vpn"}}')):
+            result = ExternalBackend().classify("vpn down", Category.objects.all())
+        self.assertEqual((result.category, result.confidence), (cat, 0.9))
+
+    def test_classification_falls_back_when_the_model_is_down(self):
+        cat = Category.objects.create(name="Network", keywords="vpn")
+        with ext_settings(), mock.patch("urllib.request.urlopen", Recorder(error=urllib.error.URLError("offline"))):
+            backend = ExternalBackend()
+            result = backend.classify("my vpn is down", Category.objects.all())
+        self.assertEqual(result.category, cat)
+        self.assertEqual(backend.name, "keyword-baseline")
+
+
+class RoutingTests(TestCase):
+    def test_only_chosen_features_use_the_external_model(self):
+        with ext_settings():
+            self.assertIsInstance(get_backend("insights"), WithFallback)
+            self.assertIsInstance(get_backend("copilot"), WithFallback)
+            self.assertIsInstance(get_backend("chat"), FakeAI)
+            self.assertIsInstance(get_backend("classify"), FakeAI)
+            self.assertIsInstance(get_backend(), FakeAI)
+
+    def test_without_a_key_everything_stays_on_the_default(self):
+        with ext_settings(HELPLY_EXT_API_KEY=""):
+            self.assertIsInstance(get_backend("insights"), FakeAI)
+        with ext_settings(HELPLY_EXT_PROVIDER=""):
+            self.assertIsInstance(get_backend("insights"), FakeAI)
+
+    def test_fallback_asks_the_default_when_the_external_model_is_down(self):
+        FakeAI.reply = {"headline": "from the default"}
+        with ext_settings(), mock.patch("urllib.request.urlopen", Recorder(error=urllib.error.URLError("offline"))):
+            backend = get_backend("insights")
+            data = backend.generate_json("s", "u")
+        self.assertEqual(data, {"headline": "from the default"})
+        self.assertEqual(backend.name, "fake")  # the audit name says who really answered
+
+    def test_external_answer_is_used_and_named(self):
+        with ext_settings(), mock.patch("urllib.request.urlopen", Recorder({"content": [{"type": "text", "text": '{"headline": "from claude"}'}]})):
+            backend = get_backend("insights")
+            data = backend.generate_json("s", "u")
+        self.assertEqual(data, {"headline": "from claude"})
+        self.assertEqual(backend.name, "anthropic:claude-sonnet-5-5")
+
+    def test_insight_report_records_which_model_wrote_it(self):
+        admin = User.objects.create_user("boss", password="x", role=User.Role.ADMINISTRATOR)
+        for i in range(4):
+            person = User.objects.create_user(f"u{i}", password="x", role=User.Role.EMPLOYEE)
+            Ticket.objects.create(requester=person, title="VPN keeps disconnecting at home", description="vpn drops every ten minutes")
+        Ticket.objects.create(requester=admin, title="Request a monitor", description="need a monitor")
+        reply = {"content": [{"type": "text", "text": '{"headline": "VPN", "findings": [{"cluster_id": 1, "severity": "high", "likely_cause": "x", "prevention": "y"}]}'}]}
+        with ext_settings(), mock.patch("urllib.request.urlopen", Recorder(reply)):
+            report = insights.generate()
+        self.assertEqual(report.backend, "anthropic:claude-sonnet-5-5")
+
+    @ext_settings()
+    def test_status_command_never_prints_the_key(self):
+        out = StringIO()
+        call_command("ai_status", stdout=out)
+        text = out.getvalue()
+        self.assertNotIn(KEY, text)
+        self.assertIn("anthropic:claude-sonnet-5-5", text)
+        self.assertIn("insights", text)
+
+    def test_status_test_flag_pings_each_provider(self):
+        out = StringIO()
+        with ext_settings(), mock.patch("urllib.request.urlopen", Recorder({"content": [{"type": "text", "text": "OK"}]})):
+            call_command("ai_status", "--test", stdout=out)
+        self.assertIn("Test external", out.getvalue())
+        self.assertNotIn(KEY, out.getvalue())
+
+def cf_settings(**extra):
+    base = dict(HELPLY_CF_ACCOUNT_ID="a" * 32, HELPLY_CF_API_TOKEN="tok", HELPLY_CF_DAILY_NEURONS=100)
+    base.update(extra)
+    return override_settings(**base)
+
+
+def cf_reply(neurons=12.5, text="Hi"):
+    usage = {"prompt_tokens": 200, "completion_tokens": 20, "total_tokens": 220}
+    if neurons is not None:
+        usage["neurons"] = neurons
+    return Recorder({"success": True, "result": {"response": text, "usage": usage}})
+
+
+def graphql_reply(used=42.5, models=1):
+    today = metering.day_start().date().isoformat()
+    return Recorder({"data": {"viewer": {"accounts": [{
+        "today": [{"count": 3, "dimensions": {"modelId": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"}, "sum": {"totalNeurons": used}}][:models],
+        "week": [{"dimensions": {"date": today}, "sum": {"totalNeurons": used}}]}]}}})
+
+
+class MeteringTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.admin = User.objects.create_user("boss", password="x", role=User.Role.ADMINISTRATOR)
+        self.tech = User.objects.create_user("tech", password="x", role=User.Role.TECHNICIAN)
+
+    def spend(self, neurons, model="@cf/meta/llama-3.1-8b-instruct", when=None):
+        row = AIUsage.objects.create(model=model, neurons=neurons)
+        if when:
+            AIUsage.objects.filter(pk=row.pk).update(created_at=when)
+        return row
+
+    def test_each_call_stores_the_neurons_cloudflare_reported(self):
+        with cf_settings(), mock.patch("urllib.request.urlopen", cf_reply(12.5)):
+            CloudflareBackend().generate_text("s", [{"role": "user", "content": "hi"}])
+        row = AIUsage.objects.get()
+        self.assertEqual((row.neurons, row.prompt_tokens, row.completion_tokens), (12.5, 200, 20))
+
+    def test_a_response_without_a_figure_is_recorded_as_unknown_not_guessed(self):
+        with cf_settings(), mock.patch("urllib.request.urlopen", cf_reply(None)):
+            CloudflareBackend().generate_text("s", [{"role": "user", "content": "hi"}])
+        self.assertIsNone(AIUsage.objects.get().neurons)
+        snap = metering.snapshot()
+        self.assertEqual((snap["used"], snap["unknown"], snap["calls"]), (0, 1, 1))
+
+    def test_metering_can_never_break_an_answer(self):
+        with cf_settings(), mock.patch("urllib.request.urlopen", cf_reply(5)), \
+                mock.patch("apps.ai.metering.record", side_effect=RuntimeError("db down")):
+            text = CloudflareBackend().generate_text("s", [{"role": "user", "content": "hi"}])
+        self.assertEqual(text, "Hi")
+
+    def test_snapshot_adds_up_only_todays_calls(self):
+        yesterday = metering.day_start() - timedelta(hours=1)
+        self.spend(30)
+        self.spend(20, model="@cf/meta/llama-3.3-70b-instruct-fp8-fast")
+        self.spend(999, when=yesterday)  # belongs to the previous allowance day
+        with cf_settings():
+            snap = metering.snapshot()
+        self.assertEqual((snap["used"], snap["limit"], snap["remaining"], snap["percent"], snap["calls"]), (50, 100, 50, 50, 2))
+        self.assertEqual({m["model"]: m["neurons"] for m in snap["models"]},
+                         {"@cf/meta/llama-3.1-8b-instruct": 30, "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 20})
+        self.assertEqual(len(snap["days"]), 7)
+        self.assertEqual(snap["days"][-1]["neurons"], 50)
+        self.assertEqual(snap["days"][-2]["neurons"], 999)
+        self.assertEqual(snap["source"], "helply")
+        self.assertEqual(snap["resets_at"], metering.day_start() + timedelta(days=1))
+
+    def test_levels(self):
+        for used, level in ((10, "ok"), (70, "warn"), (90, "critical"), (100, "exhausted"), (150, "exhausted")):
+            AIUsage.objects.all().delete()
+            self.spend(used)
+            with cf_settings():
+                self.assertEqual(metering.snapshot()["level"], level, used)
+
+    def test_no_cap_shows_usage_without_a_bar(self):
+        self.spend(500)
+        with cf_settings(HELPLY_CF_DAILY_NEURONS=0):
+            snap = metering.snapshot()
+        self.assertEqual((snap["used"], snap["percent"], snap["remaining"], snap["level"]), (500, None, None, "ok"))
+
+    def test_account_analytics_are_used_when_the_token_allows_it(self):
+        self.spend(5)
+        rec = graphql_reply(42.5)
+        with cf_settings(), mock.patch("urllib.request.urlopen", rec):
+            snap = metering.snapshot()
+        self.assertEqual((snap["source"], snap["used"], snap["helply_used"]), ("account", 42.5, 5))
+        self.assertEqual(snap["models"][0]["requests"], 3)
+        self.assertEqual(rec.last.full_url, metering.GRAPHQL_URL)
+
+    def test_missing_permission_falls_back_to_helplys_own_record_and_asks_only_once(self):
+        self.spend(7)
+        rec = Recorder({"data": {"viewer": {"accounts": [None]}}, "errors": [{"message": "not authorized for that account"}]})
+        with cf_settings(), mock.patch("urllib.request.urlopen", rec):
+            first, second = metering.snapshot(), metering.snapshot()
+        self.assertEqual((first["source"], first["used"]), ("helply", 7))
+        self.assertEqual(second["source"], "helply")
+        self.assertEqual(len(rec.requests), 1)  # the failure is cached for a few minutes
+
+    def test_analytics_outage_falls_back_too(self):
+        self.spend(7)
+        with cf_settings(), mock.patch("urllib.request.urlopen", Recorder(error=urllib.error.URLError("offline"))):
+            snap = metering.snapshot()
+        self.assertEqual((snap["source"], snap["used"]), ("helply", 7))
+
+    def test_unconfigured_cloudflare_is_reported_as_such(self):
+        with override_settings(HELPLY_CF_ACCOUNT_ID="", HELPLY_CF_API_TOKEN=""), mock.patch("urllib.request.urlopen") as net:
+            snap = metering.snapshot()
+        net.assert_not_called()
+        self.assertFalse(snap["configured"])
+
+    def alerts_for(self, user):
+        return list(Notification.objects.filter(recipient=user).values_list("title", flat=True))
+
+    def test_warnings_go_to_administrators_once_per_level_per_day(self):
+        self.spend(79)
+        with cf_settings():
+            metering.check_alerts(local_only=True)
+            self.assertEqual(self.alerts_for(self.admin), [])
+            self.spend(2)
+            metering.check_alerts(local_only=True)
+            metering.check_alerts(local_only=True)  # a repeat must not send it again
+            self.assertEqual(self.alerts_for(self.admin), ["80% of today's AI allowance is used"])
+            self.spend(30)
+            metering.check_alerts(local_only=True)
+        self.assertEqual(sorted(self.alerts_for(self.admin)), ["80% of today's AI allowance is used", "AI allowance used up for today"])
+        self.assertEqual(self.alerts_for(self.tech), [])
+        self.assertEqual(UsageAlert.objects.count(), 2)
+
+    def test_warning_comes_back_on_the_next_allowance_day(self):
+        self.spend(95)
+        with cf_settings():
+            metering.check_alerts(local_only=True)
+            tomorrow = timezone.now() + timedelta(days=1)
+            self.spend(95, when=tomorrow)
+            metering.check_alerts(now=tomorrow, local_only=True)
+        self.assertEqual(len(self.alerts_for(self.admin)), 2)
+
+    def test_recording_a_call_triggers_the_warning(self):
+        with cf_settings(HELPLY_CF_DAILY_NEURONS=10), mock.patch("urllib.request.urlopen", cf_reply(9)):
+            CloudflareBackend().generate_text("s", [{"role": "user", "content": "hi"}])
+        self.assertEqual(len(self.alerts_for(self.admin)), 1)
+
+    def test_old_records_are_pruned(self):
+        self.spend(1, when=timezone.now() - timedelta(days=61))
+        self.spend(2)
+        metering.prune()
+        self.assertEqual(list(AIUsage.objects.values_list("neurons", flat=True)), [2])
+
+    def test_card_shows_on_the_administrator_dashboard_only(self):
+        self.spend(40)
+        with cf_settings():
+            self.client.force_login(self.admin)
+            page = self.client.get(reverse("core:dashboard"))
+            self.assertContains(page, "AI usage today")
+            self.assertContains(page, "of 100 Neurons used")
+            self.assertContains(page, "Account Analytics: Read")  # tells the admin how to get account-wide numbers
+            self.client.force_login(self.tech)
+            self.assertNotContains(self.client.get(reverse("core:dashboard")), "AI usage today")
+
+    def test_card_says_so_when_cloudflare_is_not_configured(self):
+        self.client.force_login(self.admin)
+        self.assertContains(self.client.get(reverse("core:dashboard")), "Cloudflare AI is not set up")
+
+    def test_status_command_shows_the_usage_line(self):
+        self.spend(12)
+        out = StringIO()
+        with cf_settings():
+            call_command("ai_status", stdout=out)
+        self.assertIn("Usage today", out.getvalue())
+        self.assertIn("12 of 100", out.getvalue())

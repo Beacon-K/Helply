@@ -32,8 +32,6 @@
   </div>
 </section>
 
-{% include "core/_ai_insights.html" %}
-
 <div class="dash-grid">
   <section class="card">
     <div class="panel-head">
@@ -52,7 +50,7 @@
         {% else %}<span class="chip">Unassigned · {{ t.created_at|ago }}</span>{% endif %}
       </a>
     {% empty %}
-      <p class="empty">Nothing needs attention right now. 🎉</p>
+      <p class="empty">Nothing needs attention right now.</p>
     {% endfor %}
     {% if attention_more %}<p class="muted small">+ {{ attention_more }} more in the ticket list.</p>{% endif %}
   </section>
@@ -80,13 +78,17 @@
         <div class="bar-row">
           <span class="bar-label">{{ tech.first_name }}</span>
           <span class="bar"><span class="bar-fill" style="width: {{ n|percent_of:workload_max }}%"></span></span>
-          <span class="bar-value">{{ n }}{% if risky %} <span class="t-danger" title="At risk or breached">· {{ risky }}⚠</span>{% endif %}</span>
+          <span class="bar-value">{{ n }}{% if risky %} <span class="t-danger" title="At risk or breached">· {{ risky }} at risk</span>{% endif %}</span>
         </div>
       {% empty %}<p class="empty">No technicians yet.</p>{% endfor %}
-      <p class="muted small">Open tickets per technician · ⚠ at risk or breached</p>
+      <p class="muted small">Open tickets per technician</p>
     </section>
   </div>
 </div>
+
+{% include "core/_ai_insights.html" %}
+
+{% include "core/_ai_usage.html" %}
 
 <h2 class="ov-title">Company overview</h2>
 <div class="ov-grid">

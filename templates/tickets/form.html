@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block title %}New ticket{% endblock %}
 {% block content %}
-<h1>Report an IT issue</h1>
-<div class="narrow">{% include "ai/_ask.html" %}</div>
+<h1>{% if form.for_other %}New ticket{% else %}Report an IT issue{% endif %}</h1>
+{% if form.for_other %}<p class="muted narrow">Raising this for someone else? Pick their department, then their name. Leave Employee as “Myself” to log your own issue.</p>
+{% else %}<div class="narrow">{% include "ai/_ask.html" %}</div>{% endif %}
 <div class="card narrow">
   <form method="post">{% csrf_token %}
     {{ form.as_p }}

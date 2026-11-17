@@ -92,6 +92,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.core.middleware.PrivateResponsesMiddleware",  # signed-in pages are never cached (Back button after logout)
     "apps.accounts.login_records.LoginActivityMiddleware",  # online time for the sign-in record
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -197,6 +198,19 @@ HELPLY_CF_ASSISTANT_TIMEOUT = float(os.environ.get("HELPLY_CF_ASSISTANT_TIMEOUT"
 # The conversational assistant uses a stronger model than the classifier: it follows the thread and sounds natural
 # (about 15 neurons per short turn, so the free 10,000/day still covers hundreds). Empty = same model as the classifier.
 HELPLY_CF_CHAT_MODEL = os.environ.get("HELPLY_CF_CHAT_MODEL", "@cf/meta/llama-3.3-70b-instruct-fp8-fast")
+# Daily Workers AI allowance in Neurons (10,000 on the free plan, resets 00:00 UTC). 0 = no cap (paid plan): usage is
+# still shown, there is just no bar or warning.
+HELPLY_CF_DAILY_NEURONS = int(os.environ.get("HELPLY_CF_DAILY_NEURONS", "10000"))
+
+# Optional external model (OpenAI or Anthropic Claude), see apps/ai/backends/external.py. The key is only ever read
+# from the environment. HELPLY_EXT_FEATURES chooses which features use it; each one falls back to the default backend.
+# Features: classify, ask (KB panels), copilot (ticket page), chat (assistant drawer), insights (admin analysis).
+HELPLY_EXT_PROVIDER = os.environ.get("HELPLY_EXT_PROVIDER", "")          # "openai" | "anthropic"
+HELPLY_EXT_API_KEY = os.environ.get("HELPLY_EXT_API_KEY", "")
+HELPLY_EXT_MODEL = os.environ.get("HELPLY_EXT_MODEL", "")                # anthropic defaults to claude-sonnet-5-5
+HELPLY_EXT_BASE_URL = os.environ.get("HELPLY_EXT_BASE_URL", "")          # optional: OpenAI-compatible server or proxy
+HELPLY_EXT_TIMEOUT = float(os.environ.get("HELPLY_EXT_TIMEOUT", "40"))
+HELPLY_EXT_FEATURES = {f.strip() for f in os.environ.get("HELPLY_EXT_FEATURES", "insights,copilot").split(",") if f.strip()}
 # Assistant (employee Q&A + technician copilot): per-user hourly cap protects the Workers AI free quota.
 HELPLY_AI_ASSISTANT_PER_HOUR = int(os.environ.get("HELPLY_AI_ASSISTANT_PER_HOUR", "20"))
 # Admin insights: how far back to look, how often the scheduled job refreshes, and the manual-refresh cooldown.
@@ -208,6 +222,7 @@ HELPLY_AI_INSIGHTS_COOLDOWN_MIN = int(os.environ.get("HELPLY_AI_INSIGHTS_COOLDOW
 if len(sys.argv) > 1 and sys.argv[1] == "test":
     HELPLY_AI_BACKEND = "apps.ai.backends.keyword.KeywordBackend"
     HELPLY_CF_ACCOUNT_ID = HELPLY_CF_API_TOKEN = ""
+    HELPLY_EXT_API_KEY = ""
 # Share of the resolution window elapsed after which a ticket is flagged "at risk".
 HELPLY_SLA_AT_RISK_RATIO = float(os.environ.get("HELPLY_SLA_AT_RISK_RATIO", "0.75"))
 
