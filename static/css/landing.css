@@ -530,39 +530,3 @@ html.lp-deck-on:not([data-theme="dark"]) .lp-top:hover { background: #ececef; }
   .lp-deck-on .lp-cta .lp-pill.big { margin-top: 1rem; }
   .lp-deck-on .lp-trust-inline { margin-top: 1.2rem; }
 }
-
-/* ---------- Bright first page ----------
-   The photograph stays, but washed into a light page: soft blue-white, dark type, a white sign-in card. Same in both themes. */
-.lp-deck-on .lp-hero { color: #14161a; background: #f3f6fb; }
-.lp-deck-on .lp-hero-bg { background: linear-gradient(135deg, #f8fafd 0%, #eaf0f8 55%, #dde7f4 100%); }
-.lp-deck-on .lp-hero-bg img { opacity: .3; filter: grayscale(.35) brightness(1.5) contrast(.85); mix-blend-mode: multiply; }
-.lp-deck-on .lp-hero-bg::after { background: linear-gradient(90deg, rgba(248, 250, 253, .97) 6%, rgba(248, 250, 253, .72) 52%, rgba(248, 250, 253, .45) 100%), linear-gradient(0deg, rgba(243, 246, 251, .9) 0%, transparent 30%); }
-.lp-deck-on .lp-hero .lp-eyebrow { color: #5a6272; }
-.lp-deck-on .lp-hero .lp-lede { color: rgba(20, 22, 26, .7); }
-.lp-deck-on .lp-hero .lp-scrollcue a { color: #14161a; }
-.lp-deck-on .lp-hero.is-before { filter: brightness(.86); }
-
-.lp-deck-on .lp-hero .lp-card { color: #14161a; background: #ffffff; border: 1px solid rgba(20, 30, 60, .1); box-shadow: 0 30px 70px -36px rgba(20, 40, 90, .45); }
-.lp-deck-on .lp-hero .lp-card-sub { color: rgba(20, 22, 26, .62); }
-.lp-deck-on .lp-hero .lp-field label { color: rgba(20, 22, 26, .75); }
-.lp-deck-on .lp-hero .lp-form input[type=text], .lp-deck-on .lp-hero .lp-form input[type=password] { background: #f4f6f9; border-color: rgba(20, 30, 60, .16); color: #14161a; }
-.lp-deck-on .lp-hero .lp-form input::placeholder { color: rgba(20, 22, 26, .38); }
-.lp-deck-on .lp-hero .lp-form input:focus { background: #fff; border-color: #1d4fd7; box-shadow: 0 0 0 3px rgba(29, 79, 215, .18); }
-.lp-deck-on .lp-hero .lp-form input:-webkit-autofill { -webkit-text-fill-color: #14161a; box-shadow: 0 0 0 100px #eef2fb inset; }
-.lp-deck-on .lp-hero .lp-eye { color: rgba(20, 22, 26, .55); } .lp-deck-on .lp-hero .lp-eye:hover { color: #14161a; background: rgba(20, 30, 60, .07); } .lp-deck-on .lp-hero .lp-eye[aria-pressed="true"] { color: #1d4fd7; }
-.lp-deck-on .lp-hero .lp-submit { background: #14161a; color: #fff; } .lp-deck-on .lp-hero .lp-submit:hover { background: #2a2d34; }
-.lp-deck-on .lp-hero .lp-card-foot a { color: #1d4fd7; }
-.lp-deck-on .lp-hero .lp-secure { color: rgba(20, 22, 26, .55); border-top-color: rgba(20, 30, 60, .1); }
-.lp-deck-on .lp-hero .lp-err { color: #b42318; }
-.lp-deck-on .lp-hero .lp-alert { background: #fdeceb; border-color: #f0b4af; color: #8a1c14; }
-.lp-deck-on .lp-hero .lp-field.has-error input { border-color: #d92d20 !important; }
-
-/* top bar, dots and pager while the bright page is showing */
-html.lp-deck-on.lp-on-hero .lp-nav, html.lp-deck-on.lp-on-hero:not([data-theme="dark"]) .lp-nav { color: #14161a; }
-html.lp-deck-on.lp-on-hero .lp-nav .lp-toggle, html.lp-deck-on.lp-on-hero:not([data-theme="dark"]) .lp-nav .lp-toggle { border-color: rgba(20, 30, 60, .22); }
-html.lp-deck-on.lp-on-hero .lp-nav .lp-toggle:hover { background: rgba(20, 30, 60, .07); }
-html.lp-deck-on.lp-on-hero .lp-nav .lp-pill, html.lp-deck-on.lp-on-hero:not([data-theme="dark"]) .lp-nav .lp-pill { background: #14161a; color: #fff; }
-html.lp-deck-on.lp-on-hero .lp-dots, html.lp-deck-on.lp-on-hero .lp-pager { background: rgba(255, 255, 255, .92); border-color: rgba(20, 30, 60, .12); color: #14161a; }
-html.lp-deck-on.lp-on-hero .lp-dots button::before { background: rgba(20, 30, 60, .28); } html.lp-deck-on.lp-on-hero .lp-dots button:hover::before { background: rgba(20, 30, 60, .7); }
-html.lp-deck-on.lp-on-hero .lp-dots button[aria-current="true"]::before { background: #14161a; }
-html.lp-deck-on.lp-on-hero .lp-count { color: rgba(20, 22, 26, .65); } html.lp-deck-on.lp-on-hero .lp-pg:hover:not(:disabled) { background: rgba(20, 30, 60, .07); }
