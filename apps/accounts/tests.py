@@ -50,10 +50,10 @@ class PeopleAccessTests(PeopleBase):
 
     def test_sidebar_links_are_for_administrators_only(self):
         self.client.force_login(self.tech)
-        self.assertNotContains(self.client.get(reverse("core:dashboard")), reverse("people:list"))
+        self.assertNotContains(self.client.get(reverse("core:dashboard")), f'href="{reverse("people:list")}"')
         self.client.force_login(self.admin)
         page = self.client.get(reverse("core:dashboard"))
-        self.assertContains(page, reverse("people:list"))
+        self.assertContains(page, f'href="{reverse("people:list")}"')
         self.assertContains(page, reverse("sla:settings"))
 
 
@@ -735,3 +735,75 @@ class CategoryManagementTests(PeopleBase):
         Category.objects.create(name="Telephony")
         self.client.force_login(self.admin)
         self.assertContains(self.client.get(reverse("people:organization")), "Telephony")
+
+
+import shutil
+import tempfile
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
+
+PNG = (b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89"
+       b"\x00\x00\x00\rIDATx\x9cc\xf8\xcf\xc0\xf0\x1f\x00\x05\x00\x01\xff\x89\x99=\x1d\x00\x00\x00\x00IEND\xaeB`\x82")
+
+
+class AccountMenuAndAvatarTests(PeopleBase):
+    def setUp(self):
+        self.media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.media, ignore_errors=True)
+        override = override_settings(MEDIA_ROOT=self.media)
+        override.enable()
+        self.addCleanup(override.disable)
+
+    def upload(self, content=PNG, name="me.png"):
+        return self.client.post(reverse("people:avatar_edit"), {"image": SimpleUploadedFile(name, content)})
+
+    def test_top_bar_has_one_menu_with_photo_and_password(self):
+        self.client.force_login(self.emp)
+        page = self.client.get(reverse("core:dashboard"))
+        self.assertContains(page, 'data-acct')
+        self.assertContains(page, reverse("people:avatar_edit"))
+        self.assertContains(page, reverse("password_change"))
+        self.assertContains(page, "Log out")
+        self.assertNotContains(page, "pw-link")
+
+    def test_upload_serve_replace_and_remove(self):
+        self.client.force_login(self.emp)
+        self.assertEqual(self.upload().status_code, 302)
+        self.emp.refresh_from_db()
+        first = self.emp.avatar
+        self.assertTrue(first.endswith(".png"))
+        served = self.client.get(self.emp.avatar_url)
+        self.assertEqual((served.status_code, served["Content-Type"]), (200, "image/png"))
+        self.assertEqual(b"".join(served.streaming_content)[:4], b"\x89PNG")
+        self.assertContains(self.client.get(reverse("core:dashboard")), self.emp.avatar_url)
+        self.upload()  # a new photo replaces the old file
+        self.emp.refresh_from_db()
+        self.assertNotEqual(self.emp.avatar, first)
+        import os
+        self.assertEqual(len(os.listdir(os.path.join(self.media, "avatars"))), 1)
+        self.client.post(reverse("people:avatar_edit"), {"remove": "1"})
+        self.emp.refresh_from_db()
+        self.assertEqual((self.emp.avatar, self.emp.avatar_url), ("", ""))
+        self.assertEqual(os.listdir(os.path.join(self.media, "avatars")), [])
+
+    def test_only_real_small_images_are_accepted(self):
+        self.client.force_login(self.emp)
+        self.assertEqual(self.upload(b"<script>alert(1)</script>", "evil.png").status_code, 200)  # form shown again
+        self.assertEqual(self.upload(PNG + b"0" * (600 * 1024)).status_code, 200)
+        self.emp.refresh_from_db()
+        self.assertEqual(self.emp.avatar, "")
+
+    def test_photos_need_a_login_and_only_change_your_own(self):
+        self.client.force_login(self.emp)
+        self.upload()
+        self.emp.refresh_from_db()
+        self.client.logout()
+        self.assertEqual(self.client.get(self.emp.avatar_url).status_code, 302)  # to the sign-in page
+        self.client.force_login(self.tech)
+        self.assertEqual(self.client.get(self.emp.avatar_url).status_code, 200)  # colleagues can see it
+        self.upload()
+        self.emp.refresh_from_db()
+        self.assertTrue(self.emp.avatar)  # the technician's upload went to the technician only
+        self.tech.refresh_from_db()
+        self.assertTrue(self.tech.avatar)

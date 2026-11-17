@@ -189,3 +189,30 @@ class CategoryForm(forms.ModelForm):
         if parent and self.instance.pk and self.instance.children.exists():
             raise forms.ValidationError("This category has sub-categories, so it cannot sit under another one.")
         return parent
+
+
+class AvatarForm(forms.Form):
+    """A profile photo. The page shrinks the picture to a small square before sending it, so the
+    limit here only has to stop anything that is not a small, real PNG, JPEG or WebP image."""
+
+    MAX_BYTES = 512 * 1024
+    SIGNATURES = ((b"\x89PNG\r\n\x1a\n", ".png"), (b"\xff\xd8\xff", ".jpg"))
+
+    image = forms.FileField(label="Photo")
+    extension = ".png"
+
+    def clean_image(self):
+        image = self.cleaned_data["image"]
+        if image.size > self.MAX_BYTES:
+            raise forms.ValidationError("That picture is too large. Choose one under 512 KB.")
+        head = image.read(12)
+        image.seek(0)
+        # judged by the file's own first bytes, never by its name or the type the browser claims
+        for signature, extension in self.SIGNATURES:
+            if head.startswith(signature):
+                self.extension = extension
+                return image
+        if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+            self.extension = ".webp"
+            return image
+        raise forms.ValidationError("Use a PNG, JPEG or WebP picture.")

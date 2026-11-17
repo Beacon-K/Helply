@@ -1,0 +1,1 @@
+{% if u.avatar_url %}<img class="avatar{% if big %} big{% endif %}" src="{{ u.avatar_url }}" alt="" width="{% if big %}96{% else %}30{% endif %}" height="{% if big %}96{% else %}30{% endif %}">{% else %}<span class="avatar{% if big %} big{% endif %}" aria-hidden="true">{{ u.initials }}</span>{% endif %}

@@ -29,6 +29,23 @@ class User(AbstractUser):
     )
     phone = models.CharField(max_length=30, blank=True)
     email_notifications = models.BooleanField(default=True, help_text="Send email copies of important notifications.")
+    # Profile photo. Stored under MEDIA_ROOT/avatars and only ever served through the signed-in
+    # avatar view, so it works the same in production (where Django does not serve media itself).
+    avatar = models.CharField(max_length=120, blank=True, editable=False)
+
+    @property
+    def avatar_url(self):
+        """Address of the profile photo, or "" when there is none. The file name is part of the
+        query so a new photo is fetched instead of the one the browser remembered."""
+        if not self.avatar:
+            return ""
+        from django.urls import reverse
+        return f"{reverse('people:avatar', args=[self.pk])}?v={self.avatar.rsplit('-', 1)[-1].split('.')[0]}"
+
+    @property
+    def initials(self):
+        first = (self.first_name or self.username)[:1]
+        return f"{first}{self.last_name[:1]}".upper()
 
     @property
     def is_employee(self):

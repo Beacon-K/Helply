@@ -3,11 +3,15 @@ import logging
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.files.storage import default_storage
+from django.http import FileResponse, Http404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.crypto import get_random_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.decorators.cache import never_cache
@@ -18,7 +22,7 @@ from apps.tickets.choices import OPEN_STATUSES
 from apps.tickets.models import Category
 
 from .decorators import role_required
-from .forms import CategoryForm, DepartmentForm, TeamForm, UserForm, last_admin_guard
+from .forms import AvatarForm, CategoryForm, DepartmentForm, TeamForm, UserForm, last_admin_guard
 from .models import Department, SupportGroup, User
 
 log = logging.getLogger(__name__)
@@ -304,3 +308,50 @@ def people_reset(request, pk):
         messages.error(request, "Turn the account back on before resetting its password.")
         return redirect("people:edit", pk=person.pk)
     return _show_link(request, person, welcome=False)
+
+
+AVATAR_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp"}
+
+
+@login_required
+def avatar_serve(request, pk):
+    """Profile photos are only for people who are signed in (they appear next to names inside Helply)."""
+    user = get_object_or_404(User, pk=pk)
+    path = f"avatars/{user.avatar}" if user.avatar else ""
+    if not path or not default_storage.exists(path):
+        raise Http404
+    response = FileResponse(default_storage.open(path), content_type=AVATAR_TYPES.get(
+        "." + user.avatar.rsplit(".", 1)[-1], "application/octet-stream"))
+    response["Cache-Control"] = "private, max-age=86400"  # the ?v= in the address changes with every new photo
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
+def _drop_avatar(user):
+    if user.avatar:
+        default_storage.delete(f"avatars/{user.avatar}")
+        user.avatar = ""
+
+
+@login_required
+def avatar_edit(request):
+    """Anyone can change or remove their own photo."""
+    user = request.user
+    form = AvatarForm(request.POST or None, request.FILES or None)
+    if request.method == "POST":
+        if "remove" in request.POST:
+            _drop_avatar(user)
+            user.save(update_fields=["avatar"])
+            messages.success(request, "Photo removed.")
+            return redirect("people:avatar_edit")
+        if form.is_valid():
+            image = form.cleaned_data["image"]
+            _drop_avatar(user)
+            token = get_random_string(10)
+            name = f"{user.pk}-{token}{form.extension}"
+            default_storage.save(f"avatars/{name}", image)
+            user.avatar = name
+            user.save(update_fields=["avatar"])
+            messages.success(request, "Photo updated.")
+            return redirect("people:avatar_edit")
+    return render(request, "people/avatar_form.html", {"form": form})

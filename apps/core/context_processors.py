@@ -1,7 +1,7 @@
 from django.conf import settings
 
 ASSET_FILES = ("css/app.css", "css/monitoring.css", "css/theme.css", "js/theme.js", "css/people.css", "js/people.js", "js/notifications.js", "js/kb-vote.js", "js/live.js",
-               "js/fleet.js", "js/fleet-detail.js", "css/admin-helply.css", "css/landing.css", "js/landing.js", "css/apple.css", "css/tech.css", "css/calm.css", "js/tech.js", "js/assistant.js", "css/help.css", "js/help.js", "js/ticket-edit.js")
+               "js/fleet.js", "js/fleet-detail.js", "css/admin-helply.css", "css/landing.css", "js/landing.js", "css/apple.css", "css/tech.css", "css/calm.css", "js/tech.js", "js/assistant.js", "css/help.css", "js/help.js", "js/ticket-edit.js", "js/account-menu.js", "js/avatar.js")
 
 
 def asset_version(request):

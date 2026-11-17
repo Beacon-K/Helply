@@ -36,8 +36,18 @@
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg>
       <span class="bell-count" data-unread {% if not unread_notifications %}hidden{% endif %}>{% if unread_notifications > 99 %}99+{% else %}{{ unread_notifications }}{% endif %}</span>
     </a>
-    <a class="who-name" href="{% url 'password_change' %}" title="Account and password"><span class="avatar" aria-hidden="true">{{ user.first_name|slice:":1"|default:user.username|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}</span> <span class="who-text">{{ user }}</span> <small class="role role-{{ user.role }}">{{ user.get_role_display }}</small></a>
-    <a class="small pw-link" href="{% url 'password_change' %}"><span class="long">Change password</span><span class="short">Password</span></a>
+<div class="acct" data-acct>
+      <button type="button" class="acct-trigger" aria-haspopup="menu" aria-expanded="false" aria-controls="acct-menu" title="Your account">
+        {% include "partials/avatar.html" with u=user %}
+        <span class="who-text">{{ user }}</span> <small class="role role-{{ user.role }}">{{ user.get_role_display }}</small>
+        <svg class="acct-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="acct-menu" id="acct-menu" role="menu" hidden>
+        <div class="acct-head"><b>{{ user }}</b><span class="muted small">{{ user.get_role_display }}</span></div>
+        <a role="menuitem" href="{% url 'people:avatar_edit' %}">Change photo</a>
+        <a role="menuitem" href="{% url 'password_change' %}">Change password</a>
+      </div>
+    </div>
     <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">Log out</button></form>
   </div>
 </header>
@@ -52,7 +62,7 @@
 {% endif %}
 {% if user.is_authenticated %}{% include "ai/_drawer.html" %}{% endif %}
 <script src="{% static 'js/theme.js' %}?v={{ asset_version }}" defer></script>
-{% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/tech.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/assistant.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/help.js' %}?v={{ asset_version }}" defer></script>{% endif %}
+{% if user.is_authenticated %}<script src="{% static 'js/notifications.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/account-menu.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/tech.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/assistant.js' %}?v={{ asset_version }}" defer></script><script src="{% static 'js/help.js' %}?v={{ asset_version }}" defer></script>{% endif %}
 {% block scripts %}{% endblock %}
 </body>
 </html>

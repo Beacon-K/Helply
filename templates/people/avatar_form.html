@@ -1,0 +1,46 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}Your photo{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/monitoring.css' %}?v={{ asset_version }}"><link rel="stylesheet" href="{% static 'css/people.css' %}?v={{ asset_version }}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/avatar.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="fx">
+  <header class="fx-head">
+    <div>
+      <p class="fx-eyebrow">Your account</p>
+      <h1 class="fx-title">Your photo</h1>
+      <p class="fx-lede">It appears next to your name at the top of every page. Other people in Helply can see it.</p>
+    </div>
+  </header>
+
+  {% for message in messages %}<div class="fx-callout{% if message.tags == 'error' %} is-bad{% endif %}" role="status">{{ message }}</div>{% endfor %}
+
+  <form method="post" enctype="multipart/form-data" class="fx-form" novalidate>{% csrf_token %}
+    <section class="fx-fieldset">
+      <div><h2>Photo</h2><p>PNG, JPEG or WebP. It is cropped to a square and shrunk before it is saved.</p></div>
+      <div class="fx-fields">
+        <div class="fx-field full avatar-edit">
+          {% if user.avatar_url %}<img class="avatar big" data-avatar-preview src="{{ user.avatar_url }}" alt="Your current photo" width="96" height="96">
+          {% else %}<span class="avatar big" aria-hidden="true">{{ user.initials }}</span>
+          <img class="avatar big" data-avatar-preview alt="" width="96" height="96" hidden>{% endif %}
+          <div>
+            <input type="file" name="image" accept="image/png,image/jpeg,image/webp" data-avatar-input required aria-label="Choose a photo">
+            {% if form.image.errors %}<span class="err">{{ form.image.errors|join:" " }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="fx-form-actions">
+      <a class="fx-btn fx-btn-ghost" href="{% url 'core:dashboard' %}">Cancel</a>
+      <button class="fx-btn fx-btn-primary">Save photo</button>
+    </div>
+  </form>
+
+  {% if user.avatar_url %}
+  <section class="fx-danger">
+    <div><h2>Remove photo</h2><p>Your initials will be shown instead.</p></div>
+    <form method="post">{% csrf_token %}<button class="fx-btn fx-btn-danger" name="remove" value="1">Remove photo</button></form>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

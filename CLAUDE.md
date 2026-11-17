@@ -51,7 +51,7 @@ python manage.py run_jobs --every 5       # SLA、跟进、监控、续费提醒
 python manage.py init_helply              # 真实公司首次初始化
 python manage.py backup_db
 ```
-- 启动脚本：`setup.bat`、`start-demo.bat`、`start-online.bat`、`reset-demo.bat`、`start-production.bat`；Linux 用 `setup.sh`、`start-demo.sh`。
+- 启动脚本：`setup.bat`、`start-demo.bat`、`start-online.bat`、`reset-demo.bat`、`start-production.bat`、`update-online.bat`（拉取最新代码并重启公网站点，数据不动）；Linux 用 `setup.sh`、`start-demo.sh`。
 - 每台机器独立虚拟环境 `.venv-%COMPUTERNAME%`（`tools/helply-env.bat`）。
 - `HELPLY_ENVIRONMENT`：`development` | `demo` | `production`。production 要求 `DJANGO_SECRET_KEY` ≥ 40 字符。
 - 公网模式只在设置了 `HELPLY_PUBLIC_HOST` 时开启（由启动脚本设置，**不要**写进 `.env`）。

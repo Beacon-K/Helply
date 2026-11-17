@@ -367,13 +367,17 @@ class TopbarLayoutTests(TestCase):
         who = html.index('class="who"')
         self.assertLess(tools, html.index("cmdk-trigger"))
         self.assertLess(html.index("ai-launch"), who)  # both tools are inside the first group, before the account group
-        self.assertIn('class="who-name"', html)
+        self.assertIn('class="acct-trigger"', html)
 
-    def test_password_link_has_a_long_and_a_short_label_and_the_avatar_links_to_the_same_page(self):
+    def test_name_avatar_and_role_open_one_menu_instead_of_linking_straight_to_the_password_page(self):
         html = self.client.get("/").content.decode()
-        self.assertIn('class="long">Change password<', html)
-        self.assertIn('class="short">Password<', html)
-        self.assertEqual(html.count('href="/accounts/password_change/"'), 2)  # the name/avatar and the text link
+        trigger = html[html.index('class="acct-trigger"'):html.index("</button>", html.index('class="acct-trigger"'))]
+        self.assertIn("avatar", trigger)
+        self.assertNotIn("href=", trigger)  # the name and role are no longer a link
+        menu = html[html.index('class="acct-menu"'):]
+        self.assertIn('href="/people/me/avatar/"', menu)
+        self.assertEqual(html.count('href="/accounts/password_change/"'), 1)  # only inside the menu
+        self.assertLess(html.index('class="acct-menu"'), html.index("Log out"))  # Log out stays after the menu
 
     def test_every_signed_in_page_has_the_help_button_in_the_sidebar_carrying_the_role(self):
         html = self.client.get("/").content.decode()
