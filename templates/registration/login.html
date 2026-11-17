@@ -59,14 +59,26 @@
     </div>
   </div></section>
 
-  <!-- ============ Showcase ============ -->
-  <section class="lp-slide lp-showcase" id="showcase" data-slide data-id="showcase" data-title="One desk for everything IT"><div class="lp-slide-in">
-    <div class="lp-showcase-frame">
-      <img src="{% static 'img/landing/technician.jpg' %}" alt="A technician plugging a network cable into a switch" width="2000" height="1121" decoding="async">
-      <div class="lp-showcase-shade"></div>
-      <div class="lp-showcase-copy">
-        <p class="lp-kicker">One desk for everything IT</p>
-        <h2 class="lp-h2">Every request.<br>Every server.<br>One calm place.</h2>
+  <!-- ============ Tickets at a glance ============ -->
+  <section class="lp-slide lp-feature lp-overview" id="showcase" data-slide data-id="showcase" data-title="Tickets at a glance"><div class="lp-slide-in">
+    <div class="lp-wrap lp-ov">
+      <figure class="lp-ov-media reveal">
+        <img src="{% static 'img/landing/technician.jpg' %}" alt="A technician plugging a network cable into a switch" width="2000" height="1121" loading="lazy" decoding="async">
+        <figcaption><span>One desk for everything IT</span><b>Every request. <br>Every server. <br>One calm place.</b></figcaption>
+      </figure>
+      <div class="lp-ov-copy">
+        <p class="lp-kicker reveal">Tickets, end to end</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">From first message to a closed ticket.</h2>
+        <ul class="lp-feats">
+        <li class="reveal" style="--d:0.05s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span><b>Raised your way</b>Employees describe the problem in plain words. IT can also open a ticket for a colleague after a call or a desk visit.</span></li>
+        <li class="reveal" style="--d:0.09s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span><span><b>Sorted on arrival</b>A suggested category and, when Helply is sure, automatic triage and routing to the right team.</span></li>
+        <li class="reveal" style="--d:0.13s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>Priority that is not a guess</b>Impact and urgency feed the ITIL matrix, so P1 to P4 mean the same thing to everyone.</span></li>
+        <li class="reveal" style="--d:0.17s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/></svg></span><span><b>Replies and private notes</b>The requester sees every public reply. Internal notes stay with IT.</span></li>
+        <li class="reveal" style="--d:0.21s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2.5h6"/></svg></span><span><b>SLA clocks that pause</b>Response and resolution deadlines on every ticket, paused while you wait on someone else.</span></li>
+        <li class="reveal" style="--d:0.25s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M17 8h5m0 0-2-2m2 2-2 2"/></svg></span><span><b>Hand over in one click</b>Any technician can change the category or the owner from a dropdown when someone cannot follow up.</span></li>
+        <li class="reveal" style="--d:0.29s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6V3Z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg></span><span><b>Every change on record</b>Status, owner and category changes are logged with who did it and when.</span></li>
+        <li class="reveal" style="--d:0.33s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><b>Closed with feedback</b>Requesters rate the fix, and resolved tickets close themselves after a reminder.</span></li>
+        </ul>
       </div>
     </div>
   </div></section>
@@ -96,9 +108,14 @@
   <!-- ============ AI ============ -->
   <section class="lp-slide lp-ai" id="ai" data-slide data-id="ai" data-title="AI inside the workflow"><div class="lp-slide-in">
     <div class="lp-wrap">
-      <p class="lp-kicker center reveal">Intelligence, built in</p>
-      <h2 class="lp-h2 center reveal" style="--d:.06s">AI inside the workflow.<br><span class="lp-grad">Not a chat box.</span></h2>
-      <p class="lp-p center reveal" style="--d:.12s">It works where the work happens: when a ticket arrives, when it needs an owner, and when someone asks &ldquo;haven&rsquo;t we solved this before?&rdquo;</p>
+      <div class="lp-ai-top">
+        <div>
+          <p class="lp-kicker reveal">Intelligence, built in</p>
+          <h2 class="lp-h2 reveal" style="--d:.06s">AI inside the workflow.<br><span class="lp-grad">Not a chat box.</span></h2>
+          <p class="lp-p reveal" style="--d:.12s">It works where the work happens: when a ticket arrives, when it needs an owner, and when someone asks &ldquo;haven&rsquo;t we solved this before?&rdquo;</p>
+        </div>
+        <figure class="lp-ai-art reveal" style="--d:.1s" aria-hidden="true"><img src="{% static 'img/landing/ai-chip.jpg' %}" alt="" width="1999" height="1400" loading="lazy" decoding="async"></figure>
+      </div>
       <div class="lp-trio">
         <article class="lp-tile reveal" style="--d:.05s">
           <span class="lp-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span>
@@ -116,7 +133,7 @@
           <p>Related articles and similar past tickets appear beside the new one, so solved problems stay solved.</p>
         </article>
       </div>
-      <p class="lp-fine center reveal">Every correction a person makes is measured, so the dashboard always shows how often the suggestion was right.</p>
+      <p class="lp-fine reveal">Every correction a person makes is measured, so the dashboard always shows how often the suggestion was right.</p>
     </div>
   </div></section>
 
