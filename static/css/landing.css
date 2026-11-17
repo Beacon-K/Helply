@@ -462,6 +462,12 @@ html.lp-deck-on:not([data-theme="dark"]) .lp-top:hover { background: #ececef; }
 .lp-feats .d { display: block; font-size: .9rem; line-height: 1.45; color: var(--mute); }
 .lp-ico.sm { width: 2.3rem; height: 2.3rem; border-radius: 9px; color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, transparent); border: 1px solid var(--line); }
 .lp-ai .lp-ico.sm, .lp-feature.dark .lp-ico.sm { color: #f5f5f7; }
+/* every second page puts the picture on the right, so turning pages doesn't feel like the same slide twice */
+@media (min-width: 981px) {
+  .lp-fit.rev { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); }
+  .lp-fit.rev > .lp-copy { order: 1; }
+  .lp-fit.rev > :not(.lp-copy) { order: 2; }
+}
 .lp-fit .lp-fine { margin: 1rem 0 0; max-width: none; text-align: left; }
 .lp-fit .lp-kicker { margin-bottom: .6rem; }
 
