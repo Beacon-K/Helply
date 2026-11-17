@@ -391,3 +391,26 @@ class TopbarLayoutTests(TestCase):
 
     def test_page_declares_a_mobile_viewport(self):
         self.assertIn('name="viewport" content="width=device-width, initial-scale=1"', self.client.get("/").content.decode())
+
+
+class LandingDeckTests(TestCase):
+    """The sign-in page is a slide deck: every section is a card, and the form lives on the first one."""
+
+    def test_sections_are_slides_with_controls_and_the_form_on_the_first(self):
+        html = self.client.get("/accounts/login/").content.decode()
+        self.assertEqual(html.count("data-slide "), 9)
+        self.assertIn("data-deck", html)
+        for hook in ("data-dots", "data-prev", "data-next", "data-count", "data-slide-link=\"tickets\""):
+            self.assertIn(hook, html)
+        first = html[html.index('data-id="welcome"'):html.index('data-id="showcase"')]
+        self.assertIn('name="username"', first)
+        self.assertIn('name="password"', first)
+        self.assertNotIn('name="username"', html[html.index('data-id="showcase"'):])  # only one sign-in form
+        self.assertIn("js/landing.js", html)
+
+    def test_each_slide_has_a_unique_id_and_title(self):
+        import re
+        html = self.client.get("/accounts/login/").content.decode()
+        ids = re.findall(r'data-slide data-id="([^"]+)" data-title="([^"]+)"', html)
+        self.assertEqual(len(ids), 9)
+        self.assertEqual(len({i for i, _ in ids}), 9)

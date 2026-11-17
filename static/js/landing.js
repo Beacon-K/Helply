@@ -1,68 +1,13 @@
-/* Sign-in landing page: reveal on scroll, a solid navigation bar after the hero, a gentle parallax on the big photo,
-   a show/hide password button, and "Sign in" links that scroll to the card and focus the first field.
-   Everything degrades: without JavaScript the page is fully visible and the form still works. */
+/* Sign-in landing page: a slide deck.
+   The sections are cards stacked on one screen. Wheel, swipe, arrow keys, the dots and the top links slide the
+   next card up over the current one. A card taller than the window scrolls inside itself first, and only moves
+   on once its own scrolling reaches the end. Without JavaScript (or when the deck cannot start) the sections are
+   an ordinary page and the form still works. */
 (function () {
   var root = document.documentElement;
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // Reveal elements as they enter the viewport (elements already visible show immediately).
-  var items = document.querySelectorAll(".reveal, .lp-sla");
-  if (reduce || !("IntersectionObserver" in window)) {
-    items.forEach(function (el) { el.classList.add("is-in"); });
-  } else {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) { entry.target.classList.add("is-in"); io.unobserve(entry.target); }
-      });
-    }, { threshold: 0.14, rootMargin: "0px 0px -6% 0px" });
-    items.forEach(function (el) { io.observe(el); });
-  }
-
-  // Navigation: transparent over the hero, frosted afterwards (light text on dark sections, dark text on light ones).
-  var nav = document.querySelector("[data-nav]"), hero = document.querySelector(".lp-hero");
-  function lightSectionUnderNav() {
-    if (root.getAttribute("data-theme") === "dark") return false;
-    var y = 28, els = document.elementsFromPoint(window.innerWidth / 2, y);
-    for (var i = 0; i < els.length; i++) {
-      var s = els[i].closest && els[i].closest(".lp-feature, .lp-bento-sec, .lp-trust");
-      if (s) return !s.classList.contains("dark");
-    }
-    return false;
-  }
-  function paintNav() {
-    if (!nav) return;
-    var past = window.scrollY > 24;
-    nav.classList.toggle("is-solid", past);
-    nav.classList.toggle("is-light", past && lightSectionUnderNav());
-  }
-
-  // Parallax: the big photo drifts and settles as it crosses the screen.
-  var frame = document.querySelector("[data-parallax]"), ticking = false;
-  function parallax() {
-    ticking = false;
-    if (!frame || reduce) return;
-    var r = frame.getBoundingClientRect(), vh = window.innerHeight;
-    var p = Math.min(Math.max((vh - r.top) / (vh + r.height), 0), 1);  // 0 as it enters, 1 as it leaves
-    frame.style.setProperty("--s", (1.14 - p * 0.1).toFixed(3));
-    frame.style.setProperty("--y", ((p - 0.5) * -28).toFixed(1) + "px");
-  }
-  function onScroll() { paintNav(); if (!ticking) { ticking = true; requestAnimationFrame(parallax); } }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll);
-  document.addEventListener("helply:theme", paintNav);
-  onScroll();
-
-  // "Sign in" links go to the card and put the cursor in the username field.
-  document.querySelectorAll("[data-goto-signin]").forEach(function (link) {
-    link.addEventListener("click", function (e) {
-      var card = document.getElementById("signin");
-      if (!card) return;
-      e.preventDefault();
-      card.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
-      var field = card.querySelector("input[type=text], input[name=username]");
-      setTimeout(function () { if (field) field.focus({ preventScroll: true }); }, reduce ? 0 : 650);
-    });
-  });
+  var deck = document.querySelector("[data-deck]");
+  var slides = deck ? Array.prototype.slice.call(deck.querySelectorAll("[data-slide]")) : [];
 
   // Show or hide the password.
   var eye = document.querySelector("[data-eye]");
@@ -75,4 +20,173 @@
       eye.setAttribute("aria-label", show ? "Hide password" : "Show password");
     });
   }
+
+  if (!deck || slides.length < 2 || !root.classList.contains("lp-deck-on")) {
+    root.classList.remove("lp-deck-on");
+    return;
+  }
+
+  // The stage never scrolls. A #hash that matches an element (the sign-in card) or a focused field would
+  // otherwise slide it, so any such movement is undone at once.
+  [deck, document.body, root].forEach(function (el) {
+    el.addEventListener("scroll", function () { if (el.scrollTop || el.scrollLeft) { el.scrollTop = 0; el.scrollLeft = 0; } }, { passive: true });
+  });
+
+  var cur = -1;
+  var dotsBox = document.querySelector("[data-dots]");
+  var count = document.querySelector("[data-count]");
+  var prevBtn = document.querySelector("[data-prev]");
+  var nextBtns = document.querySelectorAll("[data-next]");
+  var navLinks = document.querySelectorAll("[data-slide-link]");
+  var dots = [];
+
+  slides.forEach(function (slide, i) {
+    var dot = document.createElement("button");
+    dot.type = "button";
+    dot.dataset.label = slide.dataset.title || "";
+    dot.setAttribute("aria-label", "Go to: " + (slide.dataset.title || "slide " + (i + 1)));
+    dot.addEventListener("click", function () { go(i); });
+    dotsBox.appendChild(dot);
+    dots.push(dot);
+  });
+
+  function indexOfId(id) {
+    for (var i = 0; i < slides.length; i++) if (slides[i].dataset.id === id) return i;
+    return -1;
+  }
+
+  /* Paint the deck for slide n: earlier cards stack up behind it (each one a little smaller and darker),
+     later cards wait below the screen. Cards that are not showing cannot be tabbed into. */
+  function render(n) {
+    slides.forEach(function (slide, i) {
+      var d = n - i;
+      slide.classList.toggle("is-active", d === 0);
+      slide.classList.toggle("is-before", d > 0);
+      slide.classList.toggle("is-after", d < 0);
+      slide.style.setProperty("--depth", d > 0 ? d : 0);
+      if (d === 0) { slide.removeAttribute("inert"); slide.removeAttribute("aria-hidden"); }
+      else { slide.setAttribute("inert", ""); slide.setAttribute("aria-hidden", "true"); }
+    });
+    dots.forEach(function (dot, i) { dot.setAttribute("aria-current", i === n ? "true" : "false"); });
+    navLinks.forEach(function (a) { a.setAttribute("aria-current", a.dataset.slideLink === slides[n].dataset.id ? "true" : "false"); });
+    count.textContent = (n + 1) + " / " + slides.length;
+    prevBtn.disabled = n === 0;
+    nextBtns.forEach(function (b) { if (b.classList.contains("lp-pg")) b.disabled = n === slides.length - 1; });
+  }
+
+  var locked = false, unlockTimer = null;
+  function go(n, opts) {
+    n = Math.max(0, Math.min(slides.length - 1, n));
+    if (n === cur) return;
+    cur = n;
+    render(n);
+    var inner = slides[n].querySelector(".lp-slide-in");
+    if (inner && !(opts && opts.keepScroll)) inner.scrollTop = 0;
+    try { history.replaceState(null, "", "#" + slides[n].dataset.id); } catch (e) { /* the address bar is a nicety */ }
+    lock(reduce ? 250 : 900);
+  }
+  function lock(ms) {
+    locked = true;
+    clearTimeout(unlockTimer);
+    unlockTimer = setTimeout(function () { locked = false; }, ms);
+  }
+  function step(dir) { go(cur + dir); }
+
+  /* A card that is taller than the window scrolls itself; return true when it can still move in this direction. */
+  function innerCanScroll(dir) {
+    var inner = slides[cur].querySelector(".lp-slide-in");
+    if (!inner || inner.scrollHeight <= inner.clientHeight + 1) return false;
+    return dir > 0 ? inner.scrollTop + inner.clientHeight < inner.scrollHeight - 1 : inner.scrollTop > 0;
+  }
+
+  // Mouse wheel and trackpad. Trackpad inertia keeps sending events after the gesture ends, so the lock only
+  // opens again once the wheel has been quiet for a moment.
+  var quietTimer = null;
+  deck.addEventListener("wheel", function (e) {
+    if (e.ctrlKey) return;  // pinch-zoom
+    var dir = e.deltaY > 0 ? 1 : e.deltaY < 0 ? -1 : 0;
+    if (!dir) return;
+    if (innerCanScroll(dir)) return;  // let the card scroll itself
+    e.preventDefault();
+    if (locked) {
+      clearTimeout(quietTimer);
+      quietTimer = setTimeout(function () { locked = false; }, 140);
+      return;
+    }
+    if (Math.abs(e.deltaY) < 6) return;
+    step(dir);
+  }, { passive: false });
+
+  // Touch: swipe up for the next card, down for the one before; a card that was still scrolling at the start of
+  // the swipe keeps it for scrolling.
+  var touch = null;
+  deck.addEventListener("touchstart", function (e) {
+    if (e.touches.length !== 1) { touch = null; return; }
+    touch = { y: e.touches[0].clientY, x: e.touches[0].clientX, canDown: innerCanScroll(1), canUp: innerCanScroll(-1) };
+  }, { passive: true });
+  deck.addEventListener("touchend", function (e) {
+    if (!touch || locked) { touch = null; return; }
+    var t = e.changedTouches[0], dy = touch.y - t.clientY, dx = touch.x - t.clientX;
+    var begin = touch;
+    touch = null;
+    if (Math.abs(dy) < 56 || Math.abs(dy) < Math.abs(dx) * 1.3) return;
+    if (dy > 0 && !begin.canDown) step(1);
+    else if (dy < 0 && !begin.canUp) step(-1);
+  }, { passive: true });
+
+  // Keyboard, except while typing in a field.
+  document.addEventListener("keydown", function (e) {
+    var tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || tag === "select" || e.target.isContentEditable) return;
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var k = e.key;
+    if (k === "ArrowDown" || k === "PageDown" || (k === " " && !e.shiftKey)) { if (innerCanScroll(1)) return; e.preventDefault(); if (!locked) step(1); }
+    else if (k === "ArrowUp" || k === "PageUp" || (k === " " && e.shiftKey)) { if (innerCanScroll(-1)) return; e.preventDefault(); if (!locked) step(-1); }
+    else if (k === "Home") { e.preventDefault(); go(0); }
+    else if (k === "End") { e.preventDefault(); go(slides.length - 1); }
+  });
+
+  prevBtn.addEventListener("click", function () { step(-1); });
+  nextBtns.forEach(function (b) { b.addEventListener("click", function (e) { e.preventDefault(); step(1); }); });
+  navLinks.forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      var i = indexOfId(a.dataset.slideLink);
+      if (i >= 0) go(i);
+    });
+  });
+  document.querySelectorAll("[data-go]").forEach(function (a) {
+    a.addEventListener("click", function (e) { e.preventDefault(); go(parseInt(a.dataset.go, 10) || 0); });
+  });
+
+  // "Sign in" links: back to the first card, cursor in the username field.
+  document.querySelectorAll("[data-goto-signin]").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      go(0);
+      var field = document.querySelector("#signin input[name=username]");
+      setTimeout(function () { if (field) field.focus({ preventScroll: true }); }, reduce ? 0 : 900);
+    });
+  });
+
+  // A wrong password re-renders the first card; keep it as the starting point. A #hash picks the starting card.
+  var start = indexOfId((location.hash || "").slice(1));
+  if (document.querySelector(".lp-alert, .lp-err")) start = 0;
+  cur = -1;
+  // first paint without animating cards into place
+  slides.forEach(function (s) { s.style.transition = "none"; });
+  go(start >= 0 ? start : 0, { keepScroll: true });
+  locked = false;
+  requestAnimationFrame(function () { requestAnimationFrame(function () { slides.forEach(function (s) { s.style.transition = ""; }); }); });
+
+  // an in-page anchor (#signin) can leave the card scrolled; always open on its top
+  slides.forEach(function (sl) { var in_ = sl.querySelector(".lp-slide-in"); if (in_) in_.scrollTop = 0; });
+  function settle() { deck.scrollTop = 0; deck.scrollLeft = 0; var in_ = slides[cur].querySelector(".lp-slide-in"); if (in_ && in_.scrollTop < 2) in_.scrollTop = 0; }
+  settle();
+  window.addEventListener("load", function () { settle(); setTimeout(settle, 60); });
+
+  window.addEventListener("hashchange", function () {
+    var i = indexOfId((location.hash || "").slice(1));
+    if (i >= 0) go(i);
+  });
 })();

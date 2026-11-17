@@ -39,7 +39,7 @@ Helply 是 Fanshawe College BIA 毕业设计（4 人小组，负责人 Kevin）�
 | `apps/monitoring` | 云服务器监控：上报 API、告警转工单、`presenters.py`、`geo.py` |
 | `apps/core` | 仪表盘（`views.py`、`overview.py`）、演示数据（`demo/`）、运维命令；`middleware.py` 让登录页面不可缓存 |
 | `agent/` | 监控 agent 和安装脚本 |
-| `templates/`, `static/` | **`calm.css` 最后加载，决定最终外观**（中性色阶 + 唯一强调色，无渐变/光斑/毛玻璃，按钮 10px 圆角，字重 400–600）；改外观先改它，不要往前面几层加装饰。颜色一律用变量（`theme.css`）；触屏点击区域 ≥ 36px；登录页是 `base_landing.html` + `landing.css` |
+| `templates/`, `static/` | **`calm.css` 最后加载，决定最终外观**（中性色阶 + 唯一强调色，无渐变/光斑/毛玻璃，按钮 10px 圆角，字重 400–600）；改外观先改它，不要往前面几层加装饰。颜色一律用变量（`theme.css`）；触屏点击区域 ≥ 36px；登录页是 `base_landing.html` + `landing.css` + `landing.js`：一屏幻灯片（`data-slide` 卡片叠放，滚轮/滑动/方向键/圆点切换，卡片内容过高时在卡片内部滚动；没有 JS 时退回普通长页面） |
 
 ## 常用命令
 ```bash

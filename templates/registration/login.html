@@ -1,12 +1,13 @@
 {% extends "base_landing.html" %}{% load static %}
 {% block title %}Helply · IT help, handled{% endblock %}
+{% block head %}<script>document.documentElement.classList.add("lp-deck-on")</script>{% endblock %}
 {% block scripts %}<script src="{% static 'js/landing.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
 
 {% block body %}
 <header class="lp-nav" data-nav>
-  <a class="lp-brand" href="#top" aria-label="Helply, back to the top"><img src="{% static 'img/brand/logo-glyph.png' %}" alt="" width="28" height="28"><span>Helply</span></a>
+  <a class="lp-brand" href="#signin" data-go="0" aria-label="Helply, back to the first slide"><img src="{% static 'img/brand/logo-glyph.png' %}" alt="" width="28" height="28"><span>Helply</span></a>
   <nav class="lp-links" aria-label="Sections">
-    <a href="#tickets">Tickets</a><a href="#ai">AI</a><a href="#sla">SLA</a><a href="#servers">Servers</a><a href="#assets">Assets</a>
+    <a href="#tickets" data-slide-link="tickets">Tickets</a><a href="#ai" data-slide-link="ai">AI</a><a href="#sla" data-slide-link="sla">SLA</a><a href="#servers" data-slide-link="servers">Servers</a><a href="#assets" data-slide-link="assets">Assets</a>
   </nav>
   <div class="lp-nav-end">
     <button type="button" class="lp-toggle" data-theme-toggle aria-label="Switch between light and dark mode" title="Switch theme">
@@ -17,16 +18,16 @@
   </div>
 </header>
 
-<main id="top">
+<main class="lp-deck" id="top" data-deck>
   <!-- ============ Hero + sign in ============ -->
-  <section class="lp-hero">
+  <section class="lp-slide lp-hero" data-slide data-id="welcome" data-title="Sign in"><div class="lp-slide-in">
     <div class="lp-hero-bg" aria-hidden="true"><img src="{% static 'img/landing/servers.jpg' %}" alt="" width="1050" height="700" decoding="async"></div>
     <div class="lp-hero-inner">
       <div class="lp-hero-copy">
         <p class="lp-eyebrow reveal">The IT service desk for teams of 10 to 100</p>
         <h1 class="lp-display reveal" style="--d:.08s">IT help,<br><span class="lp-grad">handled.</span></h1>
         <p class="lp-lede reveal" style="--d:.16s">Tickets that sort themselves. Servers that speak up. Renewals that never sneak up on you. One calm place for the people who keep the company running.</p>
-        <p class="lp-scrollcue reveal" style="--d:.3s"><a href="#showcase">Explore Helply <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a></p>
+        <p class="lp-scrollcue reveal" style="--d:.3s"><a href="#showcase" data-next>Explore Helply <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a></p>
       </div>
 
       <div class="lp-card reveal" id="signin" style="--d:.2s">
@@ -56,10 +57,10 @@
         <p class="lp-secure"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted connection. Repeated wrong passwords are temporarily blocked.</p>
       </div>
     </div>
-  </section>
+  </div></section>
 
   <!-- ============ Showcase ============ -->
-  <section class="lp-showcase" id="showcase">
+  <section class="lp-slide lp-showcase" id="showcase" data-slide data-id="showcase" data-title="One desk for everything IT"><div class="lp-slide-in">
     <div class="lp-showcase-frame">
       <img src="{% static 'img/landing/technician.jpg' %}" alt="A technician plugging a network cable into a switch" width="2000" height="1121" decoding="async">
       <div class="lp-showcase-shade"></div>
@@ -68,10 +69,10 @@
         <h2 class="lp-h2">Every request.<br>Every server.<br>One calm place.</h2>
       </div>
     </div>
-  </section>
+  </div></section>
 
   <!-- ============ Tickets ============ -->
-  <section class="lp-feature" id="tickets">
+  <section class="lp-slide lp-feature" id="tickets" data-slide data-id="tickets" data-title="Tickets"><div class="lp-slide-in">
     <div class="lp-wrap lp-split">
       <div class="lp-copy">
         <p class="lp-kicker reveal">Tickets</p>
@@ -90,10 +91,10 @@
         <figcaption class="chip c3"><i class="dot amber"></i>Response clock started</figcaption>
       </figure>
     </div>
-  </section>
+  </div></section>
 
   <!-- ============ AI ============ -->
-  <section class="lp-ai" id="ai">
+  <section class="lp-slide lp-ai" id="ai" data-slide data-id="ai" data-title="AI inside the workflow"><div class="lp-slide-in">
     <div class="lp-wrap">
       <p class="lp-kicker center reveal">Intelligence, built in</p>
       <h2 class="lp-h2 center reveal" style="--d:.06s">AI inside the workflow.<br><span class="lp-grad">Not a chat box.</span></h2>
@@ -117,10 +118,10 @@
       </div>
       <p class="lp-fine center reveal">Every correction a person makes is measured, so the dashboard always shows how often the suggestion was right.</p>
     </div>
-  </section>
+  </div></section>
 
   <!-- ============ SLA ============ -->
-  <section class="lp-feature alt" id="sla">
+  <section class="lp-slide lp-feature alt" id="sla" data-slide data-id="sla" data-title="Service levels"><div class="lp-slide-in">
     <div class="lp-wrap lp-split flip">
       <div class="lp-copy">
         <p class="lp-kicker reveal">Service levels</p>
@@ -139,10 +140,10 @@
         <p class="legend">Illustration of how SLA timers look in Helply</p>
       </div>
     </div>
-  </section>
+  </div></section>
 
   <!-- ============ Servers ============ -->
-  <section class="lp-feature dark" id="servers">
+  <section class="lp-slide lp-feature dark" id="servers" data-slide data-id="servers" data-title="Cloud servers"><div class="lp-slide-in">
     <div class="lp-wrap lp-split">
       <figure class="lp-media reveal">
         <img src="{% static 'img/landing/switch.jpg' %}" alt="Cables and glowing ports on a network switch" width="1050" height="700" loading="lazy" decoding="async">
@@ -160,10 +161,10 @@
         </ul>
       </div>
     </div>
-  </section>
+  </div></section>
 
   <!-- ============ Assets ============ -->
-  <section class="lp-feature" id="assets">
+  <section class="lp-slide lp-feature" id="assets" data-slide data-id="assets" data-title="Assets and renewals"><div class="lp-slide-in">
     <div class="lp-wrap lp-split flip">
       <div class="lp-copy">
         <p class="lp-kicker reveal">Assets and renewals</p>
@@ -179,10 +180,10 @@
         <figcaption class="chip c1"><i class="dot teal"></i>Renews in 14 days</figcaption>
       </figure>
     </div>
-  </section>
+  </div></section>
 
   <!-- ============ Small team ============ -->
-  <section class="lp-bento-sec">
+  <section class="lp-slide lp-bento-sec" data-slide data-id="team" data-title="Made for small teams"><div class="lp-slide-in">
     <div class="lp-wrap">
       <p class="lp-kicker center reveal">Made for small teams</p>
       <h2 class="lp-h2 center reveal" style="--d:.06s">Big-company discipline.<br>Small-company calm.</h2>
@@ -195,34 +196,31 @@
         <article class="bento b-wide reveal" style="--d:.06s"><img src="{% static 'img/landing/cables.jpg' %}" alt="Colourful patch cables in a data centre rack" width="933" height="700" loading="lazy" decoding="async"><div class="bento-copy"><h3>Quiet, useful notifications</h3><p>In-app and email, only when someone has to act, and never twice for the same thing.</p></div></article>
       </div>
     </div>
-  </section>
+  </div></section>
 
-  <!-- ============ Trust ============ -->
-  <section class="lp-trust">
-    <div class="lp-wrap">
+  <!-- ============ Trust + closing ============ -->
+  <section class="lp-slide lp-cta" data-slide data-id="start" data-title="Ready when you are"><div class="lp-slide-in">
+    <div class="lp-wrap center">
+      <h2 class="lp-display sm reveal">Ready when you are.</h2>
+      <p class="lp-lede center reveal" style="--d:.08s">Sign in to see what needs you today.</p>
+      <a class="lp-pill big reveal" style="--d:.14s" href="#signin" data-goto-signin>Sign in</a>
+      <div class="lp-trust-inline">
       <ul class="lp-facts">
         <li class="reveal"><b>10 to 100</b><span>people, the size Helply is designed for</span></li>
         <li class="reveal" style="--d:.06s"><b>0</b><span>remote commands. The agent only reports</span></li>
         <li class="reveal" style="--d:.12s"><b>1</b><span>database as the single source of truth</span></li>
         <li class="reveal" style="--d:.18s"><b>2 themes</b><span>light and dark, following your device</span></li>
       </ul>
+      </div>
+      <p class="lp-footline">Helply &middot; IT service desk &middot; A Fanshawe College capstone project</p>
     </div>
-  </section>
-
-  <!-- ============ Closing ============ -->
-  <section class="lp-cta">
-    <div class="lp-wrap center">
-      <h2 class="lp-display sm reveal">Ready when you are.</h2>
-      <p class="lp-lede center reveal" style="--d:.08s">Sign in to see what needs you today.</p>
-      <a class="lp-pill big reveal" style="--d:.14s" href="#signin" data-goto-signin>Sign in</a>
-    </div>
-  </section>
+  </div></section>
 </main>
 
-<footer class="lp-footer">
-  <div class="lp-wrap">
-    <span>Helply &middot; IT service desk</span>
-    <span>A Fanshawe College capstone project</span>
-  </div>
-</footer>
+<nav class="lp-dots" aria-label="Slides" data-dots></nav>
+<div class="lp-pager" aria-label="Slide controls">
+  <button type="button" class="lp-pg" data-prev aria-label="Previous slide"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button>
+  <span class="lp-count" data-count aria-live="polite">1 / 1</span>
+  <button type="button" class="lp-pg" data-next aria-label="Next slide"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+</div>
 {% endblock %}

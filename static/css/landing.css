@@ -291,3 +291,124 @@ html:not([data-theme="dark"]) .lp .lp-nav.is-light .lp-pill:hover { background: 
 .lp-facts b { font-weight: 500; letter-spacing: -.03em; }
 .lp-cta { background: #000; }
 @media (max-width: 980px) { .lp-display { font-size: clamp(2.3rem, 9vw, 3.4rem); } }
+
+/* =====================================================================================================
+   Slide deck
+   With JavaScript the page is one screen: the sections are cards stacked like a deck. Wheel, swipe, arrow
+   keys, the dots or the top links slide the next card up over the current one, which steps back and dims.
+   Without JavaScript (no .lp-deck-on) none of this applies and the sections read as an ordinary page.
+   ===================================================================================================== */
+.lp-foot-note, .lp-trust-inline { margin-top: clamp(2rem, 5vh, 3.5rem); }
+.lp-footline { margin: clamp(1.5rem, 4vh, 2.5rem) 0 0; font-size: .85rem; color: var(--faint, #86868b); }
+.lp-dots, .lp-pager { display: none; }
+
+html.lp-deck-on, html.lp-deck-on body.lp { height: 100%; overflow: hidden; scroll-behavior: auto; overscroll-behavior: none; }
+html.lp-deck-on body.lp { background: #0b0b0c; }
+html.lp-deck-on:not([data-theme="dark"]) body.lp { background: #d9dade; }
+
+/* the stage: one fixed screen */
+.lp-deck-on .lp-deck { position: fixed; inset: 0; overflow: hidden; }
+.lp-deck-on .lp-slide { --depth: 0; position: absolute; inset: 84px 14px 70px; overflow: hidden; border-radius: 28px; padding: 0; min-height: 0;
+  border: 1px solid var(--line); box-shadow: 0 -18px 50px -24px rgba(0, 0, 0, .55); transform-origin: 50% 0;
+  transition: transform .85s cubic-bezier(.77, 0, .18, 1), filter .85s cubic-bezier(.77, 0, .18, 1), opacity .5s linear;
+  will-change: transform; }
+.lp-deck-on .lp-slide.is-after { transform: translate3d(0, calc(100% + 100px), 0); }
+.lp-deck-on .lp-slide.is-active { transform: none; }
+.lp-deck-on .lp-slide.is-before { transform: translate3d(0, calc(var(--depth) * -13px), 0) scale(calc(1 - var(--depth) * .045)); filter: brightness(calc(1 - var(--depth) * .3)); pointer-events: none; }
+.lp-deck-on .lp-slide.is-before[style*="--depth: 3"], .lp-deck-on .lp-slide.is-before[style*="--depth: 4"], .lp-deck-on .lp-slide.is-before[style*="--depth: 5"],
+.lp-deck-on .lp-slide.is-before[style*="--depth: 6"], .lp-deck-on .lp-slide.is-before[style*="--depth: 7"], .lp-deck-on .lp-slide.is-before[style*="--depth: 8"] { opacity: 0; }
+
+/* each card scrolls inside itself when its content is taller than the window (small screens, browser zoom) */
+.lp-deck-on .lp-slide-in { height: 100%; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; padding: clamp(1.4rem, 4vh, 3rem) clamp(1.2rem, 3.5vw, 3rem); scrollbar-width: thin; }
+.lp-deck-on .lp-slide-in > * { margin-top: auto; margin-bottom: auto; width: 100%; }
+.lp-deck-on .lp-slide-in > .lp-wrap { width: min(1180px, 100%); margin-inline: auto; }
+.lp-deck-on .lp-feature, .lp-deck-on .lp-ai, .lp-deck-on .lp-bento-sec, .lp-deck-on .lp-cta { padding: 0; }
+.lp-deck-on .lp-feature { background: var(--bg); } .lp-deck-on .lp-feature.alt { background: var(--bg-2); } .lp-deck-on .lp-feature.dark { background: #000; border-color: rgba(255, 255, 255, .1); }
+.lp-deck-on .lp-bento-sec { background: var(--bg-2); }
+.lp-deck-on .lp-cta { background: #000; border-color: rgba(255, 255, 255, .1); }
+.lp-deck-on .lp-cta .lp-trust-inline { border-top: 1px solid rgba(255, 255, 255, .12); padding-top: clamp(1.4rem, 4vh, 2.4rem); color: #f5f5f7; --mute: #a1a1a8; }
+
+/* hero card */
+.lp-deck-on .lp-hero { padding: 0; min-height: 0; display: block; align-items: stretch; }
+.lp-deck-on .lp-hero .lp-slide-in { padding-top: clamp(1.4rem, 4vh, 3rem); }
+.lp-deck-on .lp-hero-inner { margin: auto; width: min(1180px, 100%); }
+.lp-deck-on .lp-hero-copy { padding-bottom: 0; }
+.lp-deck-on .lp-card { scroll-margin-top: 0; }
+
+/* showcase card: the photograph fills the whole card */
+.lp-deck-on .lp-showcase { padding: 0; background: #000; }
+.lp-deck-on .lp-showcase .lp-slide-in { padding: 0; display: block; overflow: hidden; }
+.lp-deck-on .lp-showcase-frame { position: absolute; inset: 0; width: 100%; aspect-ratio: auto; border-radius: 0; margin: 0; }
+.lp-deck-on .lp-showcase-frame img { transform: scale(1.04); transition: transform 1.6s var(--ease); }
+.lp-deck-on .lp-showcase.is-active .lp-showcase-frame img { transform: scale(1); }
+.lp-deck-on .lp-showcase-copy { left: clamp(1.4rem, 5vw, 4.5rem); right: 1.4rem; bottom: clamp(1.6rem, 7vh, 4.5rem); }
+
+/* content that has to fit a card: a little tighter than the page version */
+.lp-deck-on .lp-h2 { font-size: clamp(1.7rem, 3.4vw, 2.7rem); }
+.lp-deck-on .lp-p { margin-top: 1rem; font-size: clamp(1rem, 1.3vw, 1.12rem); }
+.lp-deck-on .lp-list { margin-top: 1.3rem; gap: .75rem; } .lp-deck-on .lp-list li { font-size: 1rem; }
+.lp-deck-on .lp-media { aspect-ratio: 4 / 3; max-height: 62vh; }
+.lp-deck-on .lp-trio { margin-top: clamp(1.4rem, 4vh, 2.6rem); } .lp-deck-on .lp-tile { padding: 1.5rem 1.4rem 1.7rem; }
+.lp-deck-on .lp-fine { margin-top: 1.4rem; }
+.lp-deck-on .lp-bento { margin-top: clamp(1.2rem, 3vh, 2rem); gap: 1rem; }
+.lp-deck-on .bento, .lp-deck-on .bento.b-wide { min-height: clamp(160px, 23vh, 230px); }
+.lp-deck-on .lp-bento-sec .bento:not(.b-wide) .bento-copy { padding-top: 1.3rem; } .lp-deck-on .mini { margin-top: .8rem; margin-bottom: 1.1rem; }
+.lp-deck-on .lp-bento-sec .bento-copy h3 { font-size: 1.2rem; } .lp-deck-on .lp-bento-sec .bento-copy p { font-size: .95rem; }
+.lp-deck-on .lp-facts b { font-size: clamp(1.6rem, 3.2vw, 2.5rem); }
+
+/* the words and pictures arrive when their card becomes the active one */
+.lp-deck-on .lp-slide .reveal { opacity: 0; transform: translateY(18px); }
+.lp-deck-on .lp-slide.is-active .reveal, .lp-deck-on .lp-slide.is-before .reveal { opacity: 1; transform: none; transition-delay: calc(var(--d, 0s) + .35s); }
+.lp-deck-on .lp-slide.is-before .reveal { transition-delay: 0s; }
+.lp-deck-on .lp-slide.is-active .lp-sla .bar i { width: var(--w); }
+
+/* top bar: a floating pill, as on the reference */
+.lp-deck-on .lp-nav { inset: 14px 14px auto; height: 56px; width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 0 .7rem 0 1.1rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(18, 18, 20, .92); color: #f5f5f7; }
+html.lp-deck-on:not([data-theme="dark"]) .lp-nav { background: rgba(255, 255, 255, .94); border-color: rgba(0, 0, 0, .1); color: #1d1d1f; }
+html.lp-deck-on:not([data-theme="dark"]) .lp-nav .lp-toggle { border-color: rgba(0, 0, 0, .2); }
+html.lp-deck-on:not([data-theme="dark"]) .lp-nav .lp-pill { background: #1d1d1f; color: #fff; }
+.lp-deck-on .lp-links a { position: relative; padding: .45rem .15rem; }
+.lp-deck-on .lp-links a[aria-current="true"] { opacity: 1; }
+.lp-deck-on .lp-links a[aria-current="true"]::after { content: ""; position: absolute; left: .15rem; right: .15rem; bottom: .1rem; height: 2px; border-radius: 2px; background: currentColor; }
+.lp-deck-on .lp .lp-pill, .lp-deck-on .lp-nav .lp-pill { border-radius: 999px; }
+.lp-deck-on .lp-nav-end .lp-toggle { border-radius: 50%; }
+
+/* progress dots (wide screens) and the pager (everywhere) */
+.lp-deck-on .lp-dots { position: fixed; z-index: 40; right: 26px; top: 50%; transform: translateY(-50%); display: grid; gap: .15rem; padding: .5rem .3rem; border-radius: 999px; background: rgba(18, 18, 20, .86); border: 1px solid rgba(255, 255, 255, .14); }
+.lp-dots button { position: relative; width: 22px; height: 22px; padding: 0; border: 0; background: transparent; cursor: pointer; display: grid; place-items: center; }
+.lp-dots button::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .38); transition: background-color .2s, transform .2s; }
+.lp-dots button:hover::before { background: rgba(255, 255, 255, .8); }
+.lp-dots button[aria-current="true"]::before { background: #fff; transform: scale(1.5); }
+.lp-dots button::after { content: attr(data-label); position: absolute; right: calc(100% + 12px); top: 50%; transform: translate(6px, -50%); padding: .3rem .65rem; border-radius: 8px; background: rgba(18, 18, 20, .95); border: 1px solid rgba(255, 255, 255, .14);
+  color: #f5f5f7; font-size: .78rem; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s, transform .15s; }
+.lp-dots button:hover::after, .lp-dots button:focus-visible::after { opacity: 1; transform: translate(0, -50%); }
+.lp-deck-on .lp-pager { position: fixed; z-index: 40; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; align-items: center; gap: .3rem; height: 44px; padding: 0 .35rem; border-radius: 999px; background: rgba(18, 18, 20, .92); border: 1px solid rgba(255, 255, 255, .14); color: #f5f5f7; }
+.lp-pg { width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; display: grid; place-items: center; }
+.lp-pg:hover:not(:disabled) { background: rgba(255, 255, 255, .12); } .lp-pg:disabled { opacity: .35; cursor: default; }
+.lp-count { min-width: 3.6rem; text-align: center; font-size: .82rem; font-variant-numeric: tabular-nums; color: rgba(245, 245, 247, .8); }
+html.lp-deck-on:not([data-theme="dark"]) .lp-dots, html.lp-deck-on:not([data-theme="dark"]) .lp-pager { background: rgba(255, 255, 255, .94); border-color: rgba(0, 0, 0, .1); color: #1d1d1f; }
+html.lp-deck-on:not([data-theme="dark"]) .lp-dots button::before { background: rgba(0, 0, 0, .3); } html.lp-deck-on:not([data-theme="dark"]) .lp-dots button:hover::before { background: rgba(0, 0, 0, .7); }
+html.lp-deck-on:not([data-theme="dark"]) .lp-dots button[aria-current="true"]::before { background: #1d1d1f; }
+html.lp-deck-on:not([data-theme="dark"]) .lp-count { color: rgba(0, 0, 0, .65); } html.lp-deck-on:not([data-theme="dark"]) .lp-pg:hover:not(:disabled) { background: rgba(0, 0, 0, .07); }
+html.lp-deck-on:not([data-theme="dark"]) .lp-dots button::after { background: #fff; color: #1d1d1f; border-color: rgba(0, 0, 0, .1); }
+@media (max-width: 1180px) { .lp-deck-on .lp-dots { display: none; } }
+
+/* small screens: a bit less chrome */
+@media (max-width: 980px) {
+  .lp-deck-on .lp-slide { inset: 78px 8px 66px; border-radius: 22px; }
+  .lp-deck-on .lp-nav { inset: 10px 8px auto; width: calc(100% - 16px); height: 52px; }
+  .lp-deck-on .lp-hero-inner { margin: 0 auto; }
+  .lp-deck-on .lp-media { max-height: 36vh; }
+}
+@media (max-width: 640px) {
+  .lp-deck-on .lp-hero-copy .lp-lede { display: none; }
+  .lp-deck-on .lp-hero .lp-display { font-size: clamp(2.1rem, 11vw, 2.8rem); }
+  .lp-deck-on .lp-hero-inner { gap: 1.4rem; }
+  .lp-deck-on .lp-scrollcue { margin-top: 1rem; }
+  .lp-deck-on .lp-brand span { display: none; }
+  .lp-deck-on .lp-slide-in { padding: 1.2rem 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-deck-on .lp-slide { transition: opacity .2s linear; }
+  .lp-deck-on .lp-slide.is-after { opacity: 0; visibility: hidden; }
+}
