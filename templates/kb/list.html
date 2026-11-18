@@ -5,7 +5,7 @@
   <h1>Knowledge base</h1>
   <div>
     {% if user.is_agent %}<a class="btn primary" href="{% url 'kb:create' %}">+ New article</a>{% endif %}
-    <a class="btn{% if not user.is_agent %} primary{% endif %}" href="{% url 'tickets:create' %}">Can't find an answer? Open a ticket</a>
+    <a id="kb-open-ticket" class="btn{% if not user.is_agent %} primary{% endif %}" href="{% url 'tickets:create' %}">Can't find an answer? Open a ticket</a>
   </div>
 </div>
 {% include "ai/_ask.html" %}
@@ -33,12 +33,12 @@
     {% empty %}<div class="card"><p class="muted">No articles yet.</p></div>{% endfor %}
     </div>
     <aside>
-      <section class="card">
+      <section class="card" id="kb-popular">
         <h2>Most viewed</h2>
         {% for a in popular %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a> <small class="muted">{{ a.views }} views</small></p>
         {% empty %}<p class="muted">No views yet.</p>{% endfor %}
       </section>
-      <section class="card">
+      <section class="card" id="kb-urgent">
         <h2>Urgent?</h2>
         <p>If you clicked a suspicious link, lost a device, or the whole office is down, <b>don't wait</b> —
           <a href="{% url 'tickets:create' %}">open a ticket</a> with Impact and Urgency set to <b>High</b>.</p>

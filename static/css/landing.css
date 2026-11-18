@@ -243,8 +243,8 @@ html:not([data-theme="dark"]) .lp .lp-nav.is-light .lp-pill:hover { background: 
 .lp-toggle { border-radius: 10px; }
 
 /* hero */
-.lp-hero-bg img { animation: none; transform: none; filter: none; opacity: .5; }
-.lp-hero-bg::after { background: linear-gradient(90deg, rgba(0, 0, 0, .92) 4%, rgba(0, 0, 0, .55) 55%, rgba(0, 0, 0, .6) 100%), linear-gradient(0deg, #000 2%, transparent 34%); }
+.lp-hero-bg img { animation: none; transform: none; filter: contrast(1.08) saturate(1.05); opacity: .9; }
+.lp-hero-bg::after { background: linear-gradient(90deg, rgba(0, 0, 0, .86) 4%, rgba(0, 0, 0, .5) 45%, rgba(0, 0, 0, .2) 100%), linear-gradient(0deg, rgba(0, 0, 0, .7) 0%, transparent 26%), linear-gradient(180deg, rgba(0, 0, 0, .55) 0%, transparent 18%); }
 .orb { display: none; }
 .lp-card { border-radius: 16px; background: rgba(17, 18, 20, .94); border: 1px solid rgba(255, 255, 255, .12); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
 .lp-card h2 { font-size: 1.6rem; font-weight: 600; letter-spacing: -.02em; }
@@ -554,3 +554,25 @@ html.lp-deck-on:not([data-theme="dark"]) .lp-top:hover { background: #ececef; }
 @media (max-height: 800px) { .lp-deck-on .lp-hero .lp-scrollcue { display: none; } }
 @media (max-width: 980px) { .lp-install { margin-top: .9rem; } }
 @media (max-width: 640px) { .lp-icons { margin-left: -.6rem; gap: .2rem; } .lp-seg { gap: .2rem; } .lp-icon { width: 58px; height: 58px; border-radius: 16px; } .lp-icon svg { width: 32px; height: 32px; } }
+
+/* Large desktop screens: the sign-in cover was sized for ~1200px and looked small on 1440–2560px displays.
+   Gated on height too, so short laptop windows keep the compact rules above. */
+@media (min-width: 1200px) and (min-height: 820px) {
+  .lp-deck-on .lp-hero-inner { width: min(1400px, 100%); grid-template-columns: minmax(0, 1.1fr) minmax(460px, 540px); gap: clamp(3rem, 6vw, 7rem); }
+  .lp-deck-on .lp-hero .lp-display { font-size: clamp(4.4rem, 6.6vw, 7.6rem); }
+  .lp-deck-on .lp-hero .lp-eyebrow { font-size: 1.15rem; }
+  .lp-deck-on .lp-hero .lp-lede { max-width: 40rem; font-size: clamp(1.4rem, 1.75vw, 1.75rem); margin-top: 1.4rem; }
+  .lp-deck-on .lp-hero .lp-scrollcue { font-size: 1.1rem; }
+  .lp-deck-on .lp-card { padding: 2.4rem 2.3rem 1.8rem; border-radius: 20px; }
+  .lp-deck-on .lp-card h2 { font-size: 2.2rem; }
+  .lp-deck-on .lp-card-sub { font-size: 1.12rem; margin-bottom: 1.8rem; }
+  .lp-deck-on .lp-form { gap: 1.2rem; }
+  .lp-deck-on .lp-field label { font-size: 1rem; }
+  .lp-deck-on .lp .lp-form input[type=text], .lp-deck-on .lp .lp-form input[type=password],
+  .lp .lp-form input[type=text], .lp .lp-form input[type=password] { height: 58px; font-size: 1.15rem; border-radius: 12px; }
+  .lp-deck-on .lp-submit { height: 58px; font-size: 1.15rem; border-radius: 12px; }
+  .lp-deck-on .lp-eye { width: 44px; height: 44px; }
+  .lp-deck-on .lp-card-foot { font-size: 1.05rem; margin-top: 1.3rem; }
+  .lp-deck-on .lp-secure { font-size: .92rem; }
+  .lp-deck-on .lp-nav a { font-size: 1rem; }
+}

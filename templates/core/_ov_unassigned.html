@@ -1,5 +1,5 @@
 {% load helply %}
-<section class="card">
+<section class="card" id="dash-unassigned">
   <div class="panel-head">
     <h2>Waiting for a technician <small class="muted">· {{ unassigned.count }} unassigned</small></h2>
     <a class="small" href="{% url 'tickets:list' %}?status=open&assignee=none">See all →</a>

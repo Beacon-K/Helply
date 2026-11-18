@@ -58,13 +58,13 @@
       {% empty %}<p class="muted">Nobody has suggested changes to this article.</p>{% endfor %}
     </section>
     {% endif %}
-    <section class="card">
+    <section class="card" id="kb-stuck">
       <h2>Still stuck?</h2>
       <p>Open a ticket and tell us which steps you already tried — it saves time for everyone.</p>
       <a class="btn primary" href="{% url 'tickets:create' %}?category={{ article.category_id|default:'' }}&from_kb={{ article.slug }}">Open a ticket</a>
     </section>
     {% if related %}
-    <section class="card">
+    <section class="card" id="kb-related">
       <h2>Related articles</h2>
       {% for a in related %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></p>{% endfor %}
     </section>

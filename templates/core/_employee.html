@@ -25,7 +25,7 @@
 {% endif %}
 
 <div class="dash-grid">
-  <section class="card">
+  <section class="card" id="dash-mine">
     <div class="panel-head">
       <h2>My open tickets</h2>
       <a class="small" href="{% url 'tickets:list' %}?status=all">All my tickets →</a>
@@ -48,12 +48,12 @@
   </section>
 
   <div class="dash-side">
-    <section class="card">
+    <section class="card" id="dash-popular">
       <h2>Popular answers</h2>
       {% for a in popular %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></p>{% endfor %}
       <a class="small" href="{% url 'kb:list' %}">Browse the knowledge base →</a>
     </section>
-    <section class="card">
+    <section class="card" id="dash-urgent">
       <h2>Urgent?</h2>
       <p class="small">Clicked a suspicious link, lost a device, or the whole office is down? Open a ticket with Impact and Urgency set to <b>High</b> — don't wait.</p>
     </section>

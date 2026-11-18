@@ -27,7 +27,7 @@
   </div>
 </section>
 
-<section class="card">
+<section class="card" id="dash-queue">
   <div class="panel-head">
     <h2>My queue <small class="muted">· most urgent first</small></h2>
     <a class="small" href="{% url 'tickets:list' %}?status=open">All tickets →</a>
@@ -50,7 +50,7 @@
 </section>
 
 {% if awaiting %}
-<section class="card">
+<section class="card" id="dash-awaiting">
   <h2>Resolved · waiting for the requester to confirm</h2>
   {% for t in awaiting %}
     <a class="attn-row" href="{{ t.get_absolute_url }}">
