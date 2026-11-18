@@ -1,66 +1,66 @@
-{% extends "base.html" %}{% load helply static %}
+{% extends "base.html" %}{% load i18n helply static %}
 {% block title %}{{ asset.asset_tag }}{% endblock %}
 {% block content %}
 {% with a=asset %}
 <div hidden data-live data-live-url="{% url 'assets:detail_live' a.pk %}" data-live-version="{{ live_version }}" data-live-interval="15"></div>
-<p><a href="{% url 'assets:list' %}">← {% if user.is_agent %}Asset register{% else %}My devices{% endif %}</a></p>
+<p><a href="{% url 'assets:list' %}">← {% if user.is_agent %}{% trans "Asset register" %}{% else %}{% trans "My devices" %}{% endif %}</a></p>
 <div class="dash-head">
   <div class="asset-title">
     <span class="asset-icon big">{{ a.icon }}</span>
     <div>
       <h1>{{ a.name }}</h1>
       <p class="muted">{{ a.asset_tag }} · {{ a.get_type_display }} · <span id="asset-status" data-live-region class="badge as-{{ a.status }}">{{ a.get_status_display }}</span>
-        <span class="live-badge" data-live-status aria-live="polite">Live</span></p>
+        <span class="live-badge" data-live-status aria-live="polite">{% trans "Live" %}</span></p>
     </div>
   </div>
   <div class="head-actions">
-    {% if a.server and user.is_agent %}<a class="btn" href="{{ a.server.get_absolute_url }}">Live monitoring</a>{% endif %}
-    <a class="btn primary" href="{% url 'tickets:create' %}?asset={{ a.pk }}">Report a problem</a>
-    {% if user.is_agent %}<a class="btn" href="{% url 'assets:edit' a.pk %}">Edit</a>{% endif %}
+    {% if a.server and user.is_agent %}<a class="btn" href="{{ a.server.get_absolute_url }}">{% trans "Live monitoring" %}</a>{% endif %}
+    <a class="btn primary" href="{% url 'tickets:create' %}?asset={{ a.pk }}">{% trans "Report a problem" %}</a>
+    {% if user.is_agent %}<a class="btn" href="{% url 'assets:edit' a.pk %}">{% trans "Edit" %}</a>{% endif %}
   </div>
 </div>
 
 <div id="asset-alert" data-live-region>{% if a.recent_tickets >= repeat_threshold %}
-<div class="callout">↻ <b>{{ a.recent_tickets }} tickets in the last {{ repeat_window }} days.</b> Repeated problems may mean this device should be repaired properly or replaced.</div>
+<div class="callout">↻ {% blocktrans with n=a.recent_tickets w=repeat_window %}<b>{{ n }} tickets in the last {{ w }} days.</b> Repeated problems may mean this device should be repaired properly or replaced.{% endblocktrans %}</div>
 {% endif %}</div>
 
 <div class="grid-detail">
   <section class="card" id="asset-history" data-live-region>
     <div class="panel-head">
-      <h2>Ticket history</h2>
-      <span class="muted small">{{ tickets|length }} ticket{{ tickets|length|pluralize }}{% if a.open_tickets %} · {{ a.open_tickets }} open{% endif %}</span>
+      <h2>{% trans "Ticket history" %}</h2>
+      <span class="muted small">{% blocktrans count n=tickets|length %}{{ n }} ticket{% plural %}{{ n }} tickets{% endblocktrans %}{% if a.open_tickets %} · {% blocktrans with n=a.open_tickets %}{{ n }} open{% endblocktrans %}{% endif %}</span>
     </div>
     {% for t, state in tickets %}
       <a class="attn-row" href="{{ t.get_absolute_url }}">
         <span class="badge p-{{ t.priority }}">{{ t.priority }}</span>
         <span class="attn-main">
           <span class="attn-title">{{ t.title }}</span>
-          <span class="attn-meta">{{ t.reference }} · {{ t.created_at|ago }} · {{ t.assignee|default:"Unassigned" }}</span>
+          <span class="attn-meta">{{ t.reference }} · {{ t.created_at|ago }} · {% if t.assignee %}{{ t.assignee }}{% else %}{% trans "Unassigned" %}{% endif %}</span>
         </span>
         <span class="badge st-{{ t.status }}">{{ t.get_status_display }}</span>
       </a>
     {% empty %}
-      <p class="empty">No tickets have been raised for this {{ a.get_type_display|lower }}.</p>
+      <p class="empty">{% trans "No tickets have been raised for this asset." %}</p>
     {% endfor %}
   </section>
 
   <aside>
     <section class="card" id="asset-details" data-live-region>
-      <h2>Details</h2>
+      <h2>{% trans "Details" %}</h2>
       <dl>
-        <dt>Assigned to</dt><dd>{{ a.owner|default:"Shared" }}</dd>
-        <dt>Department</dt><dd>{{ a.department|default:"–" }}</dd>
-        <dt>Location</dt><dd>{{ a.location|default:"–" }}</dd>
-        <dt>Serial number</dt><dd>{{ a.serial_number|default:"–" }}</dd>
-        <dt>Supplier</dt><dd>{{ a.supplier|default:"–" }}</dd>
-        <dt>{% if a.is_subscription %}Started{% else %}Purchased{% endif %}</dt><dd>{{ a.purchase_date|date:"M j, Y"|default:"–" }}{% if a.age_years is not None and not a.is_subscription %}<br><small class="muted">{{ a.age_years }} years old</small>{% endif %}</dd>
-        <dt>{% if a.is_subscription %}Cost per year{% else %}Purchase price{% endif %}</dt><dd>{% if a.purchase_cost %}${{ a.purchase_cost|money }} CAD{% else %}–{% endif %}</dd>
-        <dt>{% if a.is_subscription %}Renewal{% else %}Warranty{% endif %}</dt><dd>{{ a.warranty_expiry|date:"M j, Y"|default:"–" }}{% if a.warranty_state == "expired" or a.warranty_state == "expiring" %}<br>{% include "assets/_warranty.html" %}{% endif %}</dd>
+        <dt>{% trans "Assigned to" %}</dt><dd>{% if a.owner %}{{ a.owner }}{% else %}{% trans "Shared" %}{% endif %}</dd>
+        <dt>{% trans "Department" %}</dt><dd>{{ a.department|default:"–" }}</dd>
+        <dt>{% trans "Location" %}</dt><dd>{{ a.location|default:"–" }}</dd>
+        <dt>{% trans "Serial number" %}</dt><dd>{{ a.serial_number|default:"–" }}</dd>
+        <dt>{% trans "Supplier" %}</dt><dd>{{ a.supplier|default:"–" }}</dd>
+        <dt>{% if a.is_subscription %}{% trans "Started" %}{% else %}{% trans "Purchased" %}{% endif %}</dt><dd>{{ a.purchase_date|date:"M j, Y"|default:"–" }}{% if a.age_years is not None and not a.is_subscription %}<br><small class="muted">{% blocktrans with n=a.age_years %}{{ n }} years old{% endblocktrans %}</small>{% endif %}</dd>
+        <dt>{% if a.is_subscription %}{% trans "Cost per year" %}{% else %}{% trans "Purchase price" %}{% endif %}</dt><dd>{% if a.purchase_cost %}${{ a.purchase_cost|money }} CAD{% else %}–{% endif %}</dd>
+        <dt>{% if a.is_subscription %}{% trans "Renewal" %}{% else %}{% trans "Warranty" %}{% endif %}</dt><dd>{{ a.warranty_expiry|date:"M j, Y"|default:"–" }}{% if a.warranty_state == "expired" or a.warranty_state == "expiring" %}<br>{% include "assets/_warranty.html" %}{% endif %}</dd>
       </dl>
     </section>
     <div id="asset-notes" data-live-region>{% if a.notes and user.is_agent %}
     <section class="card">
-      <h2>IT notes</h2>
+      <h2>{% trans "IT notes" %}</h2>
       <p class="pre small">{{ a.notes }}</p>
     </section>
     {% endif %}</div>

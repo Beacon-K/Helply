@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, F, Q
+from django.utils.translation import gettext
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -102,7 +103,7 @@ def article_suggest(request, slug):
     article = get_object_or_404(Article.objects.visible_to(request.user), slug=slug)
     text = request.POST.get("text", "").strip()
     if not text:
-        return HttpResponseBadRequest("Suggestion text is required")
+        return HttpResponseBadRequest(gettext("Suggestion text is required"))
     ArticleSuggestion.objects.create(article=article, user=request.user, text=text[:2000])
     if request.headers.get("X-Requested-With") != "fetch":
         return redirect(f"{article.get_absolute_url()}#feedback")
@@ -123,7 +124,7 @@ def article_create(request):
         article = form.save(commit=False)
         article.author = request.user
         article.save()
-        messages.success(request, "Article created.")
+        messages.success(request, gettext("Article created."))
         return redirect(article)
     return render(request, "kb/form.html", {"form": form, "article": None})
 
@@ -135,7 +136,7 @@ def article_edit(request, slug):
     form = ArticleForm(request.POST or None, instance=article)
     if request.method == "POST" and form.is_valid():
         article = form.save()
-        messages.success(request, "Article saved.")
+        messages.success(request, gettext("Article saved."))
         return redirect(article)
     return render(request, "kb/form.html", {"form": form, "article": article})
 
@@ -147,7 +148,7 @@ def article_delete(request, slug):
     article = get_object_or_404(Article, slug=slug)
     if request.method == "POST":
         article.delete()
-        messages.success(request, f"Deleted “{article.title}”.")
+        messages.success(request, gettext("Deleted “%(title)s”.") % {"title": article.title})
         return redirect("kb:list")
     return render(request, "kb/confirm_delete.html", {"article": article})
 

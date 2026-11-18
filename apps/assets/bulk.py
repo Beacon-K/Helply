@@ -12,6 +12,8 @@ from decimal import Decimal, InvalidOperation
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.utils import translation
+from django.utils.translation import gettext, gettext_lazy
 
 from apps.accounts.models import Department
 
@@ -40,6 +42,15 @@ COLUMNS = [
 HEADERS = [c[0] for c in COLUMNS]
 KEYS = [c[1] for c in COLUMNS]
 LABELS = dict(zip(KEYS, HEADERS))
+# What the preview shows. The Excel headers above stay English (the import checks them); only these follow the language.
+DISPLAY_LABELS = {
+    "asset_tag": gettext_lazy("Asset tag"), "name": gettext_lazy("Name"), "type": gettext_lazy("Type"),
+    "status": gettext_lazy("Status"), "serial_number": gettext_lazy("Serial number"),
+    "owner": gettext_lazy("Owner (username or email)"), "department": gettext_lazy("Department"),
+    "location": gettext_lazy("Location"), "supplier": gettext_lazy("Supplier"),
+    "purchase_date": gettext_lazy("Purchase date"), "purchase_cost": gettext_lazy("Purchase cost (CAD)"),
+    "warranty_expiry": gettext_lazy("Warranty / renewal date"), "notes": gettext_lazy("Notes"),
+}
 TEXT_LIMITS = {"asset_tag": 30, "name": 150, "serial_number": 100, "location": 100, "supplier": 100}
 
 _FORMULA_START = "=+-@\t\r"
@@ -119,18 +130,18 @@ def read_upload(fileobj):
     except xlsx.XlsxError as exc:
         raise SheetError(str(exc))
     if not rows:
-        raise SheetError("The sheet is empty. The first row must contain the column headers.")
+        raise SheetError(gettext("The sheet is empty. The first row must contain the column headers."))
     _, header = rows[0]
     names = [_as_text(h).casefold() if not isinstance(h, xlsx.Formula) else "" for h in header]
     expected = {h.casefold(): k for h, k in zip(HEADERS, KEYS)}
     missing = [h for h in HEADERS if h.casefold() not in names]
     unknown = [header[i] for i, n in enumerate(names) if n and n not in expected]
     if missing:
-        raise SheetError("Missing column(s): " + ", ".join(missing) + ". Download the template to get the exact headers.")
+        raise SheetError(gettext("Missing column(s): %(cols)s. Download the template to get the exact headers.") % {"cols": ", ".join(missing)})
     if unknown:
-        raise SheetError("Unknown column(s): " + ", ".join(_as_text(u) for u in unknown) + ".")
+        raise SheetError(gettext("Unknown column(s): %(cols)s.") % {"cols": ", ".join(_as_text(u) for u in unknown)})
     if len({n for n in names if n}) != len([n for n in names if n]):
-        raise SheetError("A column header appears twice.")
+        raise SheetError(gettext("A column header appears twice."))
     index = {expected[n]: i for i, n in enumerate(names) if n}
     out = []
     for number, cells in rows[1:]:
@@ -141,10 +152,10 @@ def read_upload(fileobj):
                 data[key] = _as_text(cells[i]) if i < len(cells) else ""
             except SheetError:
                 data[key] = ""
-                errors.append(f"{LABELS[key]}: formulas are not accepted, paste the value instead")
+                errors.append(gettext("%(label)s: formulas are not accepted, paste the value instead") % {"label": DISPLAY_LABELS[key]})
         out.append((number, data, errors))
     if not out:
-        raise SheetError("The sheet has a header row but no assets.")
+        raise SheetError(gettext("The sheet has a header row but no assets."))
     return out
 
 
@@ -152,10 +163,13 @@ def read_upload(fileobj):
 
 def _choice(value, choices, label):
     folded = value.casefold()
+    with translation.override("en"):
+        english = {v: str(l).casefold() for v, l in choices}
     for v, l in choices:
-        if folded in (v.casefold(), l.casefold()):
+        if folded in (v.casefold(), str(l).casefold(), english[v]):
             return v
-    raise ValueError(f"{label} '{value}' is not valid (use one of: {', '.join(v for v, _ in choices)})")
+    raise ValueError(gettext("%(label)s '%(value)s' is not valid (use one of: %(options)s)")
+                     % {"label": label, "value": value, "options": ", ".join(v for v, _ in choices)})
 
 
 def _date(value, label):
@@ -164,7 +178,7 @@ def _date(value, label):
     except ValueError:
         d = None
     if d is None or not (1980 <= d.year <= 2100):
-        raise ValueError(f"{label} '{value}' is not a date (use YYYY-MM-DD)")
+        raise ValueError(gettext("%(label)s '%(value)s' is not a date (use YYYY-MM-DD)") % {"label": label, "value": value})
     return d
 
 
@@ -172,11 +186,11 @@ def _cost(value):
     try:
         d = Decimal(value.replace(",", "").lstrip("$"))
     except InvalidOperation:
-        raise ValueError(f"Purchase cost '{value}' is not a number")
+        raise ValueError(gettext("Purchase cost '%(value)s' is not a number") % {"value": value})
     if not d.is_finite() or d < 0 or d >= Decimal("100000000"):
-        raise ValueError("Purchase cost must be between 0 and 99,999,999.99")
+        raise ValueError(gettext("Purchase cost must be between 0 and 99,999,999.99"))
     if d != d.quantize(Decimal("0.01")):
-        raise ValueError("Purchase cost can have at most 2 decimals")
+        raise ValueError(gettext("Purchase cost can have at most 2 decimals"))
     return d.quantize(Decimal("0.01"))
 
 
@@ -204,15 +218,15 @@ class Lookups:
             return user
         by_email = self.emails.get(ident.casefold(), [])
         if len(by_email) > 1:
-            raise ValueError(f"Owner '{ident}' matches several users, use the username")
+            raise ValueError(gettext("Owner '%(ident)s' matches several users, use the username") % {"ident": ident})
         if by_email:
             return by_email[0]
-        raise ValueError(f"Owner '{ident}' is not an active Helply user")
+        raise ValueError(gettext("Owner '%(ident)s' is not an active Helply user") % {"ident": ident})
 
 
 def _display(field, value):
     if field == "owner":
-        return value.username if value else "Shared"
+        return value.username if value else gettext("Shared")
     if field == "department":
         return value.name if value else "–"
     if value in (None, ""):
@@ -237,34 +251,34 @@ def classify(parsed):
         values = {}
         existing = None
         if not tag:
-            errors.append("Asset tag is required")
+            errors.append(gettext("Asset tag is required"))
         elif len(tag) > TEXT_LIMITS["asset_tag"]:
-            errors.append(f"Asset tag is longer than {TEXT_LIMITS['asset_tag']} characters")
+            errors.append(gettext("Asset tag is longer than %(n)s characters") % {"n": TEXT_LIMITS["asset_tag"]})
         else:
             if tag.casefold() in seen:
-                errors.append(f"Duplicate of row {seen[tag.casefold()]} in this file")
+                errors.append(gettext("Duplicate of row %(row)s in this file") % {"row": seen[tag.casefold()]})
             else:
                 seen[tag.casefold()] = number
             existing = lk.find_asset(tag)
             if existing is None and len(lk.assets.get(tag.casefold(), [])) > 1:
-                errors.append("Matches several existing assets that differ only by upper/lower case")
+                errors.append(gettext("Matches several existing assets that differ only by upper/lower case"))
         for key in ("name", "serial_number", "location", "supplier"):
             if len(data[key]) > TEXT_LIMITS[key]:
-                errors.append(f"{LABELS[key]} is longer than {TEXT_LIMITS[key]} characters")
+                errors.append(gettext("%(label)s is longer than %(n)s characters") % {"label": DISPLAY_LABELS[key], "n": TEXT_LIMITS[key]})
             elif data[key]:
                 values[key] = data[key]
         if data["notes"]:
             if len(data["notes"]) > 5000:
-                errors.append("Notes are longer than 5000 characters")
+                errors.append(gettext("Notes are longer than 5000 characters"))
             else:
                 values["notes"] = data["notes"]
         converters = (
-            ("type", lambda v: _choice(v, Asset.Type.choices, "Type")),
-            ("status", lambda v: _choice(v, Asset.Status.choices, "Status")),
+            ("type", lambda v: _choice(v, Asset.Type.choices, gettext("Type"))),
+            ("status", lambda v: _choice(v, Asset.Status.choices, gettext("Status"))),
             ("owner", lk.find_user),
             ("department", None),
-            ("purchase_date", lambda v: _date(v, "Purchase date")),
-            ("warranty_expiry", lambda v: _date(v, "Warranty / renewal date")),
+            ("purchase_date", lambda v: _date(v, gettext("Purchase date"))),
+            ("warranty_expiry", lambda v: _date(v, gettext("Warranty / renewal date"))),
             ("purchase_cost", _cost),
         )
         for key, fn in converters:
@@ -274,7 +288,7 @@ def classify(parsed):
                 if key == "department":
                     dept = lk.departments.get(data[key].casefold())
                     if dept is None:
-                        raise ValueError(f"Department '{data[key]}' does not exist")
+                        raise ValueError(gettext("Department '%(name)s' does not exist") % {"name": data[key]})
                     values[key] = dept
                 else:
                     values[key] = fn(data[key])
@@ -283,7 +297,7 @@ def classify(parsed):
         if existing is None and not errors:
             for key in ("name", "type"):
                 if key not in values:
-                    errors.append(f"{LABELS[key]} is required for a new asset")
+                    errors.append(gettext("%(label)s is required for a new asset") % {"label": DISPLAY_LABELS[key]})
         item = {"row": number, "tag": tag, "name": values.get("name") or (existing.name if existing else ""),
                 "values": values}
         if errors:
@@ -292,7 +306,7 @@ def classify(parsed):
         elif existing is None:
             plan["create"].append(item)
         else:
-            changes = [(LABELS[k], _display(k, getattr(existing, k)), _display(k, v))
+            changes = [(DISPLAY_LABELS[k], _display(k, getattr(existing, k)), _display(k, v))
                        for k, v in values.items() if getattr(existing, k) != v]
             item["asset"] = existing
             item["changes"] = changes

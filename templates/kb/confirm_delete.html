@@ -1,13 +1,13 @@
-{% extends "base.html" %}
-{% block title %}Delete article{% endblock %}
+{% extends "base.html" %}{% load i18n %}
+{% block title %}{% trans "Delete article" %}{% endblock %}
 {% block content %}
-<h1>Delete this article?</h1>
+<h1>{% trans "Delete this article?" %}</h1>
 <div class="card narrow">
   <p><b>{{ article.title }}</b></p>
-  <p class="muted">This removes the article together with its votes and reader suggestions. It cannot be undone.</p>
+  <p class="muted">{% trans "This removes the article together with its votes and reader suggestions. It cannot be undone." %}</p>
   <form method="post">{% csrf_token %}
-    <button class="btn primary">Delete article</button>
-    <a class="btn" href="{{ article.get_absolute_url }}">Cancel</a>
+    <button class="btn primary">{% trans "Delete article" %}</button>
+    <a class="btn" href="{{ article.get_absolute_url }}">{% trans "Cancel" %}</a>
   </form>
 </div>
 {% endblock %}

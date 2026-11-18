@@ -1,17 +1,17 @@
-{% extends "base.html" %}
-{% block title %}Knowledge base{% endblock %}
+{% extends "base.html" %}{% load i18n %}
+{% block title %}{% trans "Knowledge base" %}{% endblock %}
 {% block content %}
 <div class="row-between">
-  <h1>Knowledge base</h1>
+  <h1>{% trans "Knowledge base" %}</h1>
   <div>
-    {% if user.is_agent %}<a class="btn primary" href="{% url 'kb:create' %}">+ New article</a>{% endif %}
-    <a id="kb-open-ticket" class="btn{% if not user.is_agent %} primary{% endif %}" href="{% url 'tickets:create' %}">Can't find an answer? Open a ticket</a>
+    {% if user.is_agent %}<a class="btn primary" href="{% url 'kb:create' %}">{% trans "+ New article" %}</a>{% endif %}
+    <a id="kb-open-ticket" class="btn{% if not user.is_agent %} primary{% endif %}" href="{% url 'tickets:create' %}">{% trans "Can't find an answer? Open a ticket" %}</a>
   </div>
 </div>
 {% include "ai/_ask.html" %}
 
 <p class="filters">
-  <a href="{% url 'kb:list' %}" {% if not current_category %}class="on"{% endif %}>All</a>
+  <a href="{% url 'kb:list' %}" {% if not current_category %}class="on"{% endif %}>{% trans "All" %}</a>
   {% for c in categories %}<a href="?category={{ c.pk }}" {% if current_category == c.pk|stringformat:"s" %}class="on"{% endif %}>{{ c.name }} <small class="muted">{{ c.n }}</small></a>{% endfor %}
 </p>
 
@@ -19,29 +19,28 @@
     <div>
     {% for category, articles in groups %}
       <section class="card">
-        <h2>{{ category|default:"General" }} <small class="muted">({{ articles|length }})</small></h2>
+        <h2>{% if category %}{{ category }}{% else %}{% trans "General" %}{% endif %} <small class="muted">({{ articles|length }})</small></h2>
         {% for a in articles %}
           <div class="kb-item">
             <a href="{{ a.get_absolute_url }}"><b>{{ a.title }}</b></a>
-            {% if a.is_internal %}<span class="badge internal-badge">IT only</span>{% endif %}
-            {% if a.open_suggestions %}<span class="badge">{{ a.open_suggestions }} suggestion{{ a.open_suggestions|pluralize }}</span>{% endif %}
-            {% if a.status == "draft" %}<span class="badge">Draft</span>{% endif %}
+            {% if a.is_internal %}<span class="badge internal-badge">{% trans "IT only" %}</span>{% endif %}
+            {% if a.open_suggestions %}<span class="badge">{% blocktrans count n=a.open_suggestions %}{{ n }} suggestion{% plural %}{{ n }} suggestions{% endblocktrans %}</span>{% endif %}
+            {% if a.status == "draft" %}<span class="badge">{% trans "Draft" %}</span>{% endif %}
             <p class="muted">{{ a.summary }}</p>
           </div>
         {% endfor %}
       </section>
-    {% empty %}<div class="card"><p class="muted">No articles yet.</p></div>{% endfor %}
+    {% empty %}<div class="card"><p class="muted">{% trans "No articles yet." %}</p></div>{% endfor %}
     </div>
     <aside>
       <section class="card" id="kb-popular">
-        <h2>Most viewed</h2>
-        {% for a in popular %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a> <small class="muted">{{ a.views }} views</small></p>
-        {% empty %}<p class="muted">No views yet.</p>{% endfor %}
+        <h2>{% trans "Most viewed" %}</h2>
+        {% for a in popular %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a> <small class="muted">{% blocktrans with n=a.views %}{{ n }} views{% endblocktrans %}</small></p>
+        {% empty %}<p class="muted">{% trans "No views yet." %}</p>{% endfor %}
       </section>
       <section class="card" id="kb-urgent">
-        <h2>Urgent?</h2>
-        <p>If you clicked a suspicious link, lost a device, or the whole office is down, <b>don't wait</b> —
-          <a href="{% url 'tickets:create' %}">open a ticket</a> with Impact and Urgency set to <b>High</b>.</p>
+        <h2>{% trans "Urgent?" %}</h2>
+        <p>{% url 'tickets:create' as create_url %}{% blocktrans %}If you clicked a suspicious link, lost a device, or the whole office is down, <b>don't wait</b> — <a href="{{ create_url }}">open a ticket</a> with Impact and Urgency set to <b>High</b>.{% endblocktrans %}</p>
       </section>
     </aside>
   </div>

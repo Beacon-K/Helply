@@ -1,11 +1,11 @@
-{% extends "base.html" %}{% load static %}
-{% block title %}My devices{% endblock %}
+{% extends "base.html" %}{% load i18n static %}
+{% block title %}{% trans "My devices" %}{% endblock %}
 {% block content %}
 <div hidden data-live data-live-url="{% url 'assets:live' %}" data-live-version="{{ live_version }}" data-live-interval="15"></div>
 <div class="dash-head">
   <div>
-    <h1>My devices</h1>
-    <p class="muted">Company equipment assigned to you. Something wrong with one? Report it from its card.</p>
+    <h1>{% trans "My devices" %}</h1>
+    <p class="muted">{% trans "Company equipment assigned to you. Something wrong with one? Report it from its card." %}</p>
   </div>
 </div>
 
@@ -20,19 +20,19 @@
         </span>
       </a>
       <dl>
-        <dt>Status</dt><dd><span class="badge as-{{ a.status }}">{{ a.get_status_display }}</span></dd>
-        <dt>Location</dt><dd>{{ a.location|default:"–" }}</dd>
-        <dt>Serial</dt><dd>{{ a.serial_number|default:"–" }}</dd>
-        <dt>Warranty</dt><dd>{% include "assets/_warranty.html" %}</dd>
-        {% if a.open_tickets %}<dt>Tickets</dt><dd><a href="{{ a.get_absolute_url }}">{{ a.open_tickets }} open</a></dd>{% endif %}
+        <dt>{% trans "Status" %}</dt><dd><span class="badge as-{{ a.status }}">{{ a.get_status_display }}</span></dd>
+        <dt>{% trans "Location" %}</dt><dd>{{ a.location|default:"–" }}</dd>
+        <dt>{% trans "Serial" %}</dt><dd>{{ a.serial_number|default:"–" }}</dd>
+        <dt>{% trans "Warranty" %}</dt><dd>{% include "assets/_warranty.html" %}</dd>
+        {% if a.open_tickets %}<dt>{% trans "Tickets" %}</dt><dd><a href="{{ a.get_absolute_url }}">{% blocktrans with n=a.open_tickets %}{{ n }} open{% endblocktrans %}</a></dd>{% endif %}
       </dl>
-      <a class="btn wide" href="{% url 'tickets:create' %}?asset={{ a.pk }}">Report a problem with this device</a>
+      <a class="btn wide" href="{% url 'tickets:create' %}?asset={{ a.pk }}">{% trans "Report a problem with this device" %}</a>
     </section>
   {% empty %}
-    <div class="card"><p class="empty">No devices are registered to you. If you use company equipment, let IT know so it can be added.</p></div>
+    <div class="card"><p class="empty">{% trans "No devices are registered to you. If you use company equipment, let IT know so it can be added." %}</p></div>
   {% endfor %}
 </div>
-<p class="muted small">The asset tag is the sticker on the device (e.g. LT-0001). Mention it when you call IT.</p>
+<p class="muted small">{% trans "The asset tag is the sticker on the device (e.g. LT-0001). Mention it when you call IT." %}</p>
 {% endblock %}
 
 {% block scripts %}<script src="{% static 'js/live.js' %}?v={{ asset_version }}" defer></script>{% endblock %}

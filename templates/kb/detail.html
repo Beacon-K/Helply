@@ -1,71 +1,71 @@
-{% extends "base.html" %}{% load kb_tags static %}
+{% extends "base.html" %}{% load i18n kb_tags static %}
 {% block title %}{{ article.title }}{% endblock %}
 {% block content %}
-<p><a href="{% url 'kb:list' %}">← Knowledge base</a>{% if article.category %} / <a href="{% url 'kb:list' %}?category={{ article.category_id }}">{{ article.category }}</a>{% endif %}</p>
+<p><a href="{% url 'kb:list' %}">← {% trans "Knowledge base" %}</a>{% if article.category %} / <a href="{% url 'kb:list' %}?category={{ article.category_id }}">{{ article.category }}</a>{% endif %}</p>
 <div class="grid-detail">
   <article class="card kb-article">
     <div class="row-between">
       <h1>{{ article.title }}</h1>
-      {% if user.is_agent %}<div><a class="btn small-btn" href="{% url 'kb:edit' article.slug %}">Edit</a> <a class="btn small-btn" href="{% url 'kb:delete' article.slug %}">Delete</a></div>{% endif %}
+      {% if user.is_agent %}<div><a class="btn small-btn" href="{% url 'kb:edit' article.slug %}">{% trans "Edit" %}</a> <a class="btn small-btn" href="{% url 'kb:delete' article.slug %}">{% trans "Delete" %}</a></div>{% endif %}
     </div>
     <p class="muted small">
-      {% if article.status == "draft" %}<span class="badge">Draft</span> · {% endif %}
-      {% if article.is_internal %}<span class="badge internal-badge">IT staff only</span> · {% endif %}
-      Updated {{ article.updated_at|date:"M j, Y" }} · {{ article.views }} views
+      {% if article.status == "draft" %}<span class="badge">{% trans "Draft" %}</span> · {% endif %}
+      {% if article.is_internal %}<span class="badge internal-badge">{% trans "IT staff only" %}</span> · {% endif %}
+      {% blocktrans with d=article.updated_at|date:"M j, Y" n=article.views %}Updated {{ d }} · {{ n }} views{% endblocktrans %}
     </p>
     {% if article.summary %}<p class="lead">{{ article.summary }}</p>{% endif %}
     {{ article.body|kb_render }}
 
     <hr>
     <form method="post" action="{% url 'kb:vote' article.slug %}" class="feedback" id="feedback" data-vote-form>{% csrf_token %}
-      <span>Did this article solve your problem?</span>
+      <span>{% trans "Did this article solve your problem?" %}</span>
       <button class="btn vote vote-up{% if my_vote == 1 %} active{% endif %}" name="vote" value="up"
-              aria-pressed="{% if my_vote == 1 %}true{% else %}false{% endif %}" title="Helpful (click again to undo)">
-        Yes <span class="count" data-count="up">{{ article.helpful_yes }}</span>
+              aria-pressed="{% if my_vote == 1 %}true{% else %}false{% endif %}" title="{% trans "Helpful (click again to undo)" %}">
+        {% trans "Yes" %} <span class="count" data-count="up">{{ article.helpful_yes }}</span>
       </button>
       <button class="btn vote vote-down{% if my_vote == -1 %} active{% endif %}" name="vote" value="down"
-              aria-pressed="{% if my_vote == -1 %}true{% else %}false{% endif %}" title="Not helpful (click again to undo)">
-        No <span class="count" data-count="down">{{ article.helpful_no }}</span>
+              aria-pressed="{% if my_vote == -1 %}true{% else %}false{% endif %}" title="{% trans "Not helpful (click again to undo)" %}">
+        {% trans "No" %} <span class="count" data-count="down">{{ article.helpful_no }}</span>
       </button>
     </form>
 
     <div class="suggest" data-suggest hidden>
       <form method="post" action="{% url 'kb:suggest' article.slug %}" data-suggest-form>{% csrf_token %}
-        <label for="suggest-text"><b>Sorry this didn't help.</b> Would you like to suggest an improvement?</label>
+        <label for="suggest-text">{% blocktrans %}<b>Sorry this didn't help.</b> Would you like to suggest an improvement?{% endblocktrans %}</label>
         <textarea id="suggest-text" name="text" rows="3" maxlength="2000" required
-                  placeholder="What was missing, unclear, or wrong? e.g. &quot;Step 3 doesn't match what I see on Windows 11&quot;"></textarea>
+                  placeholder="{% trans "What was missing, unclear, or wrong? e.g. “Step 3 doesn't match what I see on Windows 11”" %}"></textarea>
         <div class="suggest-actions">
-          <button class="btn primary">Send suggestion</button>
-          <button type="button" class="btn" data-suggest-dismiss>No thanks</button>
-          <a class="small" href="{% url 'tickets:create' %}?category={{ article.category_id|default:'' }}&from_kb={{ article.slug }}">Still need help? Open a ticket</a>
+          <button class="btn primary">{% trans "Send suggestion" %}</button>
+          <button type="button" class="btn" data-suggest-dismiss>{% trans "No thanks" %}</button>
+          <a class="small" href="{% url 'tickets:create' %}?category={{ article.category_id|default:'' }}&from_kb={{ article.slug }}">{% trans "Still need help? Open a ticket" %}</a>
         </div>
       </form>
-      <p class="muted" data-suggest-done hidden>Your suggestion was sent to IT.</p>
+      <p class="muted" data-suggest-done hidden>{% trans "Your suggestion was sent to IT." %}</p>
     </div>
   </article>
   <aside>
     {% if user.is_agent %}
     <section class="card" id="suggestions">
-      <h2>Reader suggestions</h2>
+      <h2>{% trans "Reader suggestions" %}</h2>
       {% for s in suggestions %}
         <div class="kb-suggestion{% if s.status == 'done' %} is-done{% endif %}">
           <p class="pre small">{{ s.text }}</p>
-          <p class="muted small">{{ s.user|default:"Someone" }} · {{ s.created_at|date:"M j, Y" }}</p>
+          <p class="muted small">{% if s.user %}{{ s.user }}{% else %}{% trans "Someone" %}{% endif %} · {{ s.created_at|date:"M j, Y" }}</p>
           <form method="post" action="{% url 'kb:suggestion_done' article.slug s.pk %}">{% csrf_token %}
-            <button class="btn small-btn">{% if s.status == 'done' %}Addressed · reopen{% else %}Mark addressed{% endif %}</button>
+            <button class="btn small-btn">{% if s.status == 'done' %}{% trans "Addressed · reopen" %}{% else %}{% trans "Mark addressed" %}{% endif %}</button>
           </form>
         </div>
-      {% empty %}<p class="muted">Nobody has suggested changes to this article.</p>{% endfor %}
+      {% empty %}<p class="muted">{% trans "Nobody has suggested changes to this article." %}</p>{% endfor %}
     </section>
     {% endif %}
     <section class="card" id="kb-stuck">
-      <h2>Still stuck?</h2>
-      <p>Open a ticket and tell us which steps you already tried — it saves time for everyone.</p>
-      <a class="btn primary" href="{% url 'tickets:create' %}?category={{ article.category_id|default:'' }}&from_kb={{ article.slug }}">Open a ticket</a>
+      <h2>{% trans "Still stuck?" %}</h2>
+      <p>{% trans "Open a ticket and tell us which steps you already tried — it saves time for everyone." %}</p>
+      <a class="btn primary" href="{% url 'tickets:create' %}?category={{ article.category_id|default:'' }}&from_kb={{ article.slug }}">{% trans "Open a ticket" %}</a>
     </section>
     {% if related %}
     <section class="card" id="kb-related">
-      <h2>Related articles</h2>
+      <h2>{% trans "Related articles" %}</h2>
       {% for a in related %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></p>{% endfor %}
     </section>
     {% endif %}

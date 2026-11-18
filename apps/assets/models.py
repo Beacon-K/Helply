@@ -3,33 +3,34 @@ from django.db import models
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class Asset(models.Model):
     """An item in the IT asset register (hardware, software licence, ...)."""
 
     class Type(models.TextChoices):
-        LAPTOP = "laptop", "Laptop"
-        DESKTOP = "desktop", "Desktop / workstation"
-        MONITOR = "monitor", "Monitor"
-        PERIPHERAL = "peripheral", "Peripheral / accessory"
-        PHONE = "phone", "Mobile phone"
-        TABLET = "tablet", "Tablet"
-        PRINTER = "printer", "Printer / scanner"
-        SERVER = "server", "Server"
-        CLOUD = "cloud", "Cloud server / VPS"
-        STORAGE = "storage", "Storage / NAS"
-        NETWORK = "network", "Network device"
-        POWER = "power", "Power / UPS"
-        AV = "av", "Meeting room / AV"
-        LICENSE = "license", "Software licence / subscription"
-        OTHER = "other", "Other"
+        LAPTOP = "laptop", _("Laptop")
+        DESKTOP = "desktop", _("Desktop / workstation")
+        MONITOR = "monitor", _("Monitor")
+        PERIPHERAL = "peripheral", _("Peripheral / accessory")
+        PHONE = "phone", _("Mobile phone")
+        TABLET = "tablet", _("Tablet")
+        PRINTER = "printer", _("Printer / scanner")
+        SERVER = "server", _("Server")
+        CLOUD = "cloud", _("Cloud server / VPS")
+        STORAGE = "storage", _("Storage / NAS")
+        NETWORK = "network", _("Network device")
+        POWER = "power", _("Power / UPS")
+        AV = "av", _("Meeting room / AV")
+        LICENSE = "license", _("Software licence / subscription")
+        OTHER = "other", _("Other")
 
     class Status(models.TextChoices):
-        IN_USE = "in_use", "In use"
-        IN_STOCK = "in_stock", "In stock"
-        IN_REPAIR = "in_repair", "In repair"
-        RETIRED = "retired", "Retired"
+        IN_USE = "in_use", _("In use")
+        IN_STOCK = "in_stock", _("In stock")
+        IN_REPAIR = "in_repair", _("In repair")
+        RETIRED = "retired", _("Retired")
 
     asset_tag = models.CharField(max_length=30, unique=True)
     name = models.CharField(max_length=150)

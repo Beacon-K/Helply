@@ -90,7 +90,7 @@ msgstr "Nouvelle conversation"
 msgid "Start a new chat"
 msgstr "Commencer une nouvelle conversation"
 
-#: templates/ai/_drawer.html
+#: templates/ai/_drawer.html templates/assets/list.html
 msgid "Close"
 msgstr "Fermer"
 
@@ -210,6 +210,534 @@ msgstr "Message à l’assistant"
 msgid "Send"
 msgstr "Envoyer"
 
+#: templates/assets/_warranty.html
+msgid "Renewal overdue"
+msgstr "Renouvellement en retard"
+
+#: templates/assets/_warranty.html
+#, python-format
+msgid "Renews in %(n)s day"
+msgid_plural "Renews in %(n)s days"
+msgstr[0] "Renouvellement dans %(n)s jour"
+msgstr[1] "Renouvellement dans %(n)s jours"
+
+#: templates/assets/_warranty.html
+#, python-format
+msgid "Renews %(d)s"
+msgstr "Renouvellement : %(d)s"
+
+#: templates/assets/_warranty.html
+msgid "Perpetual"
+msgstr "Perpétuel"
+
+#: templates/assets/_warranty.html
+#, python-format
+msgid "Expired %(d)s"
+msgstr "Expiré en %(d)s"
+
+#: templates/assets/_warranty.html
+#, python-format
+msgid "%(n)s day left"
+msgid_plural "%(n)s days left"
+msgstr[0] "%(n)s jour restant"
+msgstr[1] "%(n)s jours restants"
+
+#: templates/assets/_warranty.html
+#, python-format
+msgid "Until %(d)s"
+msgstr "Jusqu’en %(d)s"
+
+#: templates/assets/detail.html templates/assets/form.html
+msgid "Asset register"
+msgstr "Registre des actifs"
+
+#: templates/assets/detail.html templates/assets/my_devices.html templates/partials/sidebar.html
+msgid "My devices"
+msgstr "Mes appareils"
+
+#: templates/assets/detail.html templates/assets/list.html
+msgid "Live"
+msgstr "En direct"
+
+#: templates/assets/detail.html
+msgid "Live monitoring"
+msgstr "Surveillance en direct"
+
+#: templates/assets/detail.html
+msgid "Report a problem"
+msgstr "Signaler un problème"
+
+#: templates/assets/detail.html templates/assets/form.html templates/kb/detail.html
+msgid "Edit"
+msgstr "Modifier"
+
+#: templates/assets/detail.html
+#, python-format
+msgid "<b>%(n)s tickets in the last %(w)s days.</b> Repeated problems may mean this device should be repaired properly or replaced."
+msgstr "<b>%(n)s tickets au cours des %(w)s derniers jours.</b> Des problèmes répétés peuvent signifier que cet appareil doit être réparé correctement ou remplacé."
+
+#: templates/assets/detail.html
+msgid "Ticket history"
+msgstr "Historique des tickets"
+
+#: templates/assets/detail.html
+#, python-format
+msgid "%(n)s ticket"
+msgid_plural "%(n)s tickets"
+msgstr[0] "%(n)s ticket"
+msgstr[1] "%(n)s tickets"
+
+#: templates/assets/detail.html templates/assets/list.html templates/assets/my_devices.html
+#, python-format
+msgid "%(n)s open"
+msgstr "%(n)s ouverts"
+
+#: apps/tickets/views.py templates/assets/detail.html templates/core/_administrator.html
+msgid "Unassigned"
+msgstr "Non assignés"
+
+#: templates/assets/detail.html
+msgid "No tickets have been raised for this asset."
+msgstr "Aucun ticket n’a été ouvert pour cet actif."
+
+#: templates/assets/detail.html templates/tickets/detail.html
+msgid "Details"
+msgstr "Détails"
+
+#: apps/assets/forms.py templates/assets/detail.html templates/assets/list.html
+msgid "Assigned to"
+msgstr "Attribué à"
+
+#: apps/assets/bulk.py templates/assets/detail.html templates/assets/import_preview.html
+msgid "Shared"
+msgstr "Partagé"
+
+#: apps/assets/bulk.py apps/assets/forms.py apps/tickets/forms.py
+msgid "Department"
+msgstr "Service"
+
+#: apps/assets/bulk.py apps/assets/forms.py templates/assets/detail.html
+msgid "Location"
+msgstr "Emplacement"
+
+#: apps/assets/bulk.py apps/assets/forms.py templates/assets/detail.html
+msgid "Serial number"
+msgstr "Numéro de série"
+
+#: apps/assets/bulk.py apps/assets/forms.py templates/assets/detail.html
+msgid "Supplier"
+msgstr "Fournisseur"
+
+#: templates/assets/detail.html
+msgid "Started"
+msgstr "Début"
+
+#: templates/assets/detail.html
+msgid "Purchased"
+msgstr "Acheté le"
+
+#: templates/assets/detail.html
+#, python-format
+msgid "%(n)s years old"
+msgstr "%(n)s ans"
+
+#: templates/assets/detail.html
+msgid "Cost per year"
+msgstr "Coût annuel"
+
+#: templates/assets/detail.html
+msgid "Purchase price"
+msgstr "Prix d’achat"
+
+#: templates/assets/detail.html
+msgid "Renewal"
+msgstr "Renouvellement"
+
+#: templates/assets/detail.html templates/assets/my_devices.html
+msgid "Warranty"
+msgstr "Garantie"
+
+#: templates/assets/detail.html
+msgid "IT notes"
+msgstr "Notes TI"
+
+#: templates/assets/form.html
+#, python-format
+msgid "Edit %(t)s"
+msgstr "Modifier %(t)s"
+
+#: templates/assets/form.html
+msgid "Add asset"
+msgstr "Ajouter un actif"
+
+#: templates/assets/form.html
+msgid "Breadcrumb"
+msgstr "Fil d’Ariane"
+
+#: templates/assets/form.html
+msgid "Edit asset"
+msgstr "Modifier l’actif"
+
+#: templates/assets/form.html
+msgid "New asset"
+msgstr "Nouvel actif"
+
+#: templates/assets/form.html
+msgid "Add an asset"
+msgstr "Ajouter un actif"
+
+#: templates/assets/form.html
+#, python-format
+msgid "%(n)s ticket linked to this asset."
+msgid_plural "%(n)s tickets linked to this asset."
+msgstr[0] "%(n)s ticket lié à cet actif."
+msgstr[1] "%(n)s tickets liés à cet actif."
+
+#: templates/assets/form.html
+msgid "Laptops, network equipment, licences and anything else IT looks after."
+msgstr "Portables, équipement réseau, licences et tout ce dont le service TI s’occupe."
+
+#: apps/tickets/forms.py templates/assets/form.html templates/assets/import_preview.html
+msgid "Asset"
+msgstr "Actif"
+
+#: templates/assets/form.html
+msgid "What it is and what state it is in."
+msgstr "De quoi il s’agit et dans quel état il se trouve."
+
+#: templates/assets/form.html
+msgid "Assignment"
+msgstr "Attribution"
+
+#: templates/assets/form.html
+msgid "Who has it and where it is."
+msgstr "Qui l’a et où il se trouve."
+
+#: templates/assets/form.html
+msgid "Purchase and warranty"
+msgstr "Achat et garantie"
+
+#: templates/assets/form.html
+msgid "For subscriptions, the cost is per year and the date is the renewal."
+msgstr "Pour les abonnements, le coût est annuel et la date est celle du renouvellement."
+
+#: apps/assets/bulk.py apps/assets/forms.py templates/assets/form.html
+msgid "Notes"
+msgstr "Notes"
+
+#: templates/assets/form.html
+msgid "Only IT staff see these."
+msgstr "Visibles uniquement par le personnel TI."
+
+#: apps/tickets/workflow.py templates/assets/form.html templates/assets/import_preview.html
+msgid "Cancel"
+msgstr "Annuler"
+
+#: templates/assets/form.html templates/kb/form.html
+msgid "Save changes"
+msgstr "Enregistrer les modifications"
+
+#: templates/assets/form.html
+msgid "Delete asset"
+msgstr "Supprimer l’actif"
+
+#: templates/assets/form.html
+msgid "Linked tickets keep their history but lose the link to this asset. This cannot be undone."
+msgstr "Les tickets liés conservent leur historique mais perdent le lien avec cet actif. Cette action est irréversible."
+
+#: templates/assets/form.html
+msgid "This asset belongs to a monitored cloud server, so it is removed together with that server and cannot be deleted here."
+msgstr "Cet actif appartient à un serveur cloud surveillé : il est supprimé avec ce serveur et ne peut pas l’être ici."
+
+#: templates/assets/import_preview.html
+msgid "Review asset import"
+msgstr "Vérifier l’importation des actifs"
+
+#: templates/assets/import_preview.html
+msgid "Nothing has been saved yet. Check the lists below, then confirm. Assets that are not in the file are left untouched."
+msgstr "Rien n’a encore été enregistré. Vérifiez les listes ci-dessous, puis confirmez. Les actifs absents du fichier ne sont pas modifiés."
+
+#: templates/assets/import_preview.html
+msgid "Will be created"
+msgstr "Seront créés"
+
+#: templates/assets/import_preview.html
+msgid "Will be updated"
+msgstr "Seront mis à jour"
+
+#: templates/assets/import_preview.html
+msgid "Unchanged"
+msgstr "Inchangés"
+
+#: templates/assets/import_preview.html
+msgid "Rows with errors"
+msgstr "Lignes en erreur"
+
+#: templates/assets/import_preview.html
+msgid "skipped on import"
+msgstr "ignorées à l’importation"
+
+#: templates/assets/import_preview.html
+#, python-format
+msgid "Confirm import (%(c)s new, %(u)s updated)"
+msgstr "Confirmer l’importation (%(c)s nouveaux, %(u)s mis à jour)"
+
+#: templates/assets/import_preview.html
+msgid "Rows with errors are skipped. Fix them in the file and import again if you need them."
+msgstr "Les lignes en erreur sont ignorées. Corrigez-les dans le fichier et réimportez-le si vous en avez besoin."
+
+#: templates/assets/import_preview.html
+msgid "Row"
+msgstr "Ligne"
+
+#: apps/assets/bulk.py apps/assets/forms.py templates/assets/import_preview.html
+msgid "Asset tag"
+msgstr "Étiquette d’actif"
+
+#: templates/assets/import_preview.html
+msgid "Problem"
+msgstr "Problème"
+
+#: templates/assets/import_preview.html
+msgid "New assets"
+msgstr "Nouveaux actifs"
+
+#: apps/assets/bulk.py apps/assets/forms.py templates/assets/import_preview.html
+msgid "Name"
+msgstr "Nom"
+
+#: apps/assets/bulk.py apps/assets/forms.py templates/assets/import_preview.html
+msgid "Type"
+msgstr "Type"
+
+#: apps/assets/bulk.py apps/assets/forms.py apps/kb/forms.py
+msgid "Status"
+msgstr "Statut"
+
+#: templates/assets/import_preview.html
+msgid "Owner"
+msgstr "Responsable"
+
+#: templates/assets/import_preview.html
+msgid "Existing assets that will change"
+msgstr "Actifs existants qui seront modifiés"
+
+#: templates/assets/import_preview.html
+msgid "Changes"
+msgstr "Modifications"
+
+#: templates/assets/import_preview.html
+#, python-format
+msgid "%(n)s row matches existing assets exactly and needs no change."
+msgid_plural "%(n)s rows match existing assets exactly and need no change."
+msgstr[0] "%(n)s ligne correspond exactement à un actif existant et ne demande aucune modification."
+msgstr[1] "%(n)s lignes correspondent exactement à des actifs existants et ne demandent aucune modification."
+
+#: templates/assets/import_preview.html
+msgid "Back to assets"
+msgstr "Retour aux actifs"
+
+#: templates/assets/list.html templates/partials/sidebar.html templates/registration/login.html
+msgid "Assets"
+msgstr "Actifs"
+
+#: templates/assets/list.html
+msgid "IT asset register"
+msgstr "Registre des actifs TI"
+
+#: templates/assets/list.html
+#, python-format
+msgid "%(n)s asset"
+msgid_plural "%(n)s assets"
+msgstr[0] "%(n)s actif"
+msgstr[1] "%(n)s actifs"
+
+#: templates/assets/list.html
+msgid "devices, network equipment and licences"
+msgstr "appareils, équipement réseau et licences"
+
+#: templates/assets/list.html
+msgid "Import from Excel"
+msgstr "Importer depuis Excel"
+
+#: templates/assets/list.html
+msgid "Export to Excel (filtered)"
+msgstr "Exporter vers Excel (filtré)"
+
+#: templates/assets/list.html
+msgid "Export to Excel"
+msgstr "Exporter vers Excel"
+
+#: templates/assets/list.html
+msgid "+ Add asset"
+msgstr "+ Ajouter un actif"
+
+#: templates/assets/list.html
+msgid "Import assets from Excel"
+msgstr "Importer des actifs depuis Excel"
+
+#: templates/assets/list.html
+msgid "1. Download the template and fill in one row per asset. 2. Upload it here. 3. Review the preview, then confirm. Existing assets are matched on their asset tag; nothing is deleted."
+msgstr "1. Téléchargez le modèle et remplissez une ligne par actif. 2. Téléversez-le ici. 3. Vérifiez l’aperçu, puis confirmez. Les actifs existants sont reconnus grâce à leur étiquette ; rien n’est supprimé."
+
+#: templates/assets/list.html
+msgid "Download Excel template"
+msgstr "Télécharger le modèle Excel"
+
+#: templates/assets/list.html
+msgid "Excel file (.xlsx)"
+msgstr "Fichier Excel (.xlsx)"
+
+#: templates/assets/list.html
+msgid "Upload & preview"
+msgstr "Téléverser et prévisualiser"
+
+#: apps/assets/models.py templates/assets/list.html
+msgid "In use"
+msgstr "En service"
+
+#: templates/assets/list.html
+msgid "with people, rooms or in the cloud"
+msgstr "chez des personnes, dans des salles ou dans le nuage"
+
+#: apps/assets/models.py templates/assets/list.html
+msgid "In stock"
+msgstr "En stock"
+
+#: templates/assets/list.html
+msgid "spares ready to hand out"
+msgstr "pièces de rechange prêtes à distribuer"
+
+#: apps/assets/models.py templates/assets/list.html
+msgid "In repair"
+msgstr "En réparation"
+
+#: templates/assets/list.html
+msgid "out of service"
+msgstr "hors service"
+
+#: templates/assets/list.html
+msgid "Warranty & renewals"
+msgstr "Garanties et renouvellements"
+
+#: templates/assets/list.html
+#, python-format
+msgid "%(n)s expired"
+msgstr "%(n)s expirés"
+
+#: templates/assets/list.html
+#, python-format
+msgid "%(n)s due ≤ 90 days"
+msgstr "%(n)s à échéance ≤ 90 jours"
+
+#: templates/assets/list.html
+msgid "Hardware value"
+msgstr "Valeur du matériel"
+
+#: templates/assets/list.html
+msgid "purchase price, excl. retired"
+msgstr "prix d’achat, hors mis au rebut"
+
+#: templates/assets/list.html
+msgid "Subscriptions"
+msgstr "Abonnements"
+
+#: templates/assets/list.html
+msgid "per year, software & cloud"
+msgstr "par an, logiciels et infonuagique"
+
+#: templates/assets/list.html
+msgid "Search by tag, name, type, status, owner, location, supplier or serial"
+msgstr "Rechercher par étiquette, nom, type, statut, responsable, emplacement, fournisseur ou numéro de série"
+
+#: templates/assets/list.html
+msgid "Any status"
+msgstr "Tous les statuts"
+
+#: templates/assets/list.html
+msgid "Warranty expired / expiring"
+msgstr "Garantie expirée ou bientôt expirée"
+
+#: templates/assets/list.html templates/base.html
+msgid "Search"
+msgstr "Rechercher"
+
+#: templates/assets/list.html
+msgid "Clear filters"
+msgstr "Effacer les filtres"
+
+#: templates/assets/list.html
+msgid "All types"
+msgstr "Tous les types"
+
+#: templates/assets/list.html
+msgid "Warranty / renewal"
+msgstr "Garantie / renouvellement"
+
+#: templates/assets/list.html templates/assets/my_devices.html templates/partials/sidebar.html
+msgid "Tickets"
+msgstr "Tickets"
+
+#: templates/assets/list.html
+#, python-format
+msgid "%(n)s tickets in the last %(w)s days"
+msgstr "%(n)s tickets au cours des %(w)s derniers jours"
+
+#: templates/assets/list.html
+#, python-format
+msgid "%(n)s in %(w)sd"
+msgstr "%(n)s en %(w)s j"
+
+#: templates/assets/list.html
+msgid "No assets match these filters."
+msgstr "Aucun actif ne correspond à ces filtres."
+
+#: templates/assets/list.html
+msgid "Pages"
+msgstr "Pages"
+
+#: templates/assets/list.html
+#, python-format
+msgid "Showing %(a)s–%(b)s of %(c)s"
+msgstr "%(a)s–%(b)s sur %(c)s"
+
+#: templates/assets/list.html
+msgid "Nothing to show"
+msgstr "Rien à afficher"
+
+#: templates/assets/list.html
+msgid "Previous"
+msgstr "Précédent"
+
+#: templates/assets/list.html
+#, python-format
+msgid "Page %(a)s of %(b)s"
+msgstr "Page %(a)s sur %(b)s"
+
+#: templates/assets/list.html
+msgid "Next"
+msgstr "Suivant"
+
+#: templates/assets/my_devices.html
+msgid "Company equipment assigned to you. Something wrong with one? Report it from its card."
+msgstr "Équipement de l’entreprise qui vous est attribué. Un problème avec l’un d’eux ? Signalez-le depuis sa fiche."
+
+#: templates/assets/my_devices.html
+msgid "Serial"
+msgstr "N° de série"
+
+#: templates/assets/my_devices.html
+msgid "Report a problem with this device"
+msgstr "Signaler un problème avec cet appareil"
+
+#: templates/assets/my_devices.html
+msgid "No devices are registered to you. If you use company equipment, let IT know so it can be added."
+msgstr "Aucun appareil ne vous est attribué. Si vous utilisez du matériel de l’entreprise, prévenez le service TI pour qu’il l’ajoute."
+
+#: templates/assets/my_devices.html
+msgid "The asset tag is the sticker on the device (e.g. LT-0001). Mention it when you call IT."
+msgstr "L’étiquette d’actif est l’autocollant sur l’appareil (p. ex. LT-0001). Mentionnez-la quand vous contactez le service TI."
+
 #: templates/base.html templates/base_landing.html templates/partials/sidebar.html
 msgid "Helply"
 msgstr "Helply"
@@ -221,10 +749,6 @@ msgstr "· Helply"
 #: templates/base.html
 msgid "Open the command palette"
 msgstr "Ouvrir la palette de commandes"
-
-#: templates/base.html
-msgid "Search"
-msgstr "Rechercher"
 
 #: templates/base.html
 msgid "Ctrl K"
@@ -258,10 +782,6 @@ msgstr "Tickets ouverts"
 #, python-format
 msgid "%(a)s not started · %(b)s on hold"
 msgstr "%(a)s non démarrés · %(b)s en attente"
-
-#: apps/tickets/views.py templates/core/_administrator.html templates/core/_technician.html
-msgid "Unassigned"
-msgstr "Non assignés"
 
 #: templates/core/_administrator.html
 msgid "waiting for a technician"
@@ -438,11 +958,6 @@ msgstr[0] "%(c)s tickets · %(n)s personne"
 msgstr[1] "%(c)s tickets · %(n)s personnes"
 
 #: templates/core/_ai_insights.html
-#, python-format
-msgid "%(n)s open"
-msgstr "%(n)s ouverts"
-
-#: templates/core/_ai_insights.html
 msgid "Likely cause"
 msgstr "Cause probable"
 
@@ -569,7 +1084,7 @@ msgstr "Demander à Helply"
 msgid "Helply answers from our knowledge base and your own tickets. Not solved?"
 msgstr "Helply répond à partir de notre base de connaissances et de vos propres tickets. Pas résolu ?"
 
-#: templates/core/_employee.html
+#: templates/core/_employee.html templates/kb/detail.html
 msgid "Open a ticket"
 msgstr "Ouvrir un ticket"
 
@@ -620,7 +1135,7 @@ msgstr "Réponses populaires"
 msgid "Browse the knowledge base →"
 msgstr "Parcourir la base de connaissances →"
 
-#: templates/core/_employee.html
+#: templates/core/_employee.html templates/kb/list.html
 msgid "Urgent?"
 msgstr "Urgent ?"
 
@@ -866,6 +1381,176 @@ msgstr "Tableau de bord"
 msgid "New ticket"
 msgstr "Nouveau ticket"
 
+#: templates/kb/confirm_delete.html
+msgid "Delete article"
+msgstr "Supprimer l’article"
+
+#: templates/kb/confirm_delete.html
+msgid "Delete this article?"
+msgstr "Supprimer cet article ?"
+
+#: templates/kb/confirm_delete.html
+msgid "This removes the article together with its votes and reader suggestions. It cannot be undone."
+msgstr "Cette action supprime l’article ainsi que ses votes et les suggestions des lecteurs. Elle est irréversible."
+
+#: templates/kb/detail.html templates/kb/form.html templates/kb/list.html
+msgid "Knowledge base"
+msgstr "Base de connaissances"
+
+#: templates/kb/detail.html
+msgid "Delete"
+msgstr "Supprimer"
+
+#: templates/kb/detail.html templates/kb/list.html
+msgid "Draft"
+msgstr "Brouillon"
+
+#: templates/kb/detail.html
+msgid "IT staff only"
+msgstr "Réservé au personnel TI"
+
+#: templates/kb/detail.html
+#, python-format
+msgid "Updated %(d)s · %(n)s views"
+msgstr "Mis à jour le %(d)s · %(n)s vues"
+
+#: templates/kb/detail.html
+msgid "Did this article solve your problem?"
+msgstr "Cet article a-t-il résolu votre problème ?"
+
+#: templates/kb/detail.html
+msgid "Helpful (click again to undo)"
+msgstr "Utile (cliquez à nouveau pour annuler)"
+
+#: templates/kb/detail.html
+msgid "Yes"
+msgstr "Oui"
+
+#: templates/kb/detail.html
+msgid "Not helpful (click again to undo)"
+msgstr "Pas utile (cliquez à nouveau pour annuler)"
+
+#: templates/kb/detail.html
+msgid "No"
+msgstr "Non"
+
+#: templates/kb/detail.html
+msgid "<b>Sorry this didn't help.</b> Would you like to suggest an improvement?"
+msgstr "<b>Désolé que cela n’ait pas aidé.</b> Voulez-vous suggérer une amélioration ?"
+
+#: templates/kb/detail.html
+msgid "What was missing, unclear, or wrong? e.g. “Step 3 doesn't match what I see on Windows 11”"
+msgstr "Qu’est-ce qui manquait, était confus ou erroné ? Ex. : « L’étape 3 ne correspond pas à ce que je vois sous Windows 11 »"
+
+#: templates/kb/detail.html
+msgid "Send suggestion"
+msgstr "Envoyer la suggestion"
+
+#: templates/kb/detail.html
+msgid "No thanks"
+msgstr "Non merci"
+
+#: templates/kb/detail.html
+msgid "Still need help? Open a ticket"
+msgstr "Besoin d’aide ? Ouvrez un bicket"
+
+#: templates/kb/detail.html
+msgid "Your suggestion was sent to IT."
+msgstr "Votre suggestion a été envoyée au service TI."
+
+#: templates/kb/detail.html
+msgid "Reader suggestions"
+msgstr "Suggestions des lecteurs"
+
+#: templates/kb/detail.html
+msgid "Someone"
+msgstr "Quelqu’un"
+
+#: templates/kb/detail.html
+msgid "Addressed · reopen"
+msgstr "Traitée · rouvrir"
+
+#: templates/kb/detail.html
+msgid "Mark addressed"
+msgstr "Marquer comme traitée"
+
+#: templates/kb/detail.html
+msgid "Nobody has suggested changes to this article."
+msgstr "Personne n’a suggéré de modification pour cet article."
+
+#: templates/kb/detail.html
+msgid "Still stuck?"
+msgstr "Toujours bloqué ?"
+
+#: templates/kb/detail.html
+msgid "Open a ticket and tell us which steps you already tried — it saves time for everyone."
+msgstr "Ouvrez un bicket et indiquez-nous les étapes déjà essayées : cela fait gagner du temps à tout le monde."
+
+#: templates/kb/detail.html templates/tickets/detail.html
+msgid "Related articles"
+msgstr "Articles liés"
+
+#: templates/kb/form.html
+msgid "Edit article"
+msgstr "Modifier l’article"
+
+#: templates/kb/form.html
+msgid "New article"
+msgstr "Nouvel article"
+
+#: templates/kb/form.html
+msgid "Create article"
+msgstr "Créer l’article"
+
+#: templates/kb/list.html
+msgid "+ New article"
+msgstr "+ Nouvel article"
+
+#: templates/kb/list.html
+msgid "Can't find an answer? Open a ticket"
+msgstr "Pas de réponse ? Ouvrez un bicket"
+
+#: apps/tickets/choices.py templates/kb/list.html
+msgid "All"
+msgstr "Tous"
+
+#: templates/kb/list.html
+msgid "General"
+msgstr "Général"
+
+#: templates/kb/list.html
+msgid "IT only"
+msgstr "TI seulement"
+
+#: templates/kb/list.html
+#, python-format
+msgid "%(n)s suggestion"
+msgid_plural "%(n)s suggestions"
+msgstr[0] "%(n)s suggestion"
+msgstr[1] "%(n)s suggestions"
+
+#: templates/kb/list.html
+msgid "No articles yet."
+msgstr "Aucun article pour l’instant."
+
+#: templates/kb/list.html
+msgid "Most viewed"
+msgstr "Les plus consultés"
+
+#: templates/kb/list.html
+#, python-format
+msgid "%(n)s views"
+msgstr "%(n)s vues"
+
+#: templates/kb/list.html
+msgid "No views yet."
+msgstr "Aucune consultation pour l’instant."
+
+#: templates/kb/list.html
+#, python-format
+msgid "If you clicked a suspicious link, lost a device, or the whole office is down, <b>don't wait</b> — <a href=\"%(create_url)s\">open a ticket</a> with Impact and Urgency set to <b>High</b>."
+msgstr "Si vous avez cliqué sur un lien suspect, perdu un appareil ou si tout le bureau est en panne, <b>n’attendez pas</b> : <a href=\"%(create_url)s\">ouvrez un bicket</a> avec l’impact et l’urgence réglés sur <b>Élevé</b>."
+
 #: templates/notifications/list.html
 msgid "Notifications"
 msgstr "Notifications"
@@ -919,23 +1604,7 @@ msgstr "Langue"
 msgid "Main navigation"
 msgstr "Navigation principale"
 
-#: templates/partials/sidebar.html templates/registration/login.html templates/tickets/list.html
-msgid "Tickets"
-msgstr "Tickets"
-
-#: templates/partials/sidebar.html
-msgid "Knowledge base"
-msgstr "Base de connaissances"
-
-#: templates/partials/sidebar.html templates/registration/login.html
-msgid "Assets"
-msgstr "Actifs"
-
-#: templates/partials/sidebar.html
-msgid "My devices"
-msgstr "Mes appareils"
-
-#: templates/partials/sidebar.html
+#: templates/partials/sidebar.html templates/sla/settings.html
 msgid "SLA policies"
 msgstr "Politiques SLA"
 
@@ -1399,10 +2068,6 @@ msgstr "Retour au tableau de bord"
 msgid "Enter your current password, then your new one twice so we can check you typed it correctly."
 msgstr "Saisissez votre mot de passe actuel, puis le nouveau deux fois pour que nous puissions vérifier votre saisie."
 
-#: apps/tickets/workflow.py templates/registration/password_change_form.html
-msgid "Cancel"
-msgstr "Annuler"
-
 #: templates/registration/password_reset_complete.html
 msgid "Password saved"
 msgstr "Mot de passe enregistré"
@@ -1475,6 +2140,45 @@ msgstr "Envoyer le lien de réinitialisation"
 msgid "← Back to sign in"
 msgstr "← Retour à la connexion"
 
+#: templates/sla/settings.html
+msgid "Administration"
+msgstr "Administration"
+
+#: templates/sla/settings.html
+msgid "How quickly each priority must get a first response and be resolved. Tickets turn amber when most of the time is used and red when it runs out."
+msgstr "Délai de première réponse et de résolution pour chaque priorité. Les bickets passent à l’orange quand la majeure partie du temps est écoulée, puis au rouge à l’expiration."
+
+#: templates/sla/settings.html
+#, python-format
+msgid "%(n)s open ticket right now"
+msgid_plural "%(n)s open tickets right now"
+msgstr[0] "%(n)s bicket ouvert en ce moment"
+msgstr[1] "%(n)s bickets ouverts en ce moment"
+
+#: templates/sla/settings.html
+msgid "No open tickets right now"
+msgstr "Aucun bicket ouvert en ce moment"
+
+#: templates/sla/settings.html
+msgid "e.g. 30m, 4h, 1d"
+msgstr "ex. 30m, 4h, 1j"
+
+#: templates/sla/settings.html
+msgid "e.g. 8h, 2d"
+msgstr "ex. 8h, 2j"
+
+#: templates/sla/settings.html
+msgid "Off means tickets of this priority get no due dates."
+msgstr "Désactivé : les bickets de cette priorité n’ont aucune échéance."
+
+#: templates/sla/settings.html
+msgid "Changes apply to tickets created from now on. Tickets that are already open keep the due dates they have."
+msgstr "Les modifications s’appliquent aux bickets créés à partir de maintenant. Les bickets déjà ouverts conservent leurs échéances."
+
+#: templates/sla/settings.html
+msgid "Save SLA policies"
+msgstr "Enregistrer les politiques de SLA"
+
 #: templates/tickets/detail.html
 msgid "← All tickets"
 msgstr "← Tous les tickets"
@@ -1528,14 +2232,10 @@ msgid "Add comment"
 msgstr "Ajouter un commentaire"
 
 #: templates/tickets/detail.html
-msgid "Details"
-msgstr "Détails"
-
-#: templates/tickets/detail.html
 msgid "Requester"
 msgstr "Demandeur"
 
-#: apps/tickets/forms.py templates/tickets/detail.html templates/tickets/list.html
+#: apps/kb/forms.py apps/tickets/forms.py templates/tickets/detail.html
 msgid "Category"
 msgstr "Catégorie"
 
@@ -1551,10 +2251,6 @@ msgstr "Assigné à"
 msgid "Impact / urgency"
 msgstr "Impact / urgence"
 
-#: apps/tickets/forms.py templates/tickets/detail.html
-msgid "Asset"
-msgstr "Actif"
-
 #: templates/tickets/detail.html
 msgid "Response due"
 msgstr "Réponse due"
@@ -1566,10 +2262,6 @@ msgstr "Résolution due"
 #: templates/tickets/detail.html
 msgid "Similar resolved tickets"
 msgstr "Tickets similaires résolus"
-
-#: templates/tickets/detail.html
-msgid "Related articles"
-msgstr "Articles liés"
 
 #: templates/tickets/detail.html
 msgid "History"
@@ -1607,17 +2299,13 @@ msgstr "tout afficher"
 msgid "Ref"
 msgstr "Réf."
 
-#: apps/tickets/forms.py templates/tickets/list.html
+#: apps/kb/forms.py apps/tickets/forms.py templates/tickets/list.html
 msgid "Title"
 msgstr "Titre"
 
 #: templates/tickets/list.html
 msgid "Priority"
 msgstr "Priorité"
-
-#: templates/tickets/list.html
-msgid "Status"
-msgstr "Statut"
 
 #: templates/tickets/list.html
 msgid "Created"
@@ -1649,6 +2337,254 @@ msgid "Too many failed sign-in attempts. Try again in %(n)d minute."
 msgid_plural "Too many failed sign-in attempts. Try again in %(n)d minutes."
 msgstr[0] "Trop de tentatives de connexion échouées. Réessayez dans %(n)d minute."
 msgstr[1] "Trop de tentatives de connexion échouées. Réessayez dans %(n)d minutes."
+
+#: apps/assets/bulk.py
+msgid "Owner (username or email)"
+msgstr "Responsable (nom d’utilisateur ou courriel)"
+
+#: apps/assets/bulk.py apps/assets/forms.py
+msgid "Purchase date"
+msgstr "Date d’achat"
+
+#: apps/assets/bulk.py
+msgid "Purchase cost (CAD)"
+msgstr "Coût d’achat (CAD)"
+
+#: apps/assets/bulk.py apps/assets/forms.py
+msgid "Warranty / renewal date"
+msgstr "Date de garantie / renouvellement"
+
+#: apps/assets/bulk.py
+msgid "The sheet is empty. The first row must contain the column headers."
+msgstr "La feuille est vide. La première ligne doit contenir les en-têtes de colonnes."
+
+#: apps/assets/bulk.py
+msgid "A column header appears twice."
+msgstr "Un en-tête de colonne apparaît deux fois."
+
+#: apps/assets/bulk.py
+msgid "The sheet has a header row but no assets."
+msgstr "La feuille a une ligne d’en-têtes mais aucun actif."
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "%(label)s '%(value)s' is not valid (use one of: %(options)s)"
+msgstr "%(label)s « %(value)s » n’est pas valide (valeurs possibles : %(options)s)"
+
+#: apps/assets/bulk.py
+msgid "Purchase cost must be between 0 and 99,999,999.99"
+msgstr "Le coût d’achat doit être compris entre 0 et 99 999 999,99"
+
+#: apps/assets/bulk.py
+msgid "Purchase cost can have at most 2 decimals"
+msgstr "Le coût d’achat peut avoir au plus 2 décimales"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "Missing column(s): %(cols)s. Download the template to get the exact headers."
+msgstr "Colonne(s) manquante(s) : %(cols)s. Téléchargez le modèle pour obtenir les en-têtes exacts."
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "Unknown column(s): %(cols)s."
+msgstr "Colonne(s) inconnue(s) : %(cols)s."
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "%(label)s '%(value)s' is not a date (use YYYY-MM-DD)"
+msgstr "%(label)s « %(value)s » n’est pas une date (utilisez AAAA-MM-JJ)"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "Owner '%(ident)s' is not an active Helply user"
+msgstr "Le responsable « %(ident)s » n’est pas un utilisateur Helply actif"
+
+#: apps/assets/bulk.py
+msgid "Asset tag is required"
+msgstr "L’étiquette d’actif est obligatoire"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "Purchase cost '%(value)s' is not a number"
+msgstr "Le coût d’achat « %(value)s » n’est pas un nombre"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "Owner '%(ident)s' matches several users, use the username"
+msgstr "Le responsable « %(ident)s » correspond à plusieurs utilisateurs, utilisez le nom d’utilisateur"
+
+#: apps/assets/bulk.py
+msgid "Notes are longer than 5000 characters"
+msgstr "Les notes dépassent 5 000 caractères"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "Asset tag is longer than %(n)s characters"
+msgstr "L’étiquette d’actif dépasse %(n)s caractères"
+
+#: apps/assets/bulk.py
+msgid "Matches several existing assets that differ only by upper/lower case"
+msgstr "Correspond à plusieurs actifs existants qui ne diffèrent que par les majuscules et minuscules"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "%(label)s is longer than %(n)s characters"
+msgstr "%(label)s dépasse %(n)s caractères"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "%(label)s: formulas are not accepted, paste the value instead"
+msgstr "%(label)s : les formules ne sont pas acceptées, collez plutôt la valeur"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "Duplicate of row %(row)s in this file"
+msgstr "Doublon de la ligne %(row)s de ce fichier"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "%(label)s is required for a new asset"
+msgstr "%(label)s est obligatoire pour un nouvel actif"
+
+#: apps/assets/bulk.py
+#, python-format
+msgid "Department '%(name)s' does not exist"
+msgstr "Le service « %(name)s » n’existe pas"
+
+#: apps/assets/forms.py
+msgid "Shared (nobody)"
+msgstr "Partagé (personne)"
+
+#: apps/assets/forms.py
+msgid "None"
+msgstr "Aucun"
+
+#: apps/assets/forms.py
+msgid "Purchase cost"
+msgstr "Coût d’achat"
+
+#: apps/assets/forms.py
+msgid "Where it is, e.g. \"Server room\" or \"Remote\"."
+msgstr "Où il se trouve, p. ex. « Salle des serveurs » ou « À distance »."
+
+#: apps/assets/forms.py
+msgid "Purchase price (CAD). For subscriptions: cost per year."
+msgstr "Prix d’achat (CAD). Pour les abonnements : coût par an."
+
+#: apps/assets/forms.py
+msgid "Warranty end, or renewal date for licences and subscriptions."
+msgstr "Fin de garantie, ou date de renouvellement pour les licences et abonnements."
+
+#: apps/assets/forms.py
+#, python-format
+msgid "An asset tagged %(tag)s already exists."
+msgstr "Un actif portant l’étiquette %(tag)s existe déjà."
+
+#: apps/assets/models.py
+msgid "Laptop"
+msgstr "Ordinateur portable"
+
+#: apps/assets/models.py
+msgid "Desktop / workstation"
+msgstr "Poste de travail"
+
+#: apps/assets/models.py
+msgid "Monitor"
+msgstr "Moniteur"
+
+#: apps/assets/models.py
+msgid "Peripheral / accessory"
+msgstr "Périphérique / accessoire"
+
+#: apps/assets/models.py
+msgid "Mobile phone"
+msgstr "Téléphone mobile"
+
+#: apps/assets/models.py
+msgid "Tablet"
+msgstr "Tablette"
+
+#: apps/assets/models.py
+msgid "Printer / scanner"
+msgstr "Imprimante / numériseur"
+
+#: apps/assets/models.py
+msgid "Server"
+msgstr "Serveur"
+
+#: apps/assets/models.py
+msgid "Cloud server / VPS"
+msgstr "Serveur cloud / VPS"
+
+#: apps/assets/models.py
+msgid "Storage / NAS"
+msgstr "Stockage / NAS"
+
+#: apps/assets/models.py
+msgid "Network device"
+msgstr "Appareil réseau"
+
+#: apps/assets/models.py
+msgid "Power / UPS"
+msgstr "Alimentation / onduleur"
+
+#: apps/assets/models.py
+msgid "Meeting room / AV"
+msgstr "Salle de réunion / audiovisuel"
+
+#: apps/assets/models.py
+msgid "Software licence / subscription"
+msgstr "Licence logicielle / abonnement"
+
+#: apps/assets/models.py
+msgid "Other"
+msgstr "Autre"
+
+#: apps/assets/models.py
+msgid "Retired"
+msgstr "Mis au rebut"
+
+#: apps/assets/views.py
+msgid "Choose an .xlsx file to import."
+msgstr "Choisissez un fichier .xlsx à importer."
+
+#: apps/assets/views.py
+msgid "There is no import waiting. Upload a file first."
+msgstr "Aucune importation en attente. Téléversez d’abord un fichier."
+
+#: apps/assets/views.py
+msgid "That import has expired. Upload the file again."
+msgstr "Cette importation a expiré. Téléversez à nouveau le fichier."
+
+#: apps/assets/views.py
+#, python-format
+msgid "Import done: %(created)s created, %(updated)s updated, %(unchanged)s unchanged, %(skipped)s skipped because of errors."
+msgstr "Importation terminée : %(created)s créés, %(updated)s mis à jour, %(unchanged)s inchangés, %(skipped)s ignorés à cause d’erreurs."
+
+#: apps/assets/views.py
+#, python-format
+msgid "Deleted %(tag)s."
+msgstr "%(tag)s supprimé."
+
+#: apps/assets/views.py
+#, python-format
+msgid "Added %(tag)s."
+msgstr "%(tag)s ajouté."
+
+#: apps/assets/views.py
+#, python-format
+msgid "Saved %(tag)s."
+msgstr "%(tag)s enregistré."
+
+#: apps/assets/views.py
+#, python-format
+msgid "%(tag)s belongs to a monitored cloud server. Remove the server instead."
+msgstr "%(tag)s appartient à un serveur cloud surveillé. Supprimez plutôt le serveur."
+
+#: apps/assets/views.py
+#, python-format
+msgid "Import rejected: %(reason)s"
+msgstr "Importation refusée : %(reason)s"
 
 #: apps/core/overview.py
 msgid "No department"
@@ -1739,6 +2675,84 @@ msgstr "Assigné"
 msgid "In progress"
 msgstr "En cours"
 
+#: apps/kb/forms.py
+msgid "Slug"
+msgstr "Adresse"
+
+#: apps/kb/forms.py
+msgid "Part of the article's web address. Leave blank to build it from the title."
+msgstr "Partie de l’adresse web de l’article. Laissez vide pour la générer à partir du titre."
+
+#: apps/kb/forms.py
+msgid "Summary"
+msgstr "Résumé"
+
+#: apps/kb/forms.py
+msgid "Body"
+msgstr "Contenu"
+
+#: apps/kb/forms.py
+msgid "Keywords"
+msgstr "Mots-clés"
+
+#: apps/kb/forms.py
+msgid "Audience"
+msgstr "Public"
+
+#: apps/kb/forms.py
+msgid "That address is reserved. Choose another."
+msgstr "Cette adresse est réservée. Choisissez-en une autre."
+
+#: apps/kb/views.py
+msgid "Suggestion text is required"
+msgstr "Le texte de la suggestion est obligatoire"
+
+#: apps/kb/views.py
+msgid "Article created."
+msgstr "Article créé."
+
+#: apps/kb/views.py
+msgid "Article saved."
+msgstr "Article enregistré."
+
+#: apps/kb/views.py
+#, python-format
+msgid "Deleted “%(title)s”."
+msgstr "« %(title)s » supprimé."
+
+#: apps/sla/forms.py
+msgid "Use a time like 30m, 4h or 1d 2h."
+msgstr "Utilisez une durée comme 30m, 4h ou 1j 2h."
+
+#: apps/sla/forms.py
+msgid "First response within"
+msgstr "Première réponse en"
+
+#: apps/sla/forms.py
+msgid "Resolved within"
+msgstr "Résolution en"
+
+#: apps/sla/forms.py
+msgid "Track this SLA"
+msgstr "Suivre ce SLA"
+
+#: apps/sla/forms.py
+msgid "Choose between 1 minute and 365 days."
+msgstr "Choisissez entre 1 minute et 365 jours."
+
+#: apps/sla/forms.py
+#, python-format
+msgid "\"%(unit)s\" is not a unit - use m, h or d."
+msgstr "« %(unit)s » n’est pas une unité : utilisez m, h ou j."
+
+#: apps/sla/views.py
+msgid "Some targets need attention - see below."
+msgstr "Certains objectifs demandent votre attention : voir ci-dessous."
+
+#: apps/sla/views.py
+msgid "SLA policies saved. New tickets use them straight away; open tickets keep their due dates."
+msgstr "Politiques de SLA enregistrées. Les nouveaux bickets les utilisent immédiatement ; les bickets ouverts gardent leurs échéances."
+
 #: apps/tickets/choices.py
 msgid "Triaged"
 msgstr "Trié"
@@ -1799,10 +2813,6 @@ msgstr "Ouverts"
 msgid "Not started"
 msgstr "Non démarrés"
 
-#: apps/tickets/choices.py
-msgid "All"
-msgstr "Tous"
-
 #: apps/tickets/forms.py
 msgid "Not sure - let Helply decide"
 msgstr "Je ne sais pas : laissez Helply décider"
@@ -1814,10 +2824,6 @@ msgstr "Aucun / non listé"
 #: apps/tickets/forms.py
 msgid "All departments"
 msgstr "Tous les services"
-
-#: apps/tickets/forms.py
-msgid "Department"
-msgstr "Service"
 
 #: apps/tickets/forms.py
 msgid "Myself"

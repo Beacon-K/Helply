@@ -9,6 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.utils.translation import gettext
 from django.utils.crypto import get_random_string
 
 from apps.accounts.decorators import agent_required
@@ -175,12 +176,12 @@ def asset_import(request):
     """Step 1: read and validate the upload, keep only the cleaned cell text in the session, show a preview."""
     upload = request.FILES.get("file")
     if upload is None:
-        messages.error(request, "Choose an .xlsx file to import.")
+        messages.error(request, gettext("Choose an .xlsx file to import."))
         return redirect("assets:list")
     try:
         parsed = bulk.read_upload(upload)
     except bulk.SheetError as exc:
-        messages.error(request, f"Import rejected: {exc}")
+        messages.error(request, gettext("Import rejected: %(reason)s") % {"reason": exc})
         return redirect("assets:list")
     request.session[IMPORT_SESSION_KEY] = {"rows": [[n, d, e] for n, d, e in parsed],
                                            "token": get_random_string(24)}
@@ -199,7 +200,7 @@ def _pending_plan(request):
 def asset_import_preview(request):
     pending, plan = _pending_plan(request)
     if plan is None:
-        messages.info(request, "There is no import waiting. Upload a file first.")
+        messages.info(request, gettext("There is no import waiting. Upload a file first."))
         return redirect("assets:list")
     return render(request, "assets/import_preview.html", {
         "plan": plan, "token": pending["token"],
@@ -213,13 +214,13 @@ def asset_import_confirm(request):
     """Step 2: apply the valid rows in one transaction. Rows with errors are skipped, nothing is deleted."""
     pending, plan = _pending_plan(request)
     if plan is None or request.POST.get("token") != pending["token"]:
-        messages.error(request, "That import has expired. Upload the file again.")
+        messages.error(request, gettext("That import has expired. Upload the file again."))
         return redirect("assets:list")
     del request.session[IMPORT_SESSION_KEY]
     created, updated = bulk.apply_plan(plan)
     skipped = len(plan["errors"])
-    messages.success(request, f"Import done: {created} created, {updated} updated, "
-                              f"{len(plan['unchanged'])} unchanged, {skipped} skipped because of errors.")
+    messages.success(request, gettext("Import done: %(created)s created, %(updated)s updated, %(unchanged)s unchanged, %(skipped)s skipped because of errors.")
+                     % {"created": created, "updated": updated, "unchanged": len(plan["unchanged"]), "skipped": skipped})
     return redirect("assets:list")
 
 
@@ -237,7 +238,7 @@ def asset_create(request):
     form = AssetForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         asset = form.save()
-        messages.success(request, f"Added {asset.asset_tag}.")
+        messages.success(request, gettext("Added %(tag)s.") % {"tag": asset.asset_tag})
         return redirect(asset.get_absolute_url())
     return render(request, "assets/form.html", {"form": form, "asset": None})
 
@@ -248,7 +249,7 @@ def asset_edit(request, pk):
     form = AssetForm(request.POST or None, instance=asset)
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, f"Saved {asset.asset_tag}.")
+        messages.success(request, gettext("Saved %(tag)s.") % {"tag": asset.asset_tag})
         return redirect(asset.get_absolute_url())
     return render(request, "assets/form.html", {
         "form": form, "asset": asset, "ticket_count": asset.tickets.count(),
@@ -262,9 +263,9 @@ def asset_delete(request, pk):
     removed together with that server instead, so it cannot be deleted here."""
     asset = get_object_or_404(Asset, pk=pk)
     if hasattr(asset, "server"):
-        messages.error(request, f"{asset.asset_tag} belongs to a monitored cloud server. Remove the server instead.")
+        messages.error(request, gettext("%(tag)s belongs to a monitored cloud server. Remove the server instead.") % {"tag": asset.asset_tag})
         return redirect("assets:edit", pk=asset.pk)
     tag = asset.asset_tag
     asset.delete()
-    messages.success(request, f"Deleted {tag}.")
+    messages.success(request, gettext("Deleted %(tag)s.") % {"tag": tag})
     return redirect("assets:list")

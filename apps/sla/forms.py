@@ -1,6 +1,7 @@
 import re
 
 from django import forms
+from django.utils.translation import gettext, gettext_lazy
 
 from apps.tickets.choices import Priority
 
@@ -8,7 +9,7 @@ from .models import SLAPolicy
 
 MAX_MINUTES = 60 * 24 * 365
 _UNITS = {"m": 1, "min": 1, "mins": 1, "minute": 1, "minutes": 1, "h": 60, "hr": 60, "hrs": 60, "hour": 60, "hours": 60,
-          "d": 1440, "day": 1440, "days": 1440, "w": 10080, "week": 10080, "weeks": 10080}
+          "d": 1440, "j": 1440, "jour": 1440, "jours": 1440, "day": 1440, "days": 1440, "w": 10080, "week": 10080, "weeks": 10080}
 
 
 def parse_duration(text):
@@ -18,11 +19,11 @@ def parse_duration(text):
         return int(text)
     parts = re.findall(r"(\d+)\s*([a-z]+)", text)
     if not parts or re.sub(r"(\d+)\s*([a-z]+)|\s+", "", text):
-        raise ValueError("Use a time like 30m, 4h or 1d 2h.")
+        raise ValueError(gettext("Use a time like 30m, 4h or 1d 2h."))
     total = 0
     for number, unit in parts:
         if unit not in _UNITS:
-            raise ValueError(f'"{unit}" is not a unit - use m, h or d.')
+            raise ValueError(gettext('"%(unit)s" is not a unit - use m, h or d.') % {"unit": unit})
         total += int(number) * _UNITS[unit]
     return total
 
@@ -42,7 +43,7 @@ class DurationField(forms.CharField):
         except ValueError as error:
             raise forms.ValidationError(str(error))
         if not 1 <= minutes <= MAX_MINUTES:
-            raise forms.ValidationError("Choose between 1 minute and 365 days.")
+            raise forms.ValidationError(gettext("Choose between 1 minute and 365 days."))
         return minutes
 
 
@@ -50,9 +51,9 @@ class PolicyForm(forms.Form):
     """One row of the SLA page: the targets for a single priority."""
 
     name = forms.CharField(max_length=100)
-    response_minutes = DurationField(label="First response within", max_length=20)
-    resolution_minutes = DurationField(label="Resolved within", max_length=20)
-    is_active = forms.BooleanField(required=False, label="Track this SLA")
+    response_minutes = DurationField(label=gettext_lazy("First response within"), max_length=20)
+    resolution_minutes = DurationField(label=gettext_lazy("Resolved within"), max_length=20)
+    is_active = forms.BooleanField(required=False, label=gettext_lazy("Track this SLA"))
 
     def __init__(self, priority, policy=None, *args, **kwargs):
         kwargs["prefix"] = priority

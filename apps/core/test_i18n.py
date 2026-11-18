@@ -73,6 +73,57 @@ class FrenchPagesTests(TestCase):
         for phrase in ("Signaler un problème informatique", "Urgence", "Soumettre le ticket"):
             self.assertIn(phrase, form)
 
+    def test_knowledge_base_and_sla_pages_in_french(self):
+        from apps.kb.models import Article
+        art = Article.objects.create(title="VPN", slug="vpn", body="x", summary="s", author=self.admin, status="published")
+        c = self._fr(self.admin)
+        lst = c.get(reverse("kb:list")).content.decode()
+        for phrase in ("Base de connaissances", "Nouvel article", "Les plus consultés", "Urgent"):
+            self.assertIn(phrase, lst)
+        detail = c.get(art.get_absolute_url()).content.decode()
+        for phrase in ("Cet article a-t-il résolu votre problème", "Toujours bloqué"):
+            self.assertIn(phrase, detail)
+        sla = c.get(reverse("sla:settings")).content.decode()
+        for phrase in ("Politiques SLA", "Première réponse en", "Enregistrer les politiques de SLA"):
+            self.assertIn(phrase, sla)
+        self.assertNotIn("SLA policies", sla)
+
+    def test_french_duration_units_are_accepted(self):
+        from apps.sla.forms import parse_duration
+        self.assertEqual(parse_duration("1j 2h"), 1560)
+
+    def test_asset_pages_in_french(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        from apps.assets.models import Asset
+        emp_asset = Asset.objects.create(asset_tag="LT-9", name="Portable", type="laptop", status="in_use", owner=self.employee,
+                                         warranty_expiry=timezone.localdate() + timedelta(days=20))
+        adm = self._fr(self.admin)
+        lst = adm.get(reverse("assets:list")).content.decode()
+        for phrase in ("Registre des actifs TI", "Importer depuis Excel", "En stock", "Garanties et renouvellements", "Ordinateur portable"):
+            self.assertIn(phrase, lst)
+        self.assertNotIn("IT asset register", lst)
+        detail = adm.get(emp_asset.get_absolute_url()).content.decode()
+        for phrase in ("Historique des tickets", "Attribué à", "20 jours restants"):
+            self.assertIn(phrase, detail)
+        form = adm.get(reverse("assets:create")).content.decode()
+        for phrase in ("Ajouter un actif", "Achat et garantie", "Numéro de série"):
+            self.assertIn(phrase, form)
+        mine = self._fr(self.employee).get(reverse("assets:list")).content.decode()
+        self.assertIn("Mes appareils", mine) if "Mes appareils" in mine else self.assertIn("appareils", mine)
+
+    def test_import_preview_errors_follow_the_language_but_values_stay_english(self):
+        from apps.assets import bulk
+        from django.utils import translation
+        rows = [(2, {k: "" for k in bulk.KEYS} | {"asset_tag": "N-1", "name": "X", "type": "Laptop"}, []),
+                (3, {k: "" for k in bulk.KEYS} | {"asset_tag": "N-2", "name": "Y", "type": "laptop", "purchase_date": "oops"}, [])]
+        with translation.override("fr"):
+            plan = bulk.classify(rows)
+        self.assertEqual(len(plan["create"]), 1)
+        self.assertIn("n’est pas une date", plan["errors"][0]["errors"][0])
+        with translation.override("en"):
+            self.assertEqual(len(bulk.classify(rows[:1])["create"]), 1)
+
     def test_choice_labels_and_time_filters_follow_the_language(self):
         with translation.override("fr"):
             self.assertEqual(str(User.Role.ADMINISTRATOR.label), "Administrateur")

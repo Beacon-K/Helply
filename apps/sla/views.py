@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.db.models import Count
 from django.shortcuts import redirect, render
+from django.utils.translation import gettext
 
 from apps.accounts.decorators import role_required
 from apps.accounts.models import User
@@ -22,9 +23,9 @@ def policy_settings(request):
         if all([f.is_valid() for f in forms]):
             for form in forms:
                 form.save()
-            messages.success(request, "SLA policies saved. New tickets use them straight away; open tickets keep their due dates.")
+            messages.success(request, gettext("SLA policies saved. New tickets use them straight away; open tickets keep their due dates."))
             return redirect("sla:settings")
-        messages.error(request, "Some targets need attention - see below.")
+        messages.error(request, gettext("Some targets need attention - see below."))
     for form in forms:
         form.open_count = open_counts.get(form.priority, 0)
     return render(request, "sla/settings.html", {"forms": forms})

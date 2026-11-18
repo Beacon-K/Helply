@@ -1,5 +1,5 @@
-{% extends "base.html" %}{% load static helply %}
-{% block title %}Assets{% endblock %}
+{% extends "base.html" %}{% load i18n static helply %}
+{% block title %}{% trans "Assets" %}{% endblock %}
 
 {% block scripts %}<script src="{% static 'js/live.js' %}?v={{ asset_version }}" defer></script>
 <script>
@@ -17,64 +17,64 @@ document.addEventListener("click", function (e) {
 <div hidden data-live data-live-url="{% url 'assets:live' %}" data-live-version="{{ live_version }}" data-live-interval="15"></div>
 <div class="dash-head">
   <div>
-    <h1>IT asset register</h1>
-    <p class="muted"><span id="asset-total" data-live-region>{{ total }} assets</span> · devices, network equipment and licences
-      <span class="live-badge" data-live-status aria-live="polite">Live</span></p>
+    <h1>{% trans "IT asset register" %}</h1>
+    <p class="muted"><span id="asset-total" data-live-region>{% blocktrans count n=total %}{{ n }} asset{% plural %}{{ n }} assets{% endblocktrans %}</span> · {% trans "devices, network equipment and licences" %}
+      <span class="live-badge" data-live-status aria-live="polite">{% trans "Live" %}</span></p>
   </div>
   <div class="head-actions">
-    <button type="button" class="btn" data-bulk-toggle aria-controls="bulk-import" aria-expanded="false">Import from Excel</button>
-    <a class="btn" id="asset-export" href="{% url 'assets:export' %}?type={{ type_filter|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;q={{ q|urlencode }}" download>Export to Excel{% if q or status_filter or type_filter %} (filtered){% endif %}</a>
-    <a class="btn primary" href="{% url 'assets:create' %}">+ Add asset</a>
+    <button type="button" class="btn" data-bulk-toggle aria-controls="bulk-import" aria-expanded="false">{% trans "Import from Excel" %}</button>
+    <a class="btn" id="asset-export" href="{% url 'assets:export' %}?type={{ type_filter|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;q={{ q|urlencode }}" download>{% if q or status_filter or type_filter %}{% trans "Export to Excel (filtered)" %}{% else %}{% trans "Export to Excel" %}{% endif %}</a>
+    <a class="btn primary" href="{% url 'assets:create' %}">{% trans "+ Add asset" %}</a>
   </div>
 </div>
 
 <section class="card bulk-import" id="bulk-import" hidden>
   <div class="bulk-import-head">
     <div>
-      <h2>Import assets from Excel</h2>
-      <p class="muted small">1. Download the template and fill in one row per asset. 2. Upload it here. 3. Review the preview, then confirm. Existing assets are matched on their asset tag; nothing is deleted.</p>
+      <h2>{% trans "Import assets from Excel" %}</h2>
+      <p class="muted small">{% trans "1. Download the template and fill in one row per asset. 2. Upload it here. 3. Review the preview, then confirm. Existing assets are matched on their asset tag; nothing is deleted." %}</p>
     </div>
     <span class="bulk-import-buttons">
-      <a class="btn" href="{% url 'assets:import_template' %}" download>Download Excel template</a>
-      <button type="button" class="btn" data-bulk-toggle>Close</button>
+      <a class="btn" href="{% url 'assets:import_template' %}" download>{% trans "Download Excel template" %}</a>
+      <button type="button" class="btn" data-bulk-toggle>{% trans "Close" %}</button>
     </span>
   </div>
   <form method="post" action="{% url 'assets:import' %}" enctype="multipart/form-data" class="bulk-import-form">
     {% csrf_token %}
-    <input type="file" name="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required aria-label="Excel file (.xlsx)">
-    <button class="btn primary">Upload &amp; preview</button>
+    <input type="file" name="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required aria-label="{% trans "Excel file (.xlsx)" %}">
+    <button class="btn primary">{% trans "Upload & preview" %}</button>
   </form>
 </section>
 
 <section class="kpis kpis-6" id="asset-kpis" data-live-region>
-  <a class="kpi" href="?status=in_use"><span class="kpi-label">In use</span><span class="kpi-value">{{ kpi.in_use }}</span><span class="kpi-sub">with people, rooms or in the cloud</span></a>
-  <a class="kpi" href="?status=in_stock"><span class="kpi-label">In stock</span><span class="kpi-value">{{ kpi.in_stock }}</span><span class="kpi-sub">spares ready to hand out</span></a>
-  <a class="kpi {% if kpi.in_repair %}kpi-warn{% endif %}" href="?status=in_repair"><span class="kpi-label">In repair</span><span class="kpi-value">{{ kpi.in_repair }}</span><span class="kpi-sub">out of service</span></a>
-  <a class="kpi {% if kpi.expired %}kpi-danger{% elif kpi.expiring %}kpi-warn{% endif %}" href="?status=warranty"><span class="kpi-label">Warranty &amp; renewals</span><span class="kpi-value">{{ kpi.expired|add:kpi.expiring }}</span><span class="kpi-sub"><b class="t-danger">{{ kpi.expired }} expired</b> · <b class="t-warn">{{ kpi.expiring }} due ≤ 90 days</b></span></a>
-  <div class="kpi"><span class="kpi-label">Hardware value</span><span class="kpi-value">${{ kpi.hardware_value|money }}</span><span class="kpi-sub">purchase price, excl. retired</span></div>
-  <a class="kpi" href="?type=license"><span class="kpi-label">Subscriptions</span><span class="kpi-value">${{ kpi.subscriptions|money }}</span><span class="kpi-sub">per year, software &amp; cloud</span></a>
+  <a class="kpi" href="?status=in_use"><span class="kpi-label">{% trans "In use" %}</span><span class="kpi-value">{{ kpi.in_use }}</span><span class="kpi-sub">{% trans "with people, rooms or in the cloud" %}</span></a>
+  <a class="kpi" href="?status=in_stock"><span class="kpi-label">{% trans "In stock" %}</span><span class="kpi-value">{{ kpi.in_stock }}</span><span class="kpi-sub">{% trans "spares ready to hand out" %}</span></a>
+  <a class="kpi {% if kpi.in_repair %}kpi-warn{% endif %}" href="?status=in_repair"><span class="kpi-label">{% trans "In repair" %}</span><span class="kpi-value">{{ kpi.in_repair }}</span><span class="kpi-sub">{% trans "out of service" %}</span></a>
+  <a class="kpi {% if kpi.expired %}kpi-danger{% elif kpi.expiring %}kpi-warn{% endif %}" href="?status=warranty"><span class="kpi-label">{% trans "Warranty & renewals" %}</span><span class="kpi-value">{{ kpi.expired|add:kpi.expiring }}</span><span class="kpi-sub"><b class="t-danger">{% blocktrans with n=kpi.expired %}{{ n }} expired{% endblocktrans %}</b> · <b class="t-warn">{% blocktrans with n=kpi.expiring %}{{ n }} due ≤ 90 days{% endblocktrans %}</b></span></a>
+  <div class="kpi"><span class="kpi-label">{% trans "Hardware value" %}</span><span class="kpi-value">${{ kpi.hardware_value|money }}</span><span class="kpi-sub">{% trans "purchase price, excl. retired" %}</span></div>
+  <a class="kpi" href="?type=license"><span class="kpi-label">{% trans "Subscriptions" %}</span><span class="kpi-value">${{ kpi.subscriptions|money }}</span><span class="kpi-sub">{% trans "per year, software & cloud" %}</span></a>
 </section>
 
 <div class="card">
   <form method="get" class="asset-toolbar">
-    <input type="search" name="q" value="{{ q }}" placeholder="Search by tag, name, type, status, owner, location, supplier or serial">
+    <input type="search" name="q" value="{{ q }}" placeholder="{% trans "Search by tag, name, type, status, owner, location, supplier or serial" %}">
     <select name="status" onchange="this.form.submit()">
-      <option value="">Any status</option>
+      <option value="">{% trans "Any status" %}</option>
       {% for value, label in statuses %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
-      <option value="warranty" {% if status_filter == "warranty" %}selected{% endif %}>Warranty expired / expiring</option>
+      <option value="warranty" {% if status_filter == "warranty" %}selected{% endif %}>{% trans "Warranty expired / expiring" %}</option>
     </select>
     {% if type_filter %}<input type="hidden" name="type" value="{{ type_filter }}">{% endif %}
-    <button class="btn">Search</button>
-    {% if q or status_filter or type_filter %}<a class="small" href="{% url 'assets:list' %}">Clear filters</a>{% endif %}
+    <button class="btn">{% trans "Search" %}</button>
+    {% if q or status_filter or type_filter %}<a class="small" href="{% url 'assets:list' %}">{% trans "Clear filters" %}</a>{% endif %}
   </form>
   <p class="filters type-filters" id="asset-types" data-live-region>
-    <a href="?status={{ status_filter }}&q={{ q|urlencode }}" {% if not type_filter %}class="on"{% endif %}>All types <span class="filter-count">{{ total }}</span></a>
+    <a href="?status={{ status_filter }}&q={{ q|urlencode }}" {% if not type_filter %}class="on"{% endif %}>{% trans "All types" %} <span class="filter-count">{{ total }}</span></a>
     {% for value, label, icon, n in types %}<a href="?type={{ value }}&status={{ status_filter }}&q={{ q|urlencode }}" {% if type_filter == value %}class="on"{% endif %}>{{ label }} <span class="filter-count">{{ n }}</span></a>{% endfor %}
   </p>
 
   <div class="table-wrap" id="asset-table" data-live-region>
   <table class="asset-table">
-    <tr><th>Asset</th><th>Status</th><th>Assigned to</th><th>Location</th><th>Warranty / renewal</th><th>Tickets</th></tr>
+    <tr><th>{% trans "Asset" %}</th><th>{% trans "Status" %}</th><th>{% trans "Assigned to" %}</th><th>{% trans "Location" %}</th><th>{% trans "Warranty / renewal" %}</th><th>{% trans "Tickets" %}</th></tr>
     {% for a in assets %}
     <tr data-row-key="{{ a.pk }}" data-row-stamp="{{ a.updated_at|date:'U' }}-{{ a.open_tickets }}-{{ a.recent_tickets }}">
       <td>
@@ -84,27 +84,27 @@ document.addEventListener("click", function (e) {
         </a>
       </td>
       <td><span class="badge as-{{ a.status }}">{{ a.get_status_display }}</span></td>
-      <td>{% if a.owner %}{{ a.owner }}<br><small class="muted">{{ a.department|default:"" }}</small>{% else %}<span class="muted">Shared</span><br><small class="muted">{{ a.department|default:"" }}</small>{% endif %}</td>
+      <td>{% if a.owner %}{{ a.owner }}<br><small class="muted">{{ a.department|default:"" }}</small>{% else %}<span class="muted">{% trans "Shared" %}</span><br><small class="muted">{{ a.department|default:"" }}</small>{% endif %}</td>
       <td><span class="small">{{ a.location|default:"–" }}</span></td>
       <td>{% include "assets/_warranty.html" %}</td>
       <td>
-        {% if a.open_tickets %}<span class="chip chip-warn">{{ a.open_tickets }} open</span>{% endif %}
-        {% if a.recent_tickets >= repeat_threshold %}<span class="chip chip-danger" title="{{ a.recent_tickets }} tickets in the last {{ repeat_window }} days">↻ {{ a.recent_tickets }} in {{ repeat_window }}d</span>{% endif %}
+        {% if a.open_tickets %}<span class="chip chip-warn">{% blocktrans with n=a.open_tickets %}{{ n }} open{% endblocktrans %}</span>{% endif %}
+        {% if a.recent_tickets >= repeat_threshold %}<span class="chip chip-danger" title="{% blocktrans with n=a.recent_tickets w=repeat_window %}{{ n }} tickets in the last {{ w }} days{% endblocktrans %}">↻ {% blocktrans with n=a.recent_tickets w=repeat_window %}{{ n }} in {{ w }}d{% endblocktrans %}</span>{% endif %}
         {% if not a.open_tickets and a.recent_tickets < repeat_threshold %}<span class="muted">–</span>{% endif %}
       </td>
     </tr>
     {% empty %}
-    <tr><td colspan="6" class="empty">No assets match these filters.</td></tr>
+    <tr><td colspan="6" class="empty">{% trans "No assets match these filters." %}</td></tr>
     {% endfor %}
   </table>
   </div>
-  <nav class="pager" id="asset-pager" data-live-region aria-label="Pages">
-    <span class="muted small">{% if page.paginator.count %}Showing {{ page.start_index }}–{{ page.end_index }} of {{ page.paginator.count }}{% else %}Nothing to show{% endif %}</span>
+  <nav class="pager" id="asset-pager" data-live-region aria-label="{% trans "Pages" %}">
+    <span class="muted small">{% if page.paginator.count %}{% blocktrans with a=page.start_index b=page.end_index c=page.paginator.count %}Showing {{ a }}–{{ b }} of {{ c }}{% endblocktrans %}{% else %}{% trans "Nothing to show" %}{% endif %}</span>
     {% if page.paginator.num_pages > 1 %}
     <span class="pager-links">
-      {% if page.has_previous %}<a class="btn small-btn" href="?{% if pager_query %}{{ pager_query }}&amp;{% endif %}page={{ page.previous_page_number }}">← Previous</a>{% else %}<span class="btn small-btn is-disabled" aria-disabled="true">← Previous</span>{% endif %}
-      <span class="small">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
-      {% if page.has_next %}<a class="btn small-btn" href="?{% if pager_query %}{{ pager_query }}&amp;{% endif %}page={{ page.next_page_number }}">Next →</a>{% else %}<span class="btn small-btn is-disabled" aria-disabled="true">Next →</span>{% endif %}
+      {% if page.has_previous %}<a class="btn small-btn" href="?{% if pager_query %}{{ pager_query }}&amp;{% endif %}page={{ page.previous_page_number }}">← {% trans "Previous" %}</a>{% else %}<span class="btn small-btn is-disabled" aria-disabled="true">← {% trans "Previous" %}</span>{% endif %}
+      <span class="small">{% blocktrans with a=page.number b=page.paginator.num_pages %}Page {{ a }} of {{ b }}{% endblocktrans %}</span>
+      {% if page.has_next %}<a class="btn small-btn" href="?{% if pager_query %}{{ pager_query }}&amp;{% endif %}page={{ page.next_page_number }}">{% trans "Next" %} →</a>{% else %}<span class="btn small-btn is-disabled" aria-disabled="true">{% trans "Next" %} →</span>{% endif %}
     </span>
     {% endif %}
   </nav>
