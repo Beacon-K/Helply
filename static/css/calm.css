@@ -241,3 +241,17 @@ input:focus, select:focus, textarea:focus, :root[data-theme="dark"] input:focus,
 .acct-head { display: grid; gap: .1rem; padding: .55rem .7rem .6rem; margin-bottom: .25rem; border-bottom: 1px solid var(--line); }
 .acct-menu a { display: flex; align-items: center; min-height: 36px; padding: 0 .7rem; border-radius: 8px; color: var(--text); text-decoration: none; }
 .acct-menu a:hover, .acct-menu a:focus-visible { background: var(--soft); outline: none; text-decoration: none; }
+
+/* ---------- Dashboard key numbers: one tidy strip ----------
+   Every tile has the same three rows (label, number, one note), the label never wraps, the note reserves two lines
+   so the numbers sit on one baseline across the strip, and the dividers are real 1px borders (the old 1px grid gap
+   came out 1px or 2px depending on the column width). */
+.kpis { gap: 0; background: var(--card); border: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.kpis .kpi, :root[data-theme="dark"] .kpis .kpi {
+  display: grid; grid-template-rows: auto auto 1fr; align-content: start; gap: .35rem; padding: 1.2rem 1.4rem 1.25rem;
+  border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.kpis .kpi-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .82rem; color: var(--muted); }
+.kpis .kpi-value { display: flex; align-items: baseline; gap: .2rem; line-height: 1.05; font-size: clamp(1.9rem, 1.4rem + .9vw, 2.4rem); }
+.kpis .kpi-value small { font-size: .9rem; font-weight: 400; color: var(--muted); }
+.kpis .kpi-danger .kpi-value::after, .kpis .kpi-warn .kpi-value::after { align-self: center; flex: none; margin-left: .45rem; }
+.kpis .kpi-sub { font-size: .82rem; line-height: 1.4; min-height: 2.8em; color: var(--muted); }

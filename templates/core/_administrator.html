@@ -26,7 +26,7 @@
     <span class="kpi-sub">{{ kpi.csat_n }} rating{{ kpi.csat_n|pluralize }}</span>
   </div>
   <div class="kpi">
-    <span class="kpi-label">AI category accuracy</span>
+    <span class="kpi-label" title="AI category accuracy">AI accuracy</span>
     <span class="kpi-value">{% if kpi.ai_accuracy is not None %}{{ kpi.ai_accuracy }}%{% else %}–{% endif %}</span>
     <span class="kpi-sub">{{ kpi.ai_auto }} auto-triaged · {{ kpi.ai_reviewed }} reviewed</span>
   </div>
