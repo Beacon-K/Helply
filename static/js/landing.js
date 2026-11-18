@@ -85,7 +85,7 @@
     var inner = slides[n].querySelector(".lp-slide-in");
     if (inner && !(opts && opts.keepScroll)) inner.scrollTop = 0;
     try { history.replaceState(null, "", "#" + slides[n].dataset.id); } catch (e) { /* the address bar is a nicety */ }
-    lock(reduce ? 250 : 900);
+    lock(900);
   }
   function lock(ms) {
     locked = true;
@@ -172,7 +172,7 @@
       e.preventDefault();
       go(0);
       var field = document.querySelector("#signin input[name=username]");
-      setTimeout(function () { if (field) field.focus({ preventScroll: true }); }, reduce ? 0 : 900);
+      setTimeout(function () { if (field) field.focus({ preventScroll: true }); }, 900);
     });
   });
 
@@ -184,7 +184,12 @@
   slides.forEach(function (s) { s.style.transition = "none"; });
   go(start >= 0 ? start : 0, { keepScroll: true });
   locked = false;
-  requestAnimationFrame(function () { requestAnimationFrame(function () { slides.forEach(function (s) { s.style.transition = ""; }); }); });
+  // re-enable the page-turn transition once the first paint is done; a timer as well, because animation frames
+  // do not run in a hidden or throttled tab, which would leave the cards cutting instead of sliding
+  var armed = false;
+  function armTransitions() { if (armed) return; armed = true; slides.forEach(function (s) { s.style.transition = ""; }); }
+  requestAnimationFrame(function () { requestAnimationFrame(armTransitions); });
+  setTimeout(armTransitions, 120);
 
   // an in-page anchor (#signin) can leave the card scrolled; always open on its top
   slides.forEach(function (sl) { var in_ = sl.querySelector(".lp-slide-in"); if (in_) in_.scrollTop = 0; });
@@ -200,6 +205,12 @@
     if (a && a.name === "username" && (innerHeight < 700 || innerWidth < 981)) a.blur();  // would scroll the card again
     first.scrollTop = 0;
   }, 400); });
+
+  // decode every card's pictures while the browser is idle, so none of them pops in during a page turn
+  window.addEventListener("load", function () {
+    var warm = function () { document.querySelectorAll(".lp-slide img").forEach(function (im) { if (im.decode) im.decode().catch(function () {}); }); };
+    if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 2500 }); else setTimeout(warm, 800);
+  });
 
   window.addEventListener("hashchange", function () {
     var i = indexOfId((location.hash || "").slice(1));
