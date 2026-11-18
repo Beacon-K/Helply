@@ -243,8 +243,8 @@ html:not([data-theme="dark"]) .lp .lp-nav.is-light .lp-pill:hover { background: 
 .lp-toggle { border-radius: 10px; }
 
 /* hero */
-.lp-hero-bg img { animation: none; transform: none; filter: contrast(1.08) saturate(1.05); opacity: .9; }
-.lp-hero-bg::after { background: linear-gradient(90deg, rgba(0, 0, 0, .86) 4%, rgba(0, 0, 0, .5) 45%, rgba(0, 0, 0, .2) 100%), linear-gradient(0deg, rgba(0, 0, 0, .7) 0%, transparent 26%), linear-gradient(180deg, rgba(0, 0, 0, .55) 0%, transparent 18%); }
+.lp-hero-bg img { animation: none; transform: none; filter: none; opacity: 1; }
+.lp-hero-bg::after { background: linear-gradient(90deg, rgba(0, 0, 0, .66) 4%, rgba(0, 0, 0, .3) 45%, rgba(0, 0, 0, .04) 100%), linear-gradient(0deg, rgba(0, 0, 0, .55) 0%, transparent 22%), linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, transparent 16%); }
 .orb { display: none; }
 .lp-card { border-radius: 16px; background: rgba(17, 18, 20, .94); border: 1px solid rgba(255, 255, 255, .12); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
 .lp-card h2 { font-size: 1.6rem; font-weight: 600; letter-spacing: -.02em; }
@@ -555,24 +555,85 @@ html.lp-deck-on:not([data-theme="dark"]) .lp-top:hover { background: #ececef; }
 @media (max-width: 980px) { .lp-install { margin-top: .9rem; } }
 @media (max-width: 640px) { .lp-icons { margin-left: -.6rem; gap: .2rem; } .lp-seg { gap: .2rem; } .lp-icon { width: 58px; height: 58px; border-radius: 16px; } .lp-icon svg { width: 32px; height: 32px; } }
 
-/* Large desktop screens: the sign-in cover was sized for ~1200px and looked small on 1440–2560px displays.
-   Gated on height too, so short laptop windows keep the compact rules above. */
-@media (min-width: 1200px) and (min-height: 820px) {
-  .lp-deck-on .lp-hero-inner { width: min(1400px, 100%); grid-template-columns: minmax(0, 1.1fr) minmax(460px, 540px); gap: clamp(3rem, 6vw, 7rem); }
-  .lp-deck-on .lp-hero .lp-display { font-size: clamp(4.4rem, 6.6vw, 7.6rem); }
-  .lp-deck-on .lp-hero .lp-eyebrow { font-size: 1.15rem; }
-  .lp-deck-on .lp-hero .lp-lede { max-width: 40rem; font-size: clamp(1.4rem, 1.75vw, 1.75rem); margin-top: 1.4rem; }
-  .lp-deck-on .lp-hero .lp-scrollcue { font-size: 1.1rem; }
-  .lp-deck-on .lp-card { padding: 2.4rem 2.3rem 1.8rem; border-radius: 20px; }
-  .lp-deck-on .lp-card h2 { font-size: 2.2rem; }
-  .lp-deck-on .lp-card-sub { font-size: 1.12rem; margin-bottom: 1.8rem; }
-  .lp-deck-on .lp-form { gap: 1.2rem; }
-  .lp-deck-on .lp-field label { font-size: 1rem; }
-  .lp-deck-on .lp .lp-form input[type=text], .lp-deck-on .lp .lp-form input[type=password],
-  .lp .lp-form input[type=text], .lp .lp-form input[type=password] { height: 58px; font-size: 1.15rem; border-radius: 12px; }
-  .lp-deck-on .lp-submit { height: 58px; font-size: 1.15rem; border-radius: 12px; }
-  .lp-deck-on .lp-eye { width: 44px; height: 44px; }
-  .lp-deck-on .lp-card-foot { font-size: 1.05rem; margin-top: 1.3rem; }
-  .lp-deck-on .lp-secure { font-size: .92rem; }
-  .lp-deck-on .lp-nav a { font-size: 1rem; }
+/* ---------- Sign-in cover scales with the window ----------
+   One length (--hs) drives the cover's type, card and spacing, so it fits any desktop window: it follows the
+   width on wide screens and the height on short ones (a 1920px laptop at 150% zoom is only ~550px tall).
+   Under 981px the phone/tablet rules above apply unchanged. */
+@media (min-width: 981px) {
+  html.lp-deck-on { --hs: clamp(13px, min(1.1vw, calc((100svh - 150px) / 27)), 26px); }
+  .lp-deck-on .lp-hero-inner { font-size: var(--hs); width: min(calc(var(--hs) * 76), calc(100% - 3rem)); margin-inline: auto;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 27em); gap: 4em; }
+  html.lp-deck-on.lp-on-hero .lp-nav, html.lp-deck-on.lp-on-hero:not([data-theme="dark"]) .lp-nav { padding: 0 max(1.25rem, calc((100vw - var(--hs) * 76) / 2)); }
+  .lp-deck-on .lp-hero .lp-display { font-size: 4.6em; }
+  .lp-deck-on .lp-hero .lp-eyebrow { font-size: 1.02em; }
+  .lp-deck-on .lp-hero .lp-lede { font-size: 1.35em; max-width: 28em; margin-top: .9em; }
+  .lp-deck-on .lp-hero .lp-install { margin-top: 1.3em; }
+  .lp-deck-on .lp-hero .lp-icon { width: 4.2em; height: 4.2em; border-radius: 1.2em; }
+  .lp-deck-on .lp-hero .lp-icon svg { width: 2.5em; height: 2.5em; }
+  .lp-deck-on .lp-hero .lp-scrollcue { font-size: 1em; }
+  .lp-deck-on .lp-card { padding: 2em 1.9em 1.5em; border-radius: .9em; }
+  .lp-deck-on .lp-card h2 { font-size: 1.9em; }
+  .lp-deck-on .lp-card-sub { font-size: 1em; margin: .4em 0 1.3em; }
+  .lp-deck-on .lp-form { gap: 1em; }
+  .lp-deck-on .lp-field label { font-size: .9em; }
+  .lp-deck-on .lp .lp-form input[type=text], .lp-deck-on .lp .lp-form input[type=password] { height: 3em; font-size: 1.05em; border-radius: .6em; }
+  .lp-deck-on .lp-submit { height: 3em; font-size: 1.05em; border-radius: .6em; }
+  .lp-deck-on .lp-eye { width: 2.5em; height: 2.5em; }
+  .lp-deck-on .lp-alert, .lp-deck-on .lp-err { font-size: .9em; }
+  .lp-deck-on .lp-card-foot { font-size: .95em; margin-top: 1.1em; }
+  .lp-deck-on .lp-secure { font-size: .8em; }
+}
+
+/* ---------- Content pages: no scrollbar, the picture fills the page's height ----------
+   The picture used to keep a 4:3 box whatever the window, so on a short window it ran taller than the page and
+   made the card scroll. Now the picture takes the height the page has (capped on very tall screens) and crops
+   its sides instead. The card can still scroll on phones, but never shows a bar. */
+.lp-deck-on .lp-slide-in { scrollbar-width: none; -ms-overflow-style: none; }
+.lp-deck-on .lp-slide-in::-webkit-scrollbar { display: none; }
+@media (min-width: 981px) {
+  .lp-deck-on .lp-slide-in > .lp-wrap.lp-fit { grid-template-rows: minmax(0, 1fr); }
+  .lp-deck-on .lp-fit .lp-fig { aspect-ratio: 4 / 3; height: auto; max-height: 100%; align-self: center; }
+  .lp-deck-on .lp-fit .lp-fig.art { aspect-ratio: 10 / 7; }
+  .lp-deck-on .lp-fit .lp-copy { align-self: center; }
+}
+
+/* ---------- Content pages keep all of their text on every desktop window ----------
+   The older short-window rules above hid the intro line, the kicker, the feature descriptions and the optional
+   features once the window was under 760px tall, so a 1920px laptop at 150% zoom lost half of each page.
+   On desktop widths nothing is hidden any more: the text scales with the window (--hs, set for the cover) and,
+   if it still does not fit, the card scrolls without showing a bar. Phones keep their short version. */
+@media (min-width: 981px) {
+  .lp-deck-on .lp-fit .lp-kicker, .lp-deck-on .lp-fit .lp-p, .lp-deck-on .lp-fit .lp-p.opt, .lp-deck-on .lp-fit .lp-fine.opt, .lp-deck-on .lp-feats .d { display: block; }
+  .lp-deck-on .lp-feats li.opt { display: grid; }
+  .lp-deck-on .lp-fit .lp-kicker { font-size: calc(var(--hs) * .9); margin-bottom: .4em; }
+  .lp-deck-on .lp-fit .lp-h2 { font-size: calc(var(--hs) * 2.3); }
+  .lp-deck-on .lp-fit .lp-p { font-size: calc(var(--hs) * .98); margin-top: .7em; line-height: 1.45; }
+  .lp-deck-on .lp-fit .lp-fine { font-size: calc(var(--hs) * .85); margin-top: .7em; }
+  .lp-deck-on .lp-feats { margin-top: 1em; gap: .7em 1.4em; }
+  .lp-deck-on .lp-feats li { grid-template-columns: calc(var(--hs) * 2.2) minmax(0, 1fr); gap: .7em; }
+  .lp-deck-on .lp-feats b { font-size: calc(var(--hs) * .98); }
+  .lp-deck-on .lp-feats .d { font-size: calc(var(--hs) * .86); line-height: 1.4; }
+  .lp-deck-on .lp-ico.sm { width: calc(var(--hs) * 2.2); height: calc(var(--hs) * 2.2); }
+}
+
+/* AI page: the text sat against the card's left edge with a wide gap before the picture; pull it toward the middle */
+@media (min-width: 981px) {
+  .lp-deck-on #ai .lp-fit.rev > .lp-copy { justify-self: end; width: min(100%, calc(var(--hs) * 34)); margin-right: clamp(0px, 3vw, 3.5rem); }
+}
+
+/* ---------- Zooming in or out never removes anything ----------
+   Browser zoom changes the window's size in CSS pixels, and the older "short window" and "phone" rules then hid the
+   intro line, the "Explore" cue, the sign-in hint, the security note, page intros and feature descriptions.
+   Nothing is hidden by size any more. On desktop widths everything scales down to fit (--hs); on narrow windows
+   a page that is taller than the window scrolls inside its card, without a visible bar. */
+.lp-deck-on .lp-hero .lp-lede, .lp-deck-on .lp-hero-copy .lp-lede, .lp-deck-on .lp-eyebrow, .lp-deck-on .lp-card-sub,
+.lp-deck-on .lp-hero .lp-scrollcue, .lp-deck-on .lp-fit .lp-kicker, .lp-deck-on .lp-fit .lp-p, .lp-deck-on .lp-feats .d,
+.lp-deck-on .lp-fit .lp-fine.opt, .lp-deck-on .lp-cta .lp-lede, .lp-deck-on .lp-footline { display: block; }
+.lp-deck-on .lp-secure { display: flex; }
+.lp-deck-on .lp-feats li.opt { display: grid; }
+.lp-deck-on .lp-fit .lp-fig { display: block; }
+@media (min-width: 981px) {
+  html.lp-deck-on { --hs: clamp(10px, min(1.1vw, calc((100svh - 160px) / 29)), 26px); }
+  .lp-deck-on .lp-hero .lp-slide-in { padding-top: 64px; padding-bottom: 72px; }
+  .lp-deck-on .lp-hero .lp-scrollcue { margin-top: .8em; }
 }

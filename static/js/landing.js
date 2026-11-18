@@ -191,6 +191,15 @@
   function settle() { deck.scrollTop = 0; deck.scrollLeft = 0; var in_ = slides[cur].querySelector(".lp-slide-in"); if (in_ && in_.scrollTop < 2) in_.scrollTop = 0; }
   settle();
   window.addEventListener("load", function () { settle(); setTimeout(settle, 60); });
+  // the browser focuses the username field (autofocus) and scrolls a tall first card to it; on a small window that
+  // hid the headline, so open on the top once, unless a sign-in error needs the form in view
+  window.addEventListener("load", function () { setTimeout(function () {
+    var first = slides[0] && slides[0].querySelector(".lp-slide-in");
+    if (!first || cur !== 0 || document.querySelector(".lp-alert, .lp-err:not(:empty)")) return;
+    var a = document.activeElement;
+    if (a && a.name === "username" && (innerHeight < 700 || innerWidth < 981)) a.blur();  // would scroll the card again
+    first.scrollTop = 0;
+  }, 400); });
 
   window.addEventListener("hashchange", function () {
     var i = indexOfId((location.hash || "").slice(1));
