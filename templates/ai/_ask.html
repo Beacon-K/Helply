@@ -1,13 +1,13 @@
-{# Employee self-service assistant. Answers come from the KB and the user's own tickets (apps.ai.assistant.ask). #}
+{% load i18n %}{# Employee self-service assistant. Answers come from the KB and the user's own tickets (apps.ai.assistant.ask). #}
 <section class="card ai-panel" data-ai-ask data-url="{% url 'ai:ask' %}" data-ticket-url="{% url 'tickets:create' %}">
   {% csrf_token %}
   <div class="ai-head">
-    <span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Helply Assistant</span>
-    <small class="muted">Answers from our knowledge base and your own past tickets. Please don't paste passwords.</small>
+    <span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>{% trans "Helply Assistant" %}</span>
+    <small class="muted">{% trans "Answers from our knowledge base and your own past tickets. Please don't paste passwords." %}</small>
   </div>
   <form class="ai-form">
-    <textarea rows="2" maxlength="500" placeholder="Describe your problem, e.g. “my VPN disconnects every few minutes”" aria-label="Ask the assistant"></textarea>
-    <button class="btn primary" type="submit">Ask</button>
+    <textarea rows="2" maxlength="500" placeholder="{% trans "Describe your problem, e.g. “my VPN disconnects every few minutes”" %}" aria-label="{% trans "Ask the assistant" %}"></textarea>
+    <button class="btn primary" type="submit">{% trans "Ask" %}</button>
   </form>
   <div class="ai-out" aria-live="polite" hidden></div>
 </section>

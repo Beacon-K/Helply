@@ -1,37 +1,37 @@
-{# Helply Assistant: the chat drawer available on every signed-in page (apps.ai.chat). #}
-<aside class="ai-drawer" id="ai-drawer" hidden aria-label="Helply Assistant" data-user="{{ user.pk }}" data-url="{% url 'ai:chat' %}"
+{% load i18n %}{# Helply Assistant: the chat drawer available on every signed-in page (apps.ai.chat). #}
+<aside class="ai-drawer" id="ai-drawer" hidden aria-label="{% trans "Helply Assistant" %}" data-user="{{ user.pk }}" data-url="{% url 'ai:chat' %}"
        data-feedback="{% url 'ai:feedback' 0 %}" data-ticket-url="{% url 'tickets:create' %}">
   {% csrf_token %}
   <header class="aid-head">
-    <span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Helply Assistant</span>
+    <span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>{% trans "Helply Assistant" %}</span>
     <span class="aid-actions">
-      <button type="button" class="aid-icon" data-aid-new title="New chat" aria-label="Start a new chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-      <button type="button" class="aid-icon" data-aid-close title="Close" aria-label="Close the assistant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button type="button" class="aid-icon" data-aid-new title="{% trans "New chat" %}" aria-label="{% trans "Start a new chat" %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button type="button" class="aid-icon" data-aid-close title="{% trans "Close" %}" aria-label="{% trans "Close the assistant" %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </span>
   </header>
   <div class="aid-log" role="log" aria-live="polite">
     <div class="aid-welcome">
-      <p class="aid-hello">{% if user.is_administrator %}What should we look at today?{% elif user.is_technician %}How can I help with your queue?{% else %}How can I help with IT today?{% endif %}</p>
-      <p class="muted small">{% if user.is_agent %}I can use your tickets, the knowledge base and internal runbooks{% if user.is_administrator %}, and the latest ticket analysis{% endif %}.{% else %}I answer from our knowledge base and your own tickets.{% endif %} Please don't paste passwords.</p>
+      <p class="aid-hello">{% if user.is_administrator %}{% trans "What should we look at today?" %}{% elif user.is_technician %}{% trans "How can I help with your queue?" %}{% else %}{% trans "How can I help with IT today?" %}{% endif %}</p>
+      <p class="muted small">{% if user.is_agent %}{% if user.is_administrator %}{% trans "I can use your tickets, the knowledge base and internal runbooks, and the latest ticket analysis." %}{% else %}{% trans "I can use your tickets, the knowledge base and internal runbooks." %}{% endif %}{% else %}{% trans "I answer from our knowledge base and your own tickets." %}{% endif %} {% trans "Please don't paste passwords." %}</p>
       <div class="aid-starters">
         {% if user.is_administrator %}
-        <button type="button" data-prompt="What problems keep recurring, and what is the likely cause?">What keeps recurring?</button>
-        <button type="button" data-prompt="Which open tickets should I look at first and why?">What needs attention first?</button>
-        <button type="button" data-prompt="What could turn into a bigger incident if we do nothing?">What could get worse?</button>
+        <button type="button" data-prompt="{% trans "What problems keep recurring, and what is the likely cause?" %}">{% trans "What keeps recurring?" %}</button>
+        <button type="button" data-prompt="{% trans "Which open tickets should I look at first and why?" %}">{% trans "What needs attention first?" %}</button>
+        <button type="button" data-prompt="{% trans "What could turn into a bigger incident if we do nothing?" %}">{% trans "What could get worse?" %}</button>
         {% elif user.is_technician %}
-        <button type="button" data-prompt="Summarise my open tickets and tell me what to work on first.">Plan my queue</button>
-        <button type="button" data-prompt="Which of my tickets are closest to breaching their SLA?">SLA risks</button>
-        <button type="button" data-prompt="Help me write a reply to a user whose VPN keeps disconnecting.">Draft a reply</button>
+        <button type="button" data-prompt="{% trans "Summarise my open tickets and tell me what to work on first." %}">{% trans "Plan my queue" %}</button>
+        <button type="button" data-prompt="{% trans "Which of my tickets are closest to breaching their SLA?" %}">{% trans "SLA risks" %}</button>
+        <button type="button" data-prompt="{% trans "Help me write a reply to a user whose VPN keeps disconnecting." %}">{% trans "Draft a reply" %}</button>
         {% else %}
-        <button type="button" data-prompt="My VPN keeps disconnecting. What can I try?">VPN keeps disconnecting</button>
-        <button type="button" data-prompt="What is the status of my open tickets?">Status of my tickets</button>
-        <button type="button" data-prompt="Help me write a clear ticket about my problem.">Help me write a ticket</button>
+        <button type="button" data-prompt="{% trans "My VPN keeps disconnecting. What can I try?" %}">{% trans "VPN keeps disconnecting" %}</button>
+        <button type="button" data-prompt="{% trans "What is the status of my open tickets?" %}">{% trans "Status of my tickets" %}</button>
+        <button type="button" data-prompt="{% trans "Help me write a clear ticket about my problem." %}">{% trans "Help me write a ticket" %}</button>
         {% endif %}
       </div>
     </div>
   </div>
   <form class="aid-form">
-    <textarea rows="1" maxlength="800" placeholder="Ask anything about IT or your tickets…" aria-label="Message the assistant"></textarea>
-    <button class="btn primary" type="submit" aria-label="Send">Send</button>
+    <textarea rows="1" maxlength="800" placeholder="{% trans "Ask anything about IT or your tickets…" %}" aria-label="{% trans "Message the assistant" %}"></textarea>
+    <button class="btn primary" type="submit" aria-label="{% trans "Send" %}">{% trans "Send" %}</button>
   </form>
 </aside>

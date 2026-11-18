@@ -339,7 +339,8 @@ class LoginLandingTests(TestCase):
             self.assertIn(needle, html)
         for src in re.findall(r'src="/static/(img/landing/[^"?]+)', html):
             self.assertIsNotNone(finders.find(src), src)
-        self.assertEqual(html.count("<form"), 1)  # one form: the "Sign in" links scroll to it, they do not duplicate it
+        sign_in_forms = html.count("<form") - html.count('<form class="lang-switch')  # the EN/FR switch is a form too
+        self.assertEqual(sign_in_forms, 1)  # one sign-in form: the "Sign in" links scroll to it, they do not duplicate it
 
     def test_next_parameter_survives_for_the_hidden_field(self):
         html = self.client.get("/accounts/login/?next=/tickets/").content.decode()

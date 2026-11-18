@@ -1,220 +1,221 @@
-{% extends "base_landing.html" %}{% load static %}
-{% block title %}Helply · IT help, handled{% endblock %}
+{% extends "base_landing.html" %}{% load i18n %}{% load static %}
+{% block title %}{% trans "Helply · IT help, handled" %}{% endblock %}
 {% block head %}<script>document.documentElement.classList.add("lp-deck-on")</script>{% endblock %}
 {% block scripts %}<script src="{% static 'js/landing.js' %}?v={{ asset_version }}" defer></script>{% endblock %}
 
 {% block body %}
 <header class="lp-nav" data-nav>
-  <a class="lp-brand" href="#signin" data-go="0" aria-label="Helply, back to the first slide"><img src="{% static 'img/brand/logo-glyph.png' %}" alt="" width="28" height="28"><span>Helply</span></a>
-  <nav class="lp-links" aria-label="Sections">
-    <a href="#tickets" data-slide-link="tickets">Tickets</a><a href="#ai" data-slide-link="ai">AI</a><a href="#sla" data-slide-link="sla">SLA</a><a href="#servers" data-slide-link="servers">Servers</a><a href="#assets" data-slide-link="assets">Assets</a>
+  <a class="lp-brand" href="#signin" data-go="0" aria-label="{% trans "Helply, back to the first slide" %}"><img src="{% static 'img/brand/logo-glyph.png' %}" alt="" width="28" height="28"><span>{% trans "Helply" %}</span></a>
+  <nav class="lp-links" aria-label="{% trans "Sections" %}">
+    <a href="#tickets" data-slide-link="tickets">{% trans "Tickets" %}</a><a href="#ai" data-slide-link="ai">{% trans "AI" %}</a><a href="#sla" data-slide-link="sla">{% trans "SLA" %}</a><a href="#servers" data-slide-link="servers">{% trans "Servers" %}</a><a href="#assets" data-slide-link="assets">{% trans "Assets" %}</a>
   </nav>
   <div class="lp-nav-end">
-    <button type="button" class="lp-toggle" data-theme-toggle aria-label="Switch between light and dark mode" title="Switch theme">
+    {% include "partials/lang_switch.html" %}
+    <button type="button" class="lp-toggle" data-theme-toggle aria-label="{% trans "Switch between light and dark mode" %}" title="{% trans "Switch theme" %}">
       <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
       <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
     </button>
-    <a class="lp-pill" href="#signin" data-goto-signin>Sign in</a>
+    <a class="lp-pill" href="#signin" data-goto-signin>{% trans "Sign in" %}</a>
   </div>
 </header>
 
 <main class="lp-deck" id="top" data-deck>
   <!-- ============ Hero + sign in ============ -->
-  <section class="lp-slide lp-hero" data-slide data-id="welcome" data-title="Sign in"><div class="lp-slide-in">
+  <section class="lp-slide lp-hero" data-slide data-id="welcome" data-title="{% trans "Sign in" %}"><div class="lp-slide-in">
     <div class="lp-hero-bg" aria-hidden="true"><img src="{% static 'img/landing/hero-cover.webp' %}" alt="" width="2000" height="1333" decoding="async"></div>
     <div class="lp-hero-inner">
       <div class="lp-hero-copy">
-        <p class="lp-eyebrow reveal">The IT service desk for teams of 10 to 100</p>
-        <h1 class="lp-display reveal" style="--d:.08s">IT help,<br><span class="lp-grad">handled.</span></h1>
-        <p class="lp-lede reveal" style="--d:.16s">Tickets that sort themselves. Servers that speak up. Renewals that never sneak up on you. One calm place for the people who keep the company running.</p>
+        <p class="lp-eyebrow reveal">{% trans "The IT service desk for teams of 10 to 100" %}</p>
+        <h1 class="lp-display reveal" style="--d:.08s">{% trans "IT help," %}<br><span class="lp-grad">{% trans "handled." %}</span></h1>
+        <p class="lp-lede reveal" style="--d:.16s">{% trans "Tickets that sort themselves. Servers that speak up. Renewals that never sneak up on you. One calm place for the people who keep the company running." %}</p>
 
         <div class="lp-install reveal" style="--d:.2s">
-          <div class="lp-icons" role="group" aria-label="Get Helply from GitHub">
+          <div class="lp-icons" role="group" aria-label="{% trans "Get Helply from GitHub" %}">
           <div class="lp-seg">
-            <a class="lp-icon" data-os-link="win" href="https://github.com/Beacon-K/Helply" target="_blank" rel="noopener noreferrer" aria-label="Helply for Windows, on GitHub" title="Helply for Windows, on GitHub"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><path d="M2.5 5.2 10.4 4v7.4H2.5V5.2Zm9.1-1.3L21.5 2.5v8.9h-9.9V3.9ZM2.5 12.6h7.9v7.5l-7.9-1.2v-6.3Zm9.1 0h9.9v8.9l-9.9-1.4v-7.5Z"/></svg></a>
-            <a class="lp-icon" data-os-link="linux" href="https://github.com/Beacon-K/Helply" target="_blank" rel="noopener noreferrer" aria-label="Helply for Linux, on GitHub" title="Helply for Linux, on GitHub"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 7.5 6 4.5-6 4.5"/><path d="M13 17.5h7"/></svg></a>
+            <a class="lp-icon" data-os-link="win" href="https://github.com/Beacon-K/Helply" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Helply for Windows, on GitHub" %}" title="{% trans "Helply for Windows, on GitHub" %}"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><path d="M2.5 5.2 10.4 4v7.4H2.5V5.2Zm9.1-1.3L21.5 2.5v8.9h-9.9V3.9ZM2.5 12.6h7.9v7.5l-7.9-1.2v-6.3Zm9.1 0h9.9v8.9l-9.9-1.4v-7.5Z"/></svg></a>
+            <a class="lp-icon" data-os-link="linux" href="https://github.com/Beacon-K/Helply" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Helply for Linux, on GitHub" %}" title="{% trans "Helply for Linux, on GitHub" %}"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 7.5 6 4.5-6 4.5"/><path d="M13 17.5h7"/></svg></a>
           </div>
-          <a class="lp-icon" data-os-link="github" href="https://github.com/Beacon-K/Helply" target="_blank" rel="noopener noreferrer" aria-label="Helply on GitHub" title="Helply on GitHub"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.35 1.08 2.92.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg></a>
+          <a class="lp-icon" data-os-link="github" href="https://github.com/Beacon-K/Helply" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Helply on GitHub" %}" title="{% trans "Helply on GitHub" %}"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.35 1.08 2.92.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg></a>
           </div>
         </div>
-        <p class="lp-scrollcue reveal" style="--d:.3s"><a href="#showcase" data-next>Explore Helply <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a></p>
+        <p class="lp-scrollcue reveal" style="--d:.3s"><a href="#showcase" data-next>{% trans "Explore Helply" %} <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a></p>
       </div>
 
       <div class="lp-card reveal" id="signin" style="--d:.2s">
-        <h2>Sign in</h2>
-        <p class="lp-card-sub">Use the account your administrator created for you.</p>
+        <h2>{% trans "Sign in" %}</h2>
+        <p class="lp-card-sub">{% trans "Use the account your administrator created for you." %}</p>
         <form method="post" class="lp-form" novalidate>{% csrf_token %}
           {% if form.non_field_errors %}<div class="lp-alert" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
           <div class="lp-field{% if form.username.errors %} has-error{% endif %}">
-            <label for="{{ form.username.id_for_label }}">Username</label>
+            <label for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
             {{ form.username }}
             {% if form.username.errors %}<span class="lp-err">{{ form.username.errors|join:" " }}</span>{% endif %}
           </div>
           <div class="lp-field{% if form.password.errors %} has-error{% endif %}">
-            <label for="{{ form.password.id_for_label }}">Password</label>
+            <label for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
             <div class="lp-pass">
               {{ form.password }}
-              <button type="button" class="lp-eye" data-eye aria-label="Show password" aria-pressed="false">
+              <button type="button" class="lp-eye" data-eye aria-label="{% trans "Show password" %}" aria-pressed="false">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
             {% if form.password.errors %}<span class="lp-err">{{ form.password.errors|join:" " }}</span>{% endif %}
           </div>
           <input type="hidden" name="next" value="{{ next }}">
-          <button class="lp-submit">Sign in</button>
+          <button class="lp-submit">{% trans "Sign in" %}</button>
         </form>
-        <p class="lp-card-foot"><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
-        <p class="lp-secure"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted connection. Repeated wrong passwords are temporarily blocked.</p>
+        <p class="lp-card-foot"><a href="{% url 'password_reset' %}">{% trans "Forgot your password?" %}</a></p>
+        <p class="lp-secure"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>{% trans "Encrypted connection. Repeated wrong passwords are temporarily blocked." %}</p>
       </div>
     </div>
   </div></section>
 
   <!-- ============ Tickets ============ -->
-  <section class="lp-slide lp-feature" id="tickets" data-slide data-id="tickets" data-title="Tickets"><div class="lp-slide-in">
+  <section class="lp-slide lp-feature" id="tickets" data-slide data-id="tickets" data-title="{% trans "Tickets" %}"><div class="lp-slide-in">
     <div class="lp-wrap lp-fit">
       <figure class="lp-fig reveal">
-        <img src="{% static 'img/landing/server-rack.jpg' %}" alt="A rack of servers with glowing status lights" width="800" height="500" decoding="async">
-        <figcaption class="chip c1"><i class="dot"></i>Category suggested</figcaption>
-        <figcaption class="chip c2"><i class="dot teal"></i>Routed to the right team</figcaption>
-        <figcaption class="chip c3"><i class="dot amber"></i>Response clock started</figcaption>
+        <img src="{% static 'img/landing/server-rack.jpg' %}" alt="{% trans "A rack of servers with glowing status lights" %}" width="800" height="500" decoding="async">
+        <figcaption class="chip c1"><i class="dot"></i>{% trans "Category suggested" %}</figcaption>
+        <figcaption class="chip c2"><i class="dot teal"></i>{% trans "Routed to the right team" %}</figcaption>
+        <figcaption class="chip c3"><i class="dot amber"></i>{% trans "Response clock started" %}</figcaption>
       </figure>
       <div class="lp-copy">
-        <p class="lp-kicker reveal">Tickets</p>
-        <h2 class="lp-h2 reveal" style="--d:.04s">From first message to a closed ticket.</h2>
+        <p class="lp-kicker reveal">{% trans "Tickets" %}</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">{% trans "From first message to a closed ticket." %}</h2>
         <ul class="lp-feats reveal-list">
-          <li class="reveal" style="--d:0.05s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span><b>Raised your way</b><small class="d">Describe the problem in plain words.</small></span></li>
-          <li class="reveal" style="--d:0.09s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span><span><b>Sorted on arrival</b><small class="d">Suggested category, then routed to the right team.</small></span></li>
-          <li class="reveal" style="--d:0.13s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>Priority from impact and urgency</b><small class="d">P1 to P4, the same for everyone.</small></span></li>
-          <li class="reveal" style="--d:0.17s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2.5h6"/></svg></span><span><b>SLA clocks that pause</b><small class="d">Deadlines pause while you wait on someone.</small></span></li>
-          <li class="reveal opt" style="--d:0.21s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/></svg></span><span><b>Replies and private notes</b><small class="d">Internal notes stay with IT.</small></span></li>
-          <li class="reveal opt" style="--d:0.33s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><b>Closed with feedback</b><small class="d">Requesters rate the fix.</small></span></li>
+          <li class="reveal" style="--d:0.05s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span><b>{% trans "Raised your way" %}</b><small class="d">{% trans "Describe the problem in plain words." %}</small></span></li>
+          <li class="reveal" style="--d:0.09s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span><span><b>{% trans "Sorted on arrival" %}</b><small class="d">{% trans "Suggested category, then routed to the right team." %}</small></span></li>
+          <li class="reveal" style="--d:0.13s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>{% trans "Priority from impact and urgency" %}</b><small class="d">{% trans "P1 to P4, the same for everyone." %}</small></span></li>
+          <li class="reveal" style="--d:0.17s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2.5h6"/></svg></span><span><b>{% trans "SLA clocks that pause" %}</b><small class="d">{% trans "Deadlines pause while you wait on someone." %}</small></span></li>
+          <li class="reveal opt" style="--d:0.21s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/></svg></span><span><b>{% trans "Replies and private notes" %}</b><small class="d">{% trans "Internal notes stay with IT." %}</small></span></li>
+          <li class="reveal opt" style="--d:0.33s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><b>{% trans "Closed with feedback" %}</b><small class="d">{% trans "Requesters rate the fix." %}</small></span></li>
         </ul>
       </div>
     </div>
   </div></section>
 
   <!-- ============ AI ============ -->
-  <section class="lp-slide lp-ai" id="ai" data-slide data-id="ai" data-title="AI inside the workflow"><div class="lp-slide-in">
+  <section class="lp-slide lp-ai" id="ai" data-slide data-id="ai" data-title="{% trans "AI inside the workflow" %}"><div class="lp-slide-in">
     <div class="lp-wrap lp-fit rev">
       <figure class="lp-fig art reveal" aria-hidden="true"><img src="{% static 'img/landing/ai-chip.jpg' %}" alt="" width="1999" height="1400" decoding="async"></figure>
       <div class="lp-copy">
-        <p class="lp-kicker reveal">Intelligence, built in</p>
-        <h2 class="lp-h2 reveal" style="--d:.04s">AI inside the workflow.<br><span class="lp-grad">Not a chat box.</span></h2>
+        <p class="lp-kicker reveal">{% trans "Intelligence, built in" %}</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">{% trans "AI inside the workflow." %}<br><span class="lp-grad">{% trans "Not a chat box." %}</span></h2>
         <ul class="lp-feats one">
-          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span><span><b>It sorts.</b><small class="d">Suggests a category and triages when sure.</small></span></li>
-          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M17 11l2 2 3-4"/></svg></span><span><b>It routes.</b><small class="d">To the lightest-loaded technician on the right team.</small></span></li>
-          <li class="reveal" style="--d:0.20s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H20v15H6.5A1.5 1.5 0 0 0 5 19.5Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H20M9 8h7M9 12h5"/></svg></span><span><b>It remembers.</b><small class="d">Related articles and past tickets appear beside new ones.</small></span></li>
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/><path d="m16 15 2 2 4-4"/></svg></span><span><b>{% trans "It sorts." %}</b><small class="d">{% trans "Suggests a category and triages when sure." %}</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M17 11l2 2 3-4"/></svg></span><span><b>{% trans "It routes." %}</b><small class="d">{% trans "To the lightest-loaded technician on the right team." %}</small></span></li>
+          <li class="reveal" style="--d:0.20s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H20v15H6.5A1.5 1.5 0 0 0 5 19.5Z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H20M9 8h7M9 12h5"/></svg></span><span><b>{% trans "It remembers." %}</b><small class="d">{% trans "Related articles and past tickets appear beside new ones." %}</small></span></li>
         </ul>
       </div>
     </div>
   </div></section>
 
   <!-- ============ SLA ============ -->
-  <section class="lp-slide lp-feature alt" id="sla" data-slide data-id="sla" data-title="Service levels"><div class="lp-slide-in">
+  <section class="lp-slide lp-feature alt" id="sla" data-slide data-id="sla" data-title="{% trans "Service levels" %}"><div class="lp-slide-in">
     <div class="lp-wrap lp-fit rev">
       <figure class="lp-fig reveal">
-        <img src="{% static 'img/landing/patch-cables.jpg' %}" alt="Network patch cables plugged into a switch" width="1307" height="1900" decoding="async">
-        <figcaption class="chip c1"><i class="dot teal"></i>Clock paused while you wait</figcaption>
-        <figcaption class="chip c2"><i class="dot amber"></i>Warned before it is late</figcaption>
+        <img src="{% static 'img/landing/patch-cables.jpg' %}" alt="{% trans "Network patch cables plugged into a switch" %}" width="1307" height="1900" decoding="async">
+        <figcaption class="chip c1"><i class="dot teal"></i>{% trans "Clock paused while you wait" %}</figcaption>
+        <figcaption class="chip c2"><i class="dot amber"></i>{% trans "Warned before it is late" %}</figcaption>
       </figure>
       <div class="lp-copy">
-        <p class="lp-kicker reveal">Service levels</p>
-        <h2 class="lp-h2 reveal" style="--d:.04s">A promise you can see being kept.</h2>
-        <p class="lp-p reveal" style="--d:.08s">Set response and resolution targets per priority. The clock pauses while you wait, and Helply warns before a ticket is late.</p>
+        <p class="lp-kicker reveal">{% trans "Service levels" %}</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">{% trans "A promise you can see being kept." %}</h2>
+        <p class="lp-p reveal" style="--d:.08s">{% trans "Set response and resolution targets per priority. The clock pauses while you wait, and Helply warns before a ticket is late." %}</p>
         <ul class="lp-feats one">
-          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/></svg></span><span><b>P1 to P4 targets you control</b><small class="d">Changed in seconds on one page.</small></span></li>
-          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>At risk and breached tickets rise</b><small class="d">They go to the top of every dashboard.</small></span></li>
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/></svg></span><span><b>{% trans "P1 to P4 targets you control" %}</b><small class="d">{% trans "Changed in seconds on one page." %}</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>{% trans "At risk and breached tickets rise" %}</b><small class="d">{% trans "They go to the top of every dashboard." %}</small></span></li>
         </ul>
       </div>
     </div>
   </div></section>
 
   <!-- ============ Servers ============ -->
-  <section class="lp-slide lp-feature dark" id="servers" data-slide data-id="servers" data-title="Cloud servers"><div class="lp-slide-in">
+  <section class="lp-slide lp-feature dark" id="servers" data-slide data-id="servers" data-title="{% trans "Cloud servers" %}"><div class="lp-slide-in">
     <div class="lp-wrap lp-fit">
       <figure class="lp-fig reveal">
-        <img src="{% static 'img/landing/hero-switch.webp' %}" alt="Cables and glowing ports on a network switch" width="2000" height="1500" decoding="async">
-        <figcaption class="chip c1"><i class="dot"></i>Reporting every 10 seconds</figcaption>
-        <figcaption class="chip c2"><i class="dot amber"></i>Offline for 2 minutes opens a ticket</figcaption>
+        <img src="{% static 'img/landing/hero-switch.webp' %}" alt="{% trans "Cables and glowing ports on a network switch" %}" width="2000" height="1500" decoding="async">
+        <figcaption class="chip c1"><i class="dot"></i>{% trans "Reporting every 10 seconds" %}</figcaption>
+        <figcaption class="chip c2"><i class="dot amber"></i>{% trans "Offline for 2 minutes opens a ticket" %}</figcaption>
       </figure>
       <div class="lp-copy">
-        <p class="lp-kicker reveal">Cloud servers</p>
-        <h2 class="lp-h2 reveal" style="--d:.04s">See your servers before your users do.</h2>
-        <p class="lp-p reveal" style="--d:.08s">One command installs a tiny agent. Live CPU, memory, disk and network, and a ticket when something breaks.</p>
+        <p class="lp-kicker reveal">{% trans "Cloud servers" %}</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">{% trans "See your servers before your users do." %}</h2>
+        <p class="lp-p reveal" style="--d:.08s">{% trans "One command installs a tiny agent. Live CPU, memory, disk and network, and a ticket when something breaks." %}</p>
         <ul class="lp-feats one">
-          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span><b>Read-only by design</b><small class="d">Sends readings only. Accepts no commands.</small></span></li>
-          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><span><b>Where it runs, what it costs</b><small class="d">Country, provider and renewal date, beside the graphs.</small></span></li>
-          <li class="reveal opt" style="--d:0.20s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><b>Recovery noted for you</b><small class="d">When the server returns, the ticket says so.</small></span></li>
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span><b>{% trans "Read-only by design" %}</b><small class="d">{% trans "Sends readings only. Accepts no commands." %}</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><span><b>{% trans "Where it runs, what it costs" %}</b><small class="d">{% trans "Country, provider and renewal date, beside the graphs." %}</small></span></li>
+          <li class="reveal opt" style="--d:0.20s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span><span><b>{% trans "Recovery noted for you" %}</b><small class="d">{% trans "When the server returns, the ticket says so." %}</small></span></li>
         </ul>
       </div>
     </div>
   </div></section>
 
   <!-- ============ Assets ============ -->
-  <section class="lp-slide lp-feature" id="assets" data-slide data-id="assets" data-title="Assets and renewals"><div class="lp-slide-in">
+  <section class="lp-slide lp-feature" id="assets" data-slide data-id="assets" data-title="{% trans "Assets and renewals" %}"><div class="lp-slide-in">
     <div class="lp-wrap lp-fit rev">
       <figure class="lp-fig reveal">
-        <img src="{% static 'img/landing/assets.jpg' %}" alt="Network equipment on a desk in front of a server room" width="936" height="624" decoding="async">
-        <figcaption class="chip c1"><i class="dot teal"></i>Renews in 14 days</figcaption>
+        <img src="{% static 'img/landing/assets.jpg' %}" alt="{% trans "Network equipment on a desk in front of a server room" %}" width="936" height="624" decoding="async">
+        <figcaption class="chip c1"><i class="dot teal"></i>{% trans "Renews in 14 days" %}</figcaption>
       </figure>
       <div class="lp-copy">
-        <p class="lp-kicker reveal">Assets and renewals</p>
-        <h2 class="lp-h2 reveal" style="--d:.04s">Know what you own, and when it expires.</h2>
-        <p class="lp-p reveal" style="--d:.08s">Devices, licences and cloud servers in one register, with owners and renewal dates. Reminders at 30, 14 and 7 days.</p>
+        <p class="lp-kicker reveal">{% trans "Assets and renewals" %}</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">{% trans "Know what you own, and when it expires." %}</h2>
+        <p class="lp-p reveal" style="--d:.08s">{% trans "Devices, licences and cloud servers in one register, with owners and renewal dates. Reminders at 30, 14 and 7 days." %}</p>
         <ul class="lp-feats one">
-          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg></span><span><b>Every device keeps its story</b><small class="d">Including the tickets raised against it.</small></span></li>
-          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>Repeat faults stand out</b><small class="d">Replacing a laptop becomes a decision, not a hunch.</small></span></li>
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg></span><span><b>{% trans "Every device keeps its story" %}</b><small class="d">{% trans "Including the tickets raised against it." %}</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg></span><span><b>{% trans "Repeat faults stand out" %}</b><small class="d">{% trans "Replacing a laptop becomes a decision, not a hunch." %}</small></span></li>
         </ul>
       </div>
     </div>
   </div></section>
 
   <!-- ============ Small team ============ -->
-  <section class="lp-slide lp-feature alt" id="team" data-slide data-id="team" data-title="Made for small teams"><div class="lp-slide-in">
+  <section class="lp-slide lp-feature alt" id="team" data-slide data-id="team" data-title="{% trans "Made for small teams" %}"><div class="lp-slide-in">
     <div class="lp-wrap lp-fit">
       <figure class="lp-fig reveal">
-        <img src="{% static 'img/landing/team.jpg' %}" alt="Tiny figures plugging in a network cable" width="728" height="486" decoding="async">
-        <figcaption class="chip c1"><i class="dot teal"></i>One to five people in IT</figcaption>
+        <img src="{% static 'img/landing/team.jpg' %}" alt="{% trans "Tiny figures plugging in a network cable" %}" width="728" height="486" decoding="async">
+        <figcaption class="chip c1"><i class="dot teal"></i>{% trans "One to five people in IT" %}</figcaption>
       </figure>
       <div class="lp-copy">
-        <p class="lp-kicker reveal">Made for small teams</p>
-        <h2 class="lp-h2 reveal" style="--d:.04s">Big-company discipline. Small-company calm.</h2>
+        <p class="lp-kicker reveal">{% trans "Made for small teams" %}</p>
+        <h2 class="lp-h2 reveal" style="--d:.04s">{% trans "Big-company discipline. Small-company calm." %}</h2>
         <ul class="lp-feats one">
-          <li class="reveal" style="--d:0.08s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M16 5a3 3 0 0 1 0 6M18 14.5a5.5 5.5 0 0 1 3 5.5"/></svg></span><span><b>One to five people in IT?</b><small class="d">That is who Helply is for. No consultants, no long setup.</small></span></li>
-          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span><b>Three roles, nothing extra</b><small class="d">Employees, technicians, administrators.</small></span></li>
-          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span><b>Fix it yourself first</b><small class="d">Suggested answers appear while people type.</small></span></li>
-          <li class="reveal opt" style="--d:0.20s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7ZM10 19a2 2 0 0 0 4 0"/></svg></span><span><b>Quiet, useful notifications</b><small class="d">Only when someone has to act.</small></span></li>
+          <li class="reveal" style="--d:0.08s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M16 5a3 3 0 0 1 0 6M18 14.5a5.5 5.5 0 0 1 3 5.5"/></svg></span><span><b>{% trans "One to five people in IT?" %}</b><small class="d">{% trans "That is who Helply is for. No consultants, no long setup." %}</small></span></li>
+          <li class="reveal" style="--d:0.12s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span><b>{% trans "Three roles, nothing extra" %}</b><small class="d">{% trans "Employees, technicians, administrators." %}</small></span></li>
+          <li class="reveal" style="--d:0.16s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span><b>{% trans "Fix it yourself first" %}</b><small class="d">{% trans "Suggested answers appear while people type." %}</small></span></li>
+          <li class="reveal opt" style="--d:0.20s"><span class="lp-ico sm"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7ZM10 19a2 2 0 0 0 4 0"/></svg></span><span><b>{% trans "Quiet, useful notifications" %}</b><small class="d">{% trans "Only when someone has to act." %}</small></span></li>
         </ul>
       </div>
     </div>
   </div></section>
 
   <!-- ============ Trust + closing ============ -->
-  <section class="lp-slide lp-cta" data-slide data-id="start" data-title="Ready when you are"><div class="lp-slide-in">
+  <section class="lp-slide lp-cta" data-slide data-id="start" data-title="{% trans "Ready when you are" %}"><div class="lp-slide-in">
     <div class="lp-wrap center">
-      <h2 class="lp-display sm reveal">Ready when you are.</h2>
-      <p class="lp-lede center reveal" style="--d:.08s">Sign in to see what needs you today.</p>
-      <a class="lp-pill big reveal" style="--d:.14s" href="#signin" data-goto-signin>Sign in</a>
+      <h2 class="lp-display sm reveal">{% trans "Ready when you are." %}</h2>
+      <p class="lp-lede center reveal" style="--d:.08s">{% trans "Sign in to see what needs you today." %}</p>
+      <a class="lp-pill big reveal" style="--d:.14s" href="#signin" data-goto-signin>{% trans "Sign in" %}</a>
       <div class="lp-trust-inline">
       <ul class="lp-facts">
-        <li class="reveal"><b>10 to 100</b><span>people, the size Helply is designed for</span></li>
-        <li class="reveal" style="--d:.06s"><b>0</b><span>remote commands. The agent only reports</span></li>
-        <li class="reveal" style="--d:.12s"><b>1</b><span>database as the single source of truth</span></li>
-        <li class="reveal" style="--d:.18s"><b>2 themes</b><span>light and dark, following your device</span></li>
+        <li class="reveal"><b>{% trans "10 to 100" %}</b><span>{% trans "people, the size Helply is designed for" %}</span></li>
+        <li class="reveal" style="--d:.06s"><b>0</b><span>{% trans "remote commands. The agent only reports" %}</span></li>
+        <li class="reveal" style="--d:.12s"><b>1</b><span>{% trans "database as the single source of truth" %}</span></li>
+        <li class="reveal" style="--d:.18s"><b>{% trans "2 themes" %}</b><span>{% trans "light and dark, following your device" %}</span></li>
       </ul>
       </div>
-      <p class="lp-footline">Helply &middot; IT service desk &middot; A Fanshawe College capstone project</p>
+      <p class="lp-footline">{% trans "Helply · IT service desk · A Fanshawe College capstone project" %}</p>
     </div>
   </div></section>
 </main>
 
-<button type="button" class="lp-top" data-top aria-label="Back to the first page" title="Back to the first page">
-  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 11 6-6 6 6M6 19l6-6 6 6"/></svg><span>Back to start</span>
+<button type="button" class="lp-top" data-top aria-label="{% trans "Back to the first page" %}" title="{% trans "Back to the first page" %}">
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 11 6-6 6 6M6 19l6-6 6 6"/></svg><span>{% trans "Back to start" %}</span>
 </button>
-<nav class="lp-dots" aria-label="Slides" data-dots></nav>
-<div class="lp-pager" aria-label="Slide controls">
-  <button type="button" class="lp-pg" data-prev aria-label="Previous slide"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button>
+<nav class="lp-dots" aria-label="{% trans "Slides" %}" data-dots></nav>
+<div class="lp-pager" aria-label="{% trans "Slide controls" %}">
+  <button type="button" class="lp-pg" data-prev aria-label="{% trans "Previous slide" %}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button>
   <span class="lp-count" data-count aria-live="polite">1 / 1</span>
-  <button type="button" class="lp-pg" data-next aria-label="Next slide"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+  <button type="button" class="lp-pg" data-next aria-label="{% trans "Next slide" %}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
 </div>
 {% endblock %}

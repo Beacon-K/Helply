@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from django.utils.translation import gettext
 
 from apps.ai import services as ai
 from apps.sla.services import sla_state
@@ -48,8 +49,10 @@ def ticket_create(request):
         data = {k: v for k, v in form.cleaned_data.items() if k != "department"}
         requester = data.pop("requester", None) or request.user
         ticket = services.create_ticket(requester=requester, created_by=request.user, **data)
-        suffix = f" for {requester}" if requester.pk != request.user.pk else ""
-        messages.success(request, f"Ticket {ticket.reference} submitted{suffix}.")
+        if requester.pk != request.user.pk:
+            messages.success(request, gettext("Ticket %(ref)s submitted for %(who)s.") % {"ref": ticket.reference, "who": requester})
+        else:
+            messages.success(request, gettext("Ticket %(ref)s submitted.") % {"ref": ticket.reference})
         return redirect(ticket)
     return render(request, "tickets/form.html", {"form": form})
 
@@ -83,7 +86,7 @@ def ticket_detail(request, pk):
         if ticket.assignee_id:
             form.fields["assignee"].empty_label = None
         else:
-            form.fields["assignee"].empty_label = "Unassigned"
+            form.fields["assignee"].empty_label = gettext("Unassigned")
         context["assign_form"] = form
     if ticket.requester_id == user.pk and ticket.status in (Status.RESOLVED, Status.CLOSED) \
             and not hasattr(ticket, "satisfaction"):
@@ -97,7 +100,7 @@ def ticket_action(request, pk, action):
     ticket = get_object_or_404(visible_tickets(request.user), pk=pk)
     try:
         workflow.perform(ticket, action, request.user, note=request.POST.get("note", ""))
-        messages.success(request, f"Ticket is now {ticket.get_status_display().lower()}.")
+        messages.success(request, gettext("Ticket is now %(status)s.") % {"status": ticket.get_status_display().lower()})
     except workflow.TransitionError as e:
         messages.error(request, str(e))
     return redirect(ticket)
@@ -111,7 +114,7 @@ def ticket_assign(request, pk):
     if form.is_valid():
         try:
             workflow.assign(ticket, form.cleaned_data["assignee"], actor=request.user)
-            messages.success(request, f"Assigned to {ticket.assignee}.")
+            messages.success(request, gettext("Assigned to %(who)s.") % {"who": ticket.assignee})
         except workflow.TransitionError as e:
             messages.error(request, str(e))
     # A technician may hand the ticket to someone outside their groups and so lose
@@ -129,7 +132,7 @@ def ticket_categorize(request, pk):
     if form.is_valid():
         try:
             workflow.recategorize(ticket, form.cleaned_data["category"], request.user)
-            messages.success(request, f"Category set to {ticket.category}.")
+            messages.success(request, gettext("Category set to %(c)s.") % {"c": ticket.category})
         except workflow.TransitionError as e:
             messages.error(request, str(e))
     return redirect(ticket)
@@ -153,7 +156,7 @@ def ticket_survey(request, pk):
     if form.is_valid():
         try:
             services.submit_survey(ticket, request.user, form.cleaned_data["rating"], form.cleaned_data["comment"])
-            messages.success(request, "Thanks for your feedback!")
+            messages.success(request, gettext("Thanks for your feedback!"))
         except (PermissionError, ValueError) as e:
             messages.error(request, str(e))
     return redirect(ticket)

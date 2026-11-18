@@ -1,24 +1,24 @@
-{% load helply %}
+{% load i18n %}{% load helply %}
 <section class="card self-help">
-  <h2>What do you need help with?</h2>
+  <h2>{% trans "What do you need help with?" %}</h2>
   {# Hands the question to the Helply Assistant drawer (assistant.js); without JS it falls back to the knowledge base search. #}
   <form method="get" action="{% url 'kb:list' %}" class="search" data-ai-ask-form>
-    <input name="q" required minlength="2" maxlength="800" autocomplete="off" aria-label="Ask the Helply Assistant"
-           placeholder="Ask Helply, e.g. &quot;my printer is offline&quot; or &quot;I forgot my password&quot;">
-    <button class="btn primary">Ask Helply</button>
+    <input name="q" required minlength="2" maxlength="800" autocomplete="off" aria-label="{% trans "Ask the Helply Assistant" %}"
+           placeholder="{% trans "Ask Helply, e.g. “my printer is offline” or “I forgot my password”" %}">
+    <button class="btn primary">{% trans "Ask Helply" %}</button>
   </form>
-  <p class="muted small">Helply answers from our knowledge base and your own tickets. Not solved?
-    <a href="{% url 'tickets:create' %}">Open a ticket</a>.</p>
+  <p class="muted small">{% trans "Helply answers from our knowledge base and your own tickets. Not solved?" %}
+    <a href="{% url 'tickets:create' %}">{% trans "Open a ticket" %}</a>.</p>
 </section>
 
 {% if to_confirm %}
 <section class="card confirm-card">
-  <h2>Please confirm these are fixed</h2>
+  <h2>{% trans "Please confirm these are fixed" %}</h2>
   {% for t in to_confirm %}
     <a class="attn-row" href="{{ t.get_absolute_url }}">
       <span class="attn-main"><span class="attn-title">{{ t.title }}</span>
-        <span class="attn-meta">{{ t.reference }} · resolved {{ t.resolved_at|ago }} by {{ t.assignee|default:"IT" }}</span></span>
-      <span class="chip">Review →</span>
+        <span class="attn-meta">{% blocktrans with r=t.reference d=t.resolved_at|ago who=t.assignee|default:"IT" %}{{ r }} · resolved {{ d }} by {{ who }}{% endblocktrans %}</span></span>
+      <span class="chip">{% trans "Review →" %}</span>
     </a>
   {% endfor %}
 </section>
@@ -27,35 +27,35 @@
 <div class="dash-grid">
   <section class="card" id="dash-mine">
     <div class="panel-head">
-      <h2>My open tickets</h2>
-      <a class="small" href="{% url 'tickets:list' %}?status=all">All my tickets →</a>
+      <h2>{% trans "My open tickets" %}</h2>
+      <a class="small" href="{% url 'tickets:list' %}?status=all">{% trans "All my tickets →" %}</a>
     </div>
     {% for t, steps in my_open %}
       <a class="ticket-progress" href="{{ t.get_absolute_url }}">
         <span class="attn-title">{{ t.title }}</span>
-        <span class="attn-meta">{{ t.reference }} · opened {{ t.created_at|ago }}{% if t.assignee %} · with {{ t.assignee.first_name }}{% endif %}</span>
+        <span class="attn-meta">{% blocktrans with r=t.reference d=t.created_at|ago %}{{ r }} · opened {{ d }}{% endblocktrans %}{% if t.assignee %} · {% blocktrans with n=t.assignee.first_name %}with {{ n }}{% endblocktrans %}{% endif %}</span>
         <ol class="stepper">
           {% for label, state in steps %}<li class="step-{{ state }}">{{ label }}</li>{% endfor %}
         </ol>
       </a>
     {% empty %}
-      <p class="empty">You have no open tickets.</p>
+      <p class="empty">{% trans "You have no open tickets." %}</p>
     {% endfor %}
     {% if recent_closed %}
-      <h3 class="muted small upper">Recently closed</h3>
+      <h3 class="muted small upper">{% trans "Recently closed" %}</h3>
       {% for t in recent_closed %}<p class="small"><a href="{{ t.get_absolute_url }}">{{ t.title }}</a> <span class="muted">· {{ t.closed_at|ago }}</span></p>{% endfor %}
     {% endif %}
   </section>
 
   <div class="dash-side">
     <section class="card" id="dash-popular">
-      <h2>Popular answers</h2>
+      <h2>{% trans "Popular answers" %}</h2>
       {% for a in popular %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></p>{% endfor %}
-      <a class="small" href="{% url 'kb:list' %}">Browse the knowledge base →</a>
+      <a class="small" href="{% url 'kb:list' %}">{% trans "Browse the knowledge base →" %}</a>
     </section>
     <section class="card" id="dash-urgent">
-      <h2>Urgent?</h2>
-      <p class="small">Clicked a suspicious link, lost a device, or the whole office is down? Open a ticket with Impact and Urgency set to <b>High</b> — don't wait.</p>
+      <h2>{% trans "Urgent?" %}</h2>
+      <p class="small">{% blocktrans %}Clicked a suspicious link, lost a device, or the whole office is down? Open a ticket with Impact and Urgency set to <b>High</b> — don't wait.{% endblocktrans %}</p>
     </section>
   </div>
 </div>

@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% block title %}New ticket{% endblock %}
+{% load i18n %}{% block title %}{% trans "New ticket" %}{% endblock %}
 {% block content %}
-<h1>{% if form.for_other %}New ticket{% else %}Report an IT issue{% endif %}</h1>
-{% if form.for_other %}<p class="muted narrow">Raising this for someone else? Pick their department, then their name. Leave Employee as “Myself” to log your own issue.</p>
+<h1>{% if form.for_other %}{% trans "New ticket" %}{% else %}{% trans "Report an IT issue" %}{% endif %}</h1>
+{% if form.for_other %}<p class="muted narrow">{% trans "Raising this for someone else? Pick their department, then their name. Leave Employee as “Myself” to log your own issue." %}</p>
 {% else %}<div class="narrow">{% include "ai/_ask.html" %}</div>{% endif %}
 <div class="card narrow">
   <form method="post">{% csrf_token %}
     {{ form.as_p }}
-    <button class="btn primary">Submit ticket</button>
+    <button class="btn primary">{% trans "Submit ticket" %}</button>
   </form>
 </div>
 {% endblock %}

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
+{% load i18n %}{% block title %}{% trans "Dashboard" %}{% endblock %}
 {% block content %}
 <div class="dash-head">
   <div>
-    <h1>{% now "l, F j" %}</h1>
+    <h1>{% if LANGUAGE_CODE == "fr" %}{% now "l j F" %}{% else %}{% now "l, F j" %}{% endif %}</h1>
     <p class="muted">{{ user.get_role_display }} · {{ user }}</p>
   </div>
-  <a class="btn primary" href="{% url 'tickets:create' %}">New ticket</a>
+  <a class="btn primary" href="{% url 'tickets:create' %}">{% trans "New ticket" %}</a>
 </div>
 
 {% if user.is_administrator %}{% include "core/_administrator.html" %}

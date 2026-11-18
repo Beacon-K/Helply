@@ -1,13 +1,13 @@
-{% extends "base.html" %}{% load helply %}
-{% block title %}Notifications{% endblock %}
+{% extends "base.html" %}{% load i18n %}{% load helply %}
+{% block title %}{% trans "Notifications" %}{% endblock %}
 {% block content %}
 <div class="dash-head">
   <div>
-    <h1>Notifications</h1>
-    <p class="muted">Updates on tickets you raised or work on.</p>
+    <h1>{% trans "Notifications" %}</h1>
+    <p class="muted">{% trans "Updates on tickets you raised or work on." %}</p>
   </div>
   {% if unread_notifications %}
-  <form method="post" action="{% url 'notifications:read_all' %}">{% csrf_token %}<button class="btn">Mark all as read</button></form>
+  <form method="post" action="{% url 'notifications:read_all' %}">{% csrf_token %}<button class="btn">{% trans "Mark all as read" %}</button></form>
   {% endif %}
 </div>
 
@@ -18,25 +18,25 @@
         <span class="note-dot" aria-hidden="true"></span>
         <span class="attn-main">
           <span class="attn-title">{{ n.title }}</span>
-          <span class="attn-meta">{% if n.ticket %}{{ n.ticket.reference }} · {{ n.ticket.title }} · {% endif %}{{ n.created_at|ago }}{% if n.emailed %} · emailed{% endif %}</span>
+          <span class="attn-meta">{% if n.ticket %}{{ n.ticket.reference }} · {{ n.ticket.title }} · {% endif %}{{ n.created_at|ago }}{% if n.emailed %} {% trans "· emailed" %}{% endif %}</span>
           {% if n.body %}<span class="note-body">{{ n.body|truncatechars:160 }}</span>{% endif %}
         </span>
-        {% if not n.is_read %}<span class="chip chip-new">New</span>{% endif %}
+        {% if not n.is_read %}<span class="chip chip-new">{% trans "New" %}</span>{% endif %}
       </a>
     {% empty %}
-      <p class="empty">No notifications yet. You'll see updates here when someone replies to or updates your tickets.</p>
+      <p class="empty">{% trans "No notifications yet. You'll see updates here when someone replies to or updates your tickets." %}</p>
     {% endfor %}
   </section>
 
   <aside>
     <section class="card">
-      <h2>Email</h2>
+      <h2>{% trans "Email" %}</h2>
       <form method="post" action="{% url 'notifications:email_preference' %}">{% csrf_token %}
         <label class="check"><input type="checkbox" id="email_notifications" name="email_notifications" {% if user.email_notifications %}checked{% endif %} onchange="this.form.submit()">
-          Also email me about replies, tickets waiting for my confirmation and SLA problems</label>
-        <noscript><button class="btn small-btn">Save</button></noscript>
+          {% trans "Also email me about replies, tickets waiting for my confirmation and SLA problems" %}</label>
+        <noscript><button class="btn small-btn">{% trans "Save" %}</button></noscript>
       </form>
-      <p class="muted small">Sent to {{ user.email|default:"(no email address on file)" }}. Repeated updates of the same kind are grouped into one email.</p>
+      <p class="muted small">{% blocktrans with email=user.email|default:_("(no email address on file)") %}Sent to {{ email }}. Repeated updates of the same kind are grouped into one email.{% endblocktrans %}</p>
     </section>
   </aside>
 </div>

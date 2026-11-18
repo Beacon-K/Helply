@@ -1,6 +1,7 @@
 from django import template
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.utils.translation import gettext as _
 
 register = template.Library()
 
@@ -9,11 +10,12 @@ def _compact(seconds):
     minutes = int(abs(seconds) // 60)
     days, rem = divmod(minutes, 24 * 60)
     hours, mins = divmod(rem, 60)
+    # d / h / m are the short unit letters; French uses j (jour) and h
     if days:
-        return f"{days}d {hours}h" if hours else f"{days}d"
+        return _("%(d)sd %(h)sh") % {"d": days, "h": hours} if hours else _("%(d)sd") % {"d": days}
     if hours:
-        return f"{hours}h {mins}m" if mins else f"{hours}h"
-    return f"{mins}m"
+        return _("%(h)sh %(m)sm") % {"h": hours, "m": mins} if mins else _("%(h)sh") % {"h": hours}
+    return _("%(m)sm") % {"m": mins}
 
 
 @register.filter
@@ -22,7 +24,7 @@ def due_in(value):
     if not value:
         return "–"
     seconds = (value - timezone.now()).total_seconds()
-    return f"in {_compact(seconds)}" if seconds >= 0 else f"{_compact(seconds)} overdue"
+    return _("in %(t)s") % {"t": _compact(seconds)} if seconds >= 0 else _("%(t)s overdue") % {"t": _compact(seconds)}
 
 
 @register.filter
@@ -31,10 +33,10 @@ def ago(value):
         return "–"
     seconds = (timezone.now() - value).total_seconds()
     if seconds < 60:
-        return "just now"
+        return _("just now")
     if seconds >= 7 * 24 * 3600:  # older than a week: a date is easier to read
-        return "on " + date_format(timezone.localtime(value), "M j")
-    return f"{_compact(seconds)} ago"
+        return _("on %(date)s") % {"date": date_format(timezone.localtime(value), _("M j"))}
+    return _("%(t)s ago") % {"t": _compact(seconds)}
 
 
 @register.filter
@@ -70,3 +72,12 @@ def num(value):
         return f"{float(value):,.0f}"
     except (TypeError, ValueError):
         return ""
+
+
+@register.filter
+def sla_label(state):
+    """Readable name for an SLA state ('at_risk' -> 'At risk'), translated."""
+    return {
+        "none": _("No SLA"), "ok": _("On track"), "at_risk": _("At risk"), "breached": _("Breached"),
+        "paused": _("Paused"), "met": _("Met"),
+    }.get(state, state)

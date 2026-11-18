@@ -13,6 +13,7 @@ admin.site.password_change_done_template = "admin/password_change_done.html"
 admin.site.login_form = ThrottledAdminAuthenticationForm  # the admin login is a second door for password guessing
 
 urlpatterns = [
+    path("i18n/", include("django.conf.urls.i18n")),  # language switch (POST set_language)
     path("admin/", admin.site.urls),
     path("accounts/login/", LoginView.as_view(authentication_form=ThrottledAuthenticationForm), name="login"),
     path("accounts/password_reset/", PasswordResetView.as_view(form_class=ThrottledPasswordResetForm), name="password_reset"),

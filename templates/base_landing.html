@@ -1,10 +1,10 @@
-{% load static %}<!doctype html>
-<html lang="en">
+{% load i18n %}{% load static %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{% block title %}Helply{% endblock %}</title>
-  <meta name="description" content="Helply is the IT service desk for teams of 10 to 100 people: tickets that sort themselves, SLAs that keep their promise, and a live view of your servers and assets.">
+  <title>{% block title %}{% trans "Helply" %}{% endblock %}</title>
+  <meta name="description" content="{% trans "Helply is the IT service desk for teams of 10 to 100 people: tickets that sort themselves, SLAs that keep their promise, and a live view of your servers and assets." %}">
   <link rel="icon" href="{% static 'img/brand/favicon.ico' %}" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/icon-32.png' %}">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/brand/icon-16.png' %}">

@@ -152,3 +152,11 @@ tr[data-href] { cursor: pointer; }
   .side-nav a, .attn-row, .note-row, .ticket-progress, .filters a, .kb-item, .fx-seg button, .fx-seg a, .btn, .fx-btn,
   .theme-toggle, .bell, tbody tr, .fx-card, a.kpi { transition: none; }
 }
+/* ---------- Language switch (EN | FR) ---------- */
+.lang-switch { display: inline-flex; align-items: center; gap: 2px; margin: 0; padding: 2px; border: 1px solid var(--line); border-radius: 9px; background: transparent; }
+.lang-switch button { min-width: 32px; height: 28px; padding: 0 .5rem; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font: 600 .75rem/1 var(--font, inherit); letter-spacing: .04em; cursor: pointer; }
+.lang-switch button:hover { color: var(--text); background: var(--hover, transparent); }
+.lang-switch button[aria-current="true"] { color: var(--text); background: var(--soft, rgba(127, 127, 127, .16)); cursor: default; }
+.lang-switch button:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.lang-switch.floating { position: fixed; z-index: 60; top: 12px; right: 58px; }
+@media (max-width: 640px) { .lang-switch button { min-width: 36px; height: 34px; } }

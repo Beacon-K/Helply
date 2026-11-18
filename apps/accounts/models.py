@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 
@@ -19,9 +20,9 @@ class User(AbstractUser):
     """A Helply user. Every user has exactly one business role."""
 
     class Role(models.TextChoices):
-        EMPLOYEE = "employee", "Employee"
-        TECHNICIAN = "technician", "Technician"
-        ADMINISTRATOR = "administrator", "Administrator"
+        EMPLOYEE = "employee", _("Employee")
+        TECHNICIAN = "technician", _("Technician")
+        ADMINISTRATOR = "administrator", _("Administrator")
 
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.EMPLOYEE)
     department = models.ForeignKey(

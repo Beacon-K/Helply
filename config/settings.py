@@ -89,6 +89,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # serves CSS/JS/images when DEBUG is off
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # English / French: cookie first, then the browser's Accept-Language
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -108,6 +109,7 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
+                "django.template.context_processors.i18n",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.notifications.context_processors.notifications",
@@ -167,7 +169,11 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "core:dashboard"
 LOGOUT_REDIRECT_URL = "login"
 
-LANGUAGE_CODE = "en-ca"
+LANGUAGE_CODE = "en"
+LANGUAGES = [("en", "English"), ("fr", "Français")]
+LOCALE_PATHS = [BASE_DIR / "locale"]  # compiled with: python tools/compile_messages.py (no GNU gettext needed)
+LANGUAGE_COOKIE_AGE = 60 * 60 * 24 * 365
+LANGUAGE_COOKIE_SAMESITE = "Lax"
 TIME_ZONE = "America/Toronto"
 USE_I18N = True
 USE_TZ = True

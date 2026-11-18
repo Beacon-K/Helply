@@ -1,33 +1,33 @@
 {% extends "base.html" %}
-{% load static %}
+{% load i18n %}{% load static %}{% load helply %}
 {% block title %}{{ ticket.reference }}{% endblock %}
 {% block content %}
-<p><a href="{% url 'tickets:list' %}">← All tickets</a></p>
+<p><a href="{% url 'tickets:list' %}">{% trans "← All tickets" %}</a></p>
 <h1>{{ ticket.reference }} · {{ ticket.title }}</h1>
 <p>
   <span class="badge st-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
   <span class="badge p-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
-  <span class="badge sla-{{ sla }}">SLA: {{ sla }}</span>
-  {% if ticket.ai_classified %}<span class="badge">AI-classified</span>{% endif %}
+  <span class="badge sla-{{ sla }}">{% trans "SLA:" %} {{ sla|sla_label }}</span>
+  {% if ticket.ai_classified %}<span class="badge">{% trans "AI-classified" %}</span>{% endif %}
 </p>
 
 <div class="grid-detail">
   <div>
     <section class="card">
-      <h2>Description</h2>
+      <h2>{% trans "Description" %}</h2>
       <p class="pre">{{ ticket.description }}</p>
-      {% if ticket.resolution_note %}<h3>Resolution</h3><p class="pre">{{ ticket.resolution_note }}</p>{% endif %}
+      {% if ticket.resolution_note %}<h3>{% trans "Resolution" %}</h3><p class="pre">{{ ticket.resolution_note }}</p>{% endif %}
     </section>
 
     {% if user.is_agent %}{% include "ai/_copilot.html" %}{% endif %}
 
     {% if actions %}
     <section class="card">
-      <h2>Actions</h2>
+      <h2>{% trans "Actions" %}</h2>
       <div class="actions">
       {% for a in actions %}
         <form method="post" action="{% url 'tickets:action' ticket.pk a.name %}">{% csrf_token %}
-          {% if a.note_required %}<input name="note" placeholder="Note (required)" required>{% endif %}
+          {% if a.note_required %}<input name="note" placeholder="{% trans "Note (required)" %}" required>{% endif %}
           <button class="btn">{{ a.label }}</button>
         </form>
       {% endfor %}
@@ -37,24 +37,24 @@
 
     {% if survey_form %}
     <section class="card">
-      <h2>How did we do?</h2>
-      <form method="post" action="{% url 'tickets:survey' ticket.pk %}">{% csrf_token %}{{ survey_form.as_p }}<button class="btn primary">Send feedback</button></form>
+      <h2>{% trans "How did we do?" %}</h2>
+      <form method="post" action="{% url 'tickets:survey' ticket.pk %}">{% csrf_token %}{{ survey_form.as_p }}<button class="btn primary">{% trans "Send feedback" %}</button></form>
     </section>
     {% endif %}
 
     <section class="card">
-      <h2>Conversation</h2>
+      <h2>{% trans "Conversation" %}</h2>
       {% for c in comments %}
         <div class="comment {% if c.is_internal %}internal{% endif %}">
-          <b>{{ c.author }}</b> <small class="muted">{{ c.created_at|date:"M j, H:i" }}{% if c.is_internal %} · internal{% endif %}</small>
+          <b>{{ c.author }}</b> <small class="muted">{{ c.created_at|date:_("M j, H:i") }}{% if c.is_internal %} {% trans "· internal" %}{% endif %}</small>
           <p class="pre">{{ c.body }}</p>
         </div>
-      {% empty %}<p class="muted">No comments yet.</p>{% endfor %}
+      {% empty %}<p class="muted">{% trans "No comments yet." %}</p>{% endfor %}
       {% if ticket.is_open or ticket.status == "resolved" %}
       <form method="post" action="{% url 'tickets:comment' ticket.pk %}">{% csrf_token %}
         {{ comment_form.body }}
         {% if user.is_agent %}<label>{{ comment_form.is_internal }} {{ comment_form.is_internal.label }}</label>{% endif %}
-        <button class="btn">Add comment</button>
+        <button class="btn">{% trans "Add comment" %}</button>
       </form>
       {% endif %}
     </section>
@@ -62,18 +62,18 @@
 
   <aside>
     <section class="card">
-      <h2>Details</h2>
+      <h2>{% trans "Details" %}</h2>
       <dl>
-        <dt>Requester</dt><dd>{{ ticket.requester }}</dd>
-        <dt>Category</dt><dd>{% if category_form %}<form method="post" action="{% url 'tickets:categorize' ticket.pk %}" class="inline-form" data-autosave>{% csrf_token %}{{ category_form.category }}<noscript> <button class="btn small-btn">Save</button></noscript></form>{% else %}{{ ticket.category|default:"–" }}{% endif %}</dd>
-        <dt>Group</dt><dd>{{ ticket.support_group|default:"–" }}</dd>
-        <dt>Assignee</dt><dd>{% if assign_form %}<form method="post" action="{% url 'tickets:assign' ticket.pk %}" class="inline-form" data-autosave>{% csrf_token %}{{ assign_form.assignee }}<noscript> <button class="btn small-btn">Save</button></noscript></form>{% else %}{{ ticket.assignee|default:"–" }}{% endif %}</dd>
-        <dt>Impact / urgency</dt><dd>{{ ticket.get_impact_display }} / {{ ticket.get_urgency_display }}</dd>
-        <dt>Asset</dt><dd>{% if ticket.asset and user.is_agent %}<a href="{{ ticket.asset.get_absolute_url }}">{{ ticket.asset }}</a>{% else %}{{ ticket.asset|default:"–" }}{% endif %}</dd>
-        <dt>Response due</dt><dd>{{ ticket.response_due_at|date:"M j, H:i"|default:"–" }}{% if ticket.first_response_at %}{% endif %}</dd>
-        <dt>Resolution due</dt><dd>{{ ticket.resolution_due_at|date:"M j, H:i"|default:"–" }}</dd>
+        <dt>{% trans "Requester" %}</dt><dd>{{ ticket.requester }}</dd>
+        <dt>{% trans "Category" %}</dt><dd>{% if category_form %}<form method="post" action="{% url 'tickets:categorize' ticket.pk %}" class="inline-form" data-autosave>{% csrf_token %}{{ category_form.category }}<noscript> <button class="btn small-btn">{% trans "Save" %}</button></noscript></form>{% else %}{{ ticket.category|default:"–" }}{% endif %}</dd>
+        <dt>{% trans "Group" %}</dt><dd>{{ ticket.support_group|default:"–" }}</dd>
+        <dt>{% trans "Assignee" %}</dt><dd>{% if assign_form %}<form method="post" action="{% url 'tickets:assign' ticket.pk %}" class="inline-form" data-autosave>{% csrf_token %}{{ assign_form.assignee }}<noscript> <button class="btn small-btn">{% trans "Save" %}</button></noscript></form>{% else %}{{ ticket.assignee|default:"–" }}{% endif %}</dd>
+        <dt>{% trans "Impact / urgency" %}</dt><dd>{{ ticket.get_impact_display }} / {{ ticket.get_urgency_display }}</dd>
+        <dt>{% trans "Asset" %}</dt><dd>{% if ticket.asset and user.is_agent %}<a href="{{ ticket.asset.get_absolute_url }}">{{ ticket.asset }}</a>{% else %}{{ ticket.asset|default:"–" }}{% endif %}</dd>
+        <dt>{% trans "Response due" %}</dt><dd>{{ ticket.response_due_at|date:_("M j, H:i")|default:"–" }}{% if ticket.first_response_at %}{% endif %}</dd>
+        <dt>{% trans "Resolution due" %}</dt><dd>{{ ticket.resolution_due_at|date:_("M j, H:i")|default:"–" }}</dd>
         {% if ticket.satisfaction %}
-        <dt>Satisfaction</dt>
+        <dt>{% trans "Satisfaction" %}</dt>
         <dd><span class="stars" title="{{ ticket.satisfaction.rating }} out of 5">{{ ticket.satisfaction.rating }} / 5</span>
           {% if ticket.satisfaction.comment %}<br><small class="muted">“{{ ticket.satisfaction.comment }}”</small>{% endif %}</dd>
         {% endif %}
@@ -82,23 +82,23 @@
 
     {% if similar %}
     <section class="card">
-      <h2>Similar resolved tickets</h2>
+      <h2>{% trans "Similar resolved tickets" %}</h2>
       {% for score, t in similar %}<p><a href="{{ t.get_absolute_url }}">{{ t.reference }}</a> {{ t.title }} <small class="muted">({{ score }})</small></p>{% endfor %}
     </section>
     {% endif %}
 
     {% if related_articles %}
     <section class="card">
-      <h2>Related articles</h2>
+      <h2>{% trans "Related articles" %}</h2>
       {% for a in related_articles %}<p><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></p>{% endfor %}
     </section>
     {% endif %}
 
     <section class="card">
-      <h2>History</h2>
+      <h2>{% trans "History" %}</h2>
       <ul class="timeline">
       {% for e in events %}
-        <li><small class="muted">{{ e.created_at|date:"M j, H:i" }}</small> <b>{{ e.actor|default:"System" }}</b> — {{ e.get_kind_display }}
+        <li><small class="muted">{{ e.created_at|date:_("M j, H:i") }}</small> <b>{{ e.actor|default:"System" }}</b> — {{ e.get_kind_display }}
           {% if e.to_status and e.from_status != e.to_status %}→ {{ e.get_to_status_display }}{% endif %}
           {% if e.note %}<br><small>{{ e.note }}</small>{% endif %}</li>
       {% endfor %}

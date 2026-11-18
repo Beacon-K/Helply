@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 
 from django.db import transaction
 from django.utils import timezone
+from django.utils.translation import gettext, gettext_lazy as _
 
 from apps.accounts.models import User
 from apps.notifications import events
@@ -43,20 +44,20 @@ class Transition:
 TRANSITIONS = {
     t.name: t
     for t in [
-        Transition("triage", "Mark triaged", frozenset({Status.NEW}), Status.TRIAGED, frozenset({ADMIN})),
-        Transition("start", "Start work", frozenset({Status.ASSIGNED}), Status.IN_PROGRESS,
+        Transition("triage", _("Mark triaged"), frozenset({Status.NEW}), Status.TRIAGED, frozenset({ADMIN})),
+        Transition("start", _("Start work"), frozenset({Status.ASSIGNED}), Status.IN_PROGRESS,
                    frozenset({TECH, ADMIN}), assignee_only=True),
-        Transition("hold", "Put on hold", frozenset({Status.IN_PROGRESS}), Status.ON_HOLD,
+        Transition("hold", _("Put on hold"), frozenset({Status.IN_PROGRESS}), Status.ON_HOLD,
                    frozenset({TECH, ADMIN}), assignee_only=True, note_required=True),
-        Transition("resume", "Resume", frozenset({Status.ON_HOLD}), Status.IN_PROGRESS,
+        Transition("resume", _("Resume"), frozenset({Status.ON_HOLD}), Status.IN_PROGRESS,
                    frozenset({TECH, ADMIN}), assignee_only=True),
-        Transition("resolve", "Resolve", frozenset({Status.IN_PROGRESS}), Status.RESOLVED,
+        Transition("resolve", _("Resolve"), frozenset({Status.IN_PROGRESS}), Status.RESOLVED,
                    frozenset({TECH, ADMIN}), assignee_only=True, note_required=True),
-        Transition("reopen", "Reopen", frozenset({Status.RESOLVED}), Status.IN_PROGRESS,
+        Transition("reopen", _("Reopen"), frozenset({Status.RESOLVED}), Status.IN_PROGRESS,
                    requester_allowed=True, note_required=True),
-        Transition("close", "Confirm & close", frozenset({Status.RESOLVED}), Status.CLOSED,
+        Transition("close", _("Confirm & close"), frozenset({Status.RESOLVED}), Status.CLOSED,
                    frozenset({ADMIN}), requester_allowed=True),
-        Transition("cancel", "Cancel", frozenset({Status.NEW, Status.TRIAGED, Status.ASSIGNED}),
+        Transition("cancel", _("Cancel"), frozenset({Status.NEW, Status.TRIAGED, Status.ASSIGNED}),
                    Status.CANCELLED, frozenset({ADMIN}), requester_allowed=True),
     ]
 }
@@ -85,7 +86,7 @@ def perform(ticket, name, user, note=""):
     if ticket.status not in transition.sources:
         raise TransitionError(f"Cannot {transition.label.lower()} a ticket that is {ticket.get_status_display().lower()}.")
     if not can_perform(transition, ticket, user):
-        raise TransitionError("You are not allowed to perform this action.")
+        raise TransitionError(gettext("You are not allowed to perform this action."))
     note = note.strip()
     if transition.note_required and not note:
         raise TransitionError(f"A note is required to {transition.label.lower()}.")
@@ -121,7 +122,7 @@ def perform(ticket, name, user, note=""):
 def auto_close(ticket, days):
     """Close a resolved ticket the requester never confirmed (run by the scheduled follow-up job)."""
     if ticket.status != Status.RESOLVED:
-        raise TransitionError("Only resolved tickets can be closed automatically.")
+        raise TransitionError(gettext("Only resolved tickets can be closed automatically."))
     with transaction.atomic():
         ticket.status = Status.CLOSED
         ticket.closed_at = timezone.now()
@@ -140,11 +141,11 @@ def assign(ticket, assignee, actor=None):
     # Any IT staff member may reassign: the usual case is a technician who cannot
     # follow up and hands the ticket to a colleague.
     if actor is not None and not actor.is_agent:
-        raise TransitionError("Only IT staff can assign tickets.")
+        raise TransitionError(gettext("Only IT staff can assign tickets."))
     if ticket.status not in OPEN_STATUSES:
-        raise TransitionError("Only open tickets can be assigned.")
+        raise TransitionError(gettext("Only open tickets can be assigned."))
     if not assignee.is_agent:
-        raise TransitionError("Tickets can only be assigned to technicians or administrators.")
+        raise TransitionError(gettext("Tickets can only be assigned to technicians or administrators."))
 
     with transaction.atomic():
         from_status = ticket.status
@@ -169,7 +170,7 @@ def can_recategorize(ticket, user):
 def recategorize(ticket, category, actor):
     """Change a ticket's category (e.g. correcting the AI) and route it to that category's group."""
     if not can_recategorize(ticket, actor):
-        raise TransitionError("Only IT staff can change the category.")
+        raise TransitionError(gettext("Only IT staff can change the category."))
     if ticket.category_id == category.pk:
         return ticket
     with transaction.atomic():

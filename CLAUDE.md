@@ -60,3 +60,4 @@ python manage.py backup_db
 - 跟随周围写法；注释说明「为什么」。
 - 新页面的静态文件要加进 `apps/core/context_processors.py` 的 `ASSET_FILES`。
 - 外部数据（如 agent 上报）一律校验并限制范围（参考 `monitoring/services.py` 的 `_number`、`_text`）。
+- **英语 / 法语双语**（Django i18n，`locale/fr/LC_MESSAGES/django.po`）：页面文字写 `{% trans %}` / `{% blocktrans %}`，Python 里用 `gettext` / `gettext_lazy`（不要把 `_` 当临时变量）；数据库里用户写的内容不翻译。本机没有 GNU gettext，流程是 `python tools/extract_messages.py` → 在 .po 里补法语 → `python tools/compile_messages.py`，**.mo 要一起提交**（`test_i18n` 会检查 .mo 没过期、占位符没丢）。语言用 `django_language` cookie（页面右上角 EN/FR），没选过就看浏览器语言。目前已翻译：登录与重置密码、侧栏/顶栏、仪表盘、工单列表/详情/新建、通知、助手抽屉；**还没翻译**：Help tour 与 Ctrl+K 面板（JS）、知识库、资产、云服务器、人员、SLA 页、邮件正文。

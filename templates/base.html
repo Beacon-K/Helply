@@ -1,9 +1,9 @@
-{% load static %}<!doctype html>
-<html lang="en">
+{% load i18n %}{% load static %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Helply{% endblock %} · Helply</title>
+  <title>{% block title %}{% trans "Helply" %}{% endblock %} {% trans "· Helply" %}</title>
   <link rel="icon" href="{% static 'img/brand/favicon.ico' %}" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/icon-32.png' %}">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/brand/icon-16.png' %}">
@@ -20,16 +20,17 @@
   {% if user.is_authenticated %}<link rel="stylesheet" href="{% static 'css/help.css' %}?v={{ asset_version }}">{% endif %}
 </head>
 <body>
-{% if not user.is_authenticated %}{% include "partials/theme_toggle.html" with floating=True %}{% endif %}
+{% if not user.is_authenticated %}{% include "partials/lang_switch.html" with floating=True %}{% include "partials/theme_toggle.html" with floating=True %}{% endif %}
 {% if user.is_authenticated %}
 <div class="app-shell">
 {% include "partials/sidebar.html" %}
 <div class="app-main">
 <header class="topbar"><div class="topbar-tools">
-  <button type="button" class="cmdk-trigger" data-cmdk aria-label="Open the command palette"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="label">Search</span><kbd>Ctrl K</kbd></button>
-  <button type="button" class="ai-launch" data-ai-open aria-label="Open the Helply Assistant" title="Helply Assistant (Ctrl J)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg><span class="label">Assistant</span></button>
+  <button type="button" class="cmdk-trigger" data-cmdk aria-label="{% trans "Open the command palette" %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="label">{% trans "Search" %}</span><kbd>{% trans "Ctrl K" %}</kbd></button>
+  <button type="button" class="ai-launch" data-ai-open aria-label="{% trans "Open the Helply Assistant" %}" title="{% trans "Helply Assistant (Ctrl J)" %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg><span class="label">{% trans "Assistant" %}</span></button>
   </div>
   <div class="who">
+    {% include "partials/lang_switch.html" %}
     {% include "partials/theme_toggle.html" %}
     <a class="bell" href="{% url 'notifications:list' %}" data-bell data-url="{% url 'notifications:unread' %}"
        aria-label="Notifications{% if unread_notifications %}, {{ unread_notifications }} unread{% endif %}">
@@ -37,18 +38,18 @@
       <span class="bell-count" data-unread {% if not unread_notifications %}hidden{% endif %}>{% if unread_notifications > 99 %}99+{% else %}{{ unread_notifications }}{% endif %}</span>
     </a>
 <div class="acct" data-acct>
-      <button type="button" class="acct-trigger" aria-haspopup="menu" aria-expanded="false" aria-controls="acct-menu" title="Your account">
+      <button type="button" class="acct-trigger" aria-haspopup="menu" aria-expanded="false" aria-controls="acct-menu" title="{% trans "Your account" %}">
         {% include "partials/avatar.html" with u=user %}
         <span class="who-text">{{ user }}</span> <small class="role role-{{ user.role }}">{{ user.get_role_display }}</small>
         <svg class="acct-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
       </button>
       <div class="acct-menu" id="acct-menu" role="menu" hidden>
         <div class="acct-head"><b>{{ user }}</b><span class="muted small">{{ user.get_role_display }}</span></div>
-        <a role="menuitem" href="{% url 'people:avatar_edit' %}">Change photo</a>
-        <a role="menuitem" href="{% url 'password_change' %}">Change password</a>
+        <a role="menuitem" href="{% url 'people:avatar_edit' %}">{% trans "Change photo" %}</a>
+        <a role="menuitem" href="{% url 'password_change' %}">{% trans "Change password" %}</a>
       </div>
     </div>
-    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">Log out</button></form>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">{% trans "Log out" %}</button></form>
   </div>
 </header>
 {% endif %}

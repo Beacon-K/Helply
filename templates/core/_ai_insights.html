@@ -1,47 +1,47 @@
-{% load helply %}
+{% load i18n %}{% load helply %}
 {# Administrator-only: recurring problems found in recent tickets (apps.ai.insights). #}
 <section class="card ins" id="ai-insights">
   <div class="panel-head">
-    <h2><span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>AI insights</span></h2>
+    <h2><span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>{% trans "AI insights" %}</span></h2>
     <span class="ins-meta">
-      {% if insights %}Last {{ insights.stats.days }} days · updated {{ insights.report.created_at|ago }}{% endif %}
-      <button type="button" class="btn small-btn" data-ai-insights-refresh data-url="{% url 'ai:insights_refresh' %}">{% if insights %}Refresh{% else %}Analyse tickets{% endif %}</button>
+      {% if insights %}{% blocktrans with days=insights.stats.days when=insights.report.created_at|ago %}Last {{ days }} days · updated {{ when }}{% endblocktrans %}{% endif %}
+      <button type="button" class="btn small-btn" data-ai-insights-refresh data-url="{% url 'ai:insights_refresh' %}">{% if insights %}{% trans "Refresh" %}{% else %}{% trans "Analyse tickets" %}{% endif %}</button>
     </span>
   </div>
   {% csrf_token %}
   {% if not insights %}
-    <p class="muted">No analysis yet. It runs automatically once a day, or press the button to run it now.</p>
+    <p class="muted">{% trans "No analysis yet. It runs automatically once a day, or press the button to run it now." %}</p>
   {% elif not insights.enough_data %}
-    <p class="muted">Only {{ insights.stats.tickets }} ticket{{ insights.stats.tickets|pluralize }} in the last {{ insights.stats.days }} days. The analysis starts once there are a few more to compare.</p>
+    <p class="muted">{% blocktrans count n=insights.stats.tickets with days=insights.stats.days %}Only {{ n }} ticket in the last {{ days }} days. The analysis starts once there are a few more to compare.{% plural %}Only {{ n }} tickets in the last {{ days }} days. The analysis starts once there are a few more to compare.{% endblocktrans %}</p>
   {% else %}
     <div class="ins-stats">
-      <span><b>{{ insights.stats.tickets }}</b> tickets{% if insights.change_pct is not None %} <em class="{% if insights.change_pct > 0 %}t-warn{% else %}t-ok{% endif %}">{% if insights.change_pct > 0 %}+{% endif %}{{ insights.change_pct }}% vs previous</em>{% endif %}</span>
-      <span><b>{{ insights.stats.open_over_7d }}</b> open over 7 days</span>
-      <span><b>{{ insights.stats.reopened }}</b> reopened</span>
-      <span><b>{{ insights.stats.sla_breached }}</b> SLA breaches</span>
+      <span><b>{{ insights.stats.tickets }}</b> {% trans "tickets" %}{% if insights.change_pct is not None %} <em class="{% if insights.change_pct > 0 %}t-warn{% else %}t-ok{% endif %}">{% if insights.change_pct > 0 %}+{% endif %}{{ insights.change_pct }}% {% trans "vs previous" %}</em>{% endif %}</span>
+      <span><b>{{ insights.stats.open_over_7d }}</b> {% trans "open over 7 days" %}</span>
+      <span><b>{{ insights.stats.reopened }}</b> {% trans "reopened" %}</span>
+      <span><b>{{ insights.stats.sla_breached }}</b> {% trans "SLA breaches" %}</span>
     </div>
     {% if insights.headline %}<p class="ins-headline">{{ insights.headline }}</p>{% endif %}
-    {% if not insights.ai %}<p class="muted small">The AI explanation is not available right now, so only measured patterns are shown.</p>{% endif %}
+    {% if not insights.ai %}<p class="muted small">{% trans "The AI explanation is not available right now, so only measured patterns are shown." %}</p>{% endif %}
     {% for r in insights.rows %}
     <article class="ins-item sev-{{ r.severity }}">
       <div class="ins-top">
         <span class="ins-sev">{{ r.severity }}</span>
         <b class="ins-title">{{ r.label }}</b>
-        <span class="ins-count">{{ r.count }} tickets · {{ r.people }} {{ r.people|pluralize:"person,people" }}{% if r.open %} · {{ r.open }} open{% endif %}</span>
+        <span class="ins-count">{% blocktrans count n=r.people with c=r.count %}{{ c }} tickets · {{ n }} person{% plural %}{{ c }} tickets · {{ n }} people{% endblocktrans %}{% if r.open %} · {% blocktrans with n=r.open %}{{ n }} open{% endblocktrans %}{% endif %}</span>
       </div>
-      {% if r.likely_cause %}<p><b>Likely cause</b> {{ r.likely_cause }}</p>{% endif %}
-      {% if r.prevention %}<p><b>Prevent it</b> {{ r.prevention }}</p>{% endif %}
+      {% if r.likely_cause %}<p><b>{% trans "Likely cause" %}</b> {{ r.likely_cause }}</p>{% endif %}
+      {% if r.prevention %}<p><b>{% trans "Prevent it" %}</b> {{ r.prevention }}</p>{% endif %}
       <p class="ins-links">
         {% for t in r.refs %}<a href="{% url 'tickets:detail' t.id %}">{{ t.ref }}</a>{% endfor %}
         {% if r.assets %}<span class="muted">· {{ r.assets|join:", " }}</span>{% endif %}
-        <button type="button" class="ai-chip" data-ai-ask-about="Tell me more about this recurring problem and what to do: {{ r.label }}">Ask the assistant</button>
+        <button type="button" class="ai-chip" data-ai-ask-about="Tell me more about this recurring problem and what to do: {{ r.label }}">{% trans "Ask the assistant" %}</button>
       </p>
     </article>
     {% empty %}
-      <p class="muted">No problem has repeated three or more times in this period.</p>
+      <p class="muted">{% trans "No problem has repeated three or more times in this period." %}</p>
     {% endfor %}
     {% if insights.watchlist %}
-    <div class="ins-watch"><b>Worth watching</b><ul>{% for w in insights.watchlist %}<li>{{ w }}</li>{% endfor %}</ul></div>
+    <div class="ins-watch"><b>{% trans "Worth watching" %}</b><ul>{% for w in insights.watchlist %}<li>{{ w }}</li>{% endfor %}</ul></div>
     {% endif %}
   {% endif %}
 </section>

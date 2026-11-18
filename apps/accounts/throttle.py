@@ -26,6 +26,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import ngettext
 
 from .models import LoginFailure, ResetRequest
 
@@ -105,4 +106,5 @@ def record_reset(email, ip, sent):
 
 def lock_message(seconds):
     minutes = max(1, -(-seconds // 60))
-    return f"Too many failed sign-in attempts. Try again in {minutes} minute{'s' if minutes != 1 else ''}."
+    return ngettext("Too many failed sign-in attempts. Try again in %(n)d minute.",
+                     "Too many failed sign-in attempts. Try again in %(n)d minutes.", minutes) % {"n": minutes}

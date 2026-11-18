@@ -1,0 +1,1933 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Helply\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+
+#: templates/admin/_userlinks.html templates/base.html templates/registration/password_change_form.html
+msgid "Change password"
+msgstr "Changer le mot de passe"
+
+#: templates/admin/_userlinks.html templates/base.html
+msgid "Log out"
+msgstr "Se déconnecter"
+
+#: templates/admin/base_site.html
+msgid "Django site admin"
+msgstr ""
+
+#: templates/admin/password_change_done.html templates/admin/password_change_form.html
+msgid "Home"
+msgstr ""
+
+#: templates/admin/password_change_done.html templates/admin/password_change_form.html
+msgid "Password change"
+msgstr ""
+
+#: templates/admin/password_change_done.html
+msgid "Your password was changed."
+msgstr ""
+
+#: templates/admin/password_change_form.html
+msgid "Error:"
+msgstr ""
+
+#: templates/admin/password_change_form.html
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/password_change_form.html
+msgid "Please enter your old password, for security’s sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr ""
+
+#: templates/admin/password_change_form.html templates/registration/password_change_form.html
+msgid "Change my password"
+msgstr ""
+
+#: templates/ai/_ask.html templates/ai/_drawer.html
+msgid "Helply Assistant"
+msgstr "Assistant Helply"
+
+#: templates/ai/_ask.html
+msgid "Answers from our knowledge base and your own past tickets. Please don't paste passwords."
+msgstr "Réponses tirées de notre base de connaissances et de vos tickets passés. Merci de ne pas coller de mots de passe."
+
+#: templates/ai/_ask.html
+msgid "Describe your problem, e.g. “my VPN disconnects every few minutes”"
+msgstr "Décrivez votre problème, p. ex. « mon VPN se déconnecte toutes les quelques minutes »"
+
+#: templates/ai/_ask.html templates/core/_ai_insights.html
+msgid "Ask the assistant"
+msgstr "Demander à l'assistant"
+
+#: templates/ai/_ask.html
+msgid "Ask"
+msgstr "Demander"
+
+#: templates/ai/_copilot.html templates/base.html
+msgid "Assistant"
+msgstr "Assistant"
+
+#: templates/ai/_copilot.html
+msgid "Summary, likely cause, steps and a draft reply, from this ticket, the requester's history and the knowledge base."
+msgstr "Résumé, cause probable, étapes et projet de réponse, à partir de ce ticket, de l'historique du demandeur et de la base de connaissances."
+
+#: templates/ai/_copilot.html
+msgid "Analyze this ticket"
+msgstr "Analyser ce ticket"
+
+#: templates/ai/_drawer.html
+msgid "New chat"
+msgstr "Nouvelle conversation"
+
+#: templates/ai/_drawer.html
+msgid "Start a new chat"
+msgstr "Commencer une nouvelle conversation"
+
+#: templates/ai/_drawer.html
+msgid "Close"
+msgstr "Fermer"
+
+#: templates/ai/_drawer.html
+msgid "Close the assistant"
+msgstr "Fermer l’assistant"
+
+#: templates/ai/_drawer.html
+msgid "What should we look at today?"
+msgstr "Sur quoi se pencher aujourd’hui ?"
+
+#: templates/ai/_drawer.html
+msgid "How can I help with your queue?"
+msgstr "Comment puis-je vous aider avec votre file ?"
+
+#: templates/ai/_drawer.html
+msgid "How can I help with IT today?"
+msgstr "Comment puis-je vous aider en informatique aujourd’hui ?"
+
+#: templates/ai/_drawer.html
+msgid "I can use your tickets, the knowledge base and internal runbooks, and the latest ticket analysis."
+msgstr "Je peux m’appuyer sur vos tickets, la base de connaissances, les procédures internes et la dernière analyse des tickets."
+
+#: templates/ai/_drawer.html
+msgid "I can use your tickets, the knowledge base and internal runbooks."
+msgstr "Je peux m’appuyer sur vos tickets, la base de connaissances et les procédures internes."
+
+#: templates/ai/_drawer.html
+msgid "I answer from our knowledge base and your own tickets."
+msgstr "Je réponds à partir de notre base de connaissances et de vos propres tickets."
+
+#: templates/ai/_drawer.html
+msgid "Please don't paste passwords."
+msgstr "Merci de ne pas coller de mots de passe."
+
+#: templates/ai/_drawer.html
+msgid "What problems keep recurring, and what is the likely cause?"
+msgstr "Quels problèmes reviennent sans cesse, et quelle en est la cause probable ?"
+
+#: templates/ai/_drawer.html
+msgid "What keeps recurring?"
+msgstr "Qu’est-ce qui revient sans cesse ?"
+
+#: templates/ai/_drawer.html
+msgid "Which open tickets should I look at first and why?"
+msgstr "Quels tickets ouverts dois-je regarder en premier, et pourquoi ?"
+
+#: templates/ai/_drawer.html
+msgid "What needs attention first?"
+msgstr "Qu’est-ce qui demande de l’attention en premier ?"
+
+#: templates/ai/_drawer.html
+msgid "What could turn into a bigger incident if we do nothing?"
+msgstr "Qu’est-ce qui pourrait devenir un incident plus grave si l’on ne fait rien ?"
+
+#: templates/ai/_drawer.html
+msgid "What could get worse?"
+msgstr "Qu’est-ce qui pourrait empirer ?"
+
+#: templates/ai/_drawer.html
+msgid "Summarise my open tickets and tell me what to work on first."
+msgstr "Résume mes tickets ouverts et dis-moi sur quoi travailler en premier."
+
+#: templates/ai/_drawer.html
+msgid "Plan my queue"
+msgstr "Planifier ma file"
+
+#: templates/ai/_drawer.html
+msgid "Which of my tickets are closest to breaching their SLA?"
+msgstr "Lesquels de mes tickets sont les plus proches de dépasser leur SLA ?"
+
+#: templates/ai/_drawer.html
+msgid "SLA risks"
+msgstr "Risques SLA"
+
+#: templates/ai/_drawer.html
+msgid "Help me write a reply to a user whose VPN keeps disconnecting."
+msgstr "Aide-moi à rédiger une réponse à un utilisateur dont le VPN se déconnecte sans cesse."
+
+#: templates/ai/_drawer.html
+msgid "Draft a reply"
+msgstr "Rédiger une réponse"
+
+#: templates/ai/_drawer.html
+msgid "My VPN keeps disconnecting. What can I try?"
+msgstr "Mon VPN se déconnecte sans cesse. Que puis-je essayer ?"
+
+#: templates/ai/_drawer.html
+msgid "VPN keeps disconnecting"
+msgstr "Le VPN se déconnecte sans cesse"
+
+#: templates/ai/_drawer.html
+msgid "What is the status of my open tickets?"
+msgstr "Quel est l’état de mes tickets ouverts ?"
+
+#: templates/ai/_drawer.html
+msgid "Status of my tickets"
+msgstr "État de mes tickets"
+
+#: templates/ai/_drawer.html
+msgid "Help me write a clear ticket about my problem."
+msgstr "Aide-moi à rédiger un ticket clair sur mon problème."
+
+#: templates/ai/_drawer.html
+msgid "Help me write a ticket"
+msgstr "M’aider à rédiger un ticket"
+
+#: templates/ai/_drawer.html
+msgid "Ask anything about IT or your tickets…"
+msgstr "Posez une question sur l’informatique ou vos tickets…"
+
+#: templates/ai/_drawer.html
+msgid "Message the assistant"
+msgstr "Message à l’assistant"
+
+#: templates/ai/_drawer.html
+msgid "Send"
+msgstr "Envoyer"
+
+#: templates/base.html templates/base_landing.html templates/partials/sidebar.html
+msgid "Helply"
+msgstr "Helply"
+
+#: templates/base.html
+msgid "· Helply"
+msgstr "· Helply"
+
+#: templates/base.html
+msgid "Open the command palette"
+msgstr "Ouvrir la palette de commandes"
+
+#: templates/base.html
+msgid "Search"
+msgstr "Rechercher"
+
+#: templates/base.html
+msgid "Ctrl K"
+msgstr "Ctrl K"
+
+#: templates/base.html
+msgid "Open the Helply Assistant"
+msgstr "Ouvrir l'assistant Helply"
+
+#: templates/base.html
+msgid "Helply Assistant (Ctrl J)"
+msgstr "Assistant Helply (Ctrl J)"
+
+#: templates/base.html
+msgid "Your account"
+msgstr "Votre compte"
+
+#: templates/base.html
+msgid "Change photo"
+msgstr "Changer la photo"
+
+#: templates/base_landing.html
+msgid "Helply is the IT service desk for teams of 10 to 100 people: tickets that sort themselves, SLAs that keep their promise, and a live view of your servers and assets."
+msgstr "Helply est le centre de services TI des équipes de 10 à 100 personnes : des tickets qui se trient tout seuls, des SLA qui tiennent leur promesse et une vue en direct de vos serveurs et de vos actifs."
+
+#: templates/core/_administrator.html
+msgid "Open tickets"
+msgstr "Tickets ouverts"
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "%(a)s not started · %(b)s on hold"
+msgstr "%(a)s non démarrés · %(b)s en attente"
+
+#: apps/tickets/views.py templates/core/_administrator.html templates/core/_technician.html
+msgid "Unassigned"
+msgstr "Non assignés"
+
+#: templates/core/_administrator.html
+msgid "waiting for a technician"
+msgstr "en attente d’un technicien"
+
+#: templates/core/_administrator.html templates/core/_technician.html
+msgid "everything has an owner"
+msgstr "tout a un responsable"
+
+#: templates/core/_administrator.html
+msgid "SLA risk"
+msgstr "Risque SLA"
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "%(n)s breached"
+msgstr "%(n)s dépassés"
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "%(n)s at risk"
+msgstr "%(n)s à risque"
+
+#: templates/core/_administrator.html
+msgid "SLA met · 30 days"
+msgstr "SLA respecté · 30 jours"
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "%(a)s of %(b)s resolved on time"
+msgstr "%(a)s sur %(b)s résolus dans les délais"
+
+#: templates/core/_administrator.html templates/tickets/detail.html
+msgid "Satisfaction"
+msgstr "Satisfaction"
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "%(n)s rating"
+msgid_plural "%(n)s ratings"
+msgstr[0] "%(n)s évaluation"
+msgstr[1] "%(n)s évaluations"
+
+#: templates/core/_administrator.html
+msgid "AI category accuracy"
+msgstr "Précision de la catégorie par l’IA"
+
+#: templates/core/_administrator.html
+msgid "AI accuracy"
+msgstr "Précision IA"
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "%(a)s auto-triaged · %(b)s reviewed"
+msgstr "%(a)s triés automatiquement · %(b)s vérifiés"
+
+#: templates/core/_administrator.html
+msgid "Needs attention"
+msgstr "À traiter en priorité"
+
+#: templates/core/_administrator.html
+msgid "All open tickets →"
+msgstr "Tous les tickets ouverts →"
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "Breached · %(d)s"
+msgstr "Dépassé · %(d)s"
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "At risk · due %(d)s"
+msgstr "À risque · échéance %(d)s"
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "Unassigned · %(d)s"
+msgstr "Non assigné · %(d)s"
+
+#: templates/core/_administrator.html
+msgid "Nothing needs attention right now."
+msgstr "Rien ne demande votre attention pour le moment."
+
+#: templates/core/_administrator.html
+#, python-format
+msgid "+ %(n)s more in the ticket list."
+msgstr "+ %(n)s de plus dans la liste des tickets."
+
+#: templates/core/_administrator.html
+msgid "Open work by stage"
+msgstr "Travail en cours par étape"
+
+#: templates/core/_administrator.html
+msgid "Team workload"
+msgstr "Charge de l’équipe"
+
+#: templates/core/_administrator.html
+msgid "At risk or breached"
+msgstr "À risque ou dépassé"
+
+#: templates/core/_administrator.html
+msgid "No technicians yet."
+msgstr "Aucun technicien pour l’instant."
+
+#: templates/core/_administrator.html
+msgid "Open tickets per technician"
+msgstr "Tickets ouverts par technicien"
+
+#: templates/core/_administrator.html
+msgid "Company overview"
+msgstr "Vue d’ensemble de l’entreprise"
+
+#: templates/core/_administrator.html templates/core/_ov_unassigned.html
+msgid "Uncategorized"
+msgstr "Sans catégorie"
+
+#: templates/core/_ai_insights.html
+msgid "AI insights"
+msgstr "Analyses IA"
+
+#: templates/core/_ai_insights.html
+#, python-format
+msgid "Last %(days)s days · updated %(when)s"
+msgstr "%(days)s derniers jours · mis à jour %(when)s"
+
+#: templates/core/_ai_insights.html
+msgid "Refresh"
+msgstr "Actualiser"
+
+#: templates/core/_ai_insights.html
+msgid "Analyse tickets"
+msgstr "Analyser les tickets"
+
+#: templates/core/_ai_insights.html
+msgid "No analysis yet. It runs automatically once a day, or press the button to run it now."
+msgstr "Aucune analyse pour l’instant. Elle s’exécute automatiquement une fois par jour, ou appuyez sur le bouton pour la lancer maintenant."
+
+#: templates/core/_ai_insights.html
+#, python-format
+msgid "Only %(n)s ticket in the last %(days)s days. The analysis starts once there are a few more to compare."
+msgid_plural "Only %(n)s tickets in the last %(days)s days. The analysis starts once there are a few more to compare."
+msgstr[0] "Seulement %(n)s ticket au cours des %(days)s derniers jours. L’analyse démarre dès qu’il y en a quelques autres à comparer."
+msgstr[1] "Seulement %(n)s tickets au cours des %(days)s derniers jours. L’analyse démarre dès qu’il y en a quelques autres à comparer."
+
+#: templates/core/_ai_insights.html
+msgid "tickets"
+msgstr "tickets"
+
+#: templates/core/_ai_insights.html
+msgid "vs previous"
+msgstr "par rapport à la période précédente"
+
+#: templates/core/_ai_insights.html
+msgid "open over 7 days"
+msgstr "ouverts depuis plus de 7 jours"
+
+#: templates/core/_ai_insights.html
+msgid "reopened"
+msgstr "rouverts"
+
+#: templates/core/_ai_insights.html
+msgid "SLA breaches"
+msgstr "SLA dépassés"
+
+#: templates/core/_ai_insights.html
+msgid "The AI explanation is not available right now, so only measured patterns are shown."
+msgstr "L’explication par l’IA n’est pas disponible pour le moment : seules les tendances mesurées sont affichées."
+
+#: templates/core/_ai_insights.html
+#, python-format
+msgid "%(c)s tickets · %(n)s person"
+msgid_plural "%(c)s tickets · %(n)s people"
+msgstr[0] "%(c)s tickets · %(n)s personne"
+msgstr[1] "%(c)s tickets · %(n)s personnes"
+
+#: templates/core/_ai_insights.html
+#, python-format
+msgid "%(n)s open"
+msgstr "%(n)s ouverts"
+
+#: templates/core/_ai_insights.html
+msgid "Likely cause"
+msgstr "Cause probable"
+
+#: templates/core/_ai_insights.html
+msgid "Prevent it"
+msgstr "Prévention"
+
+#: templates/core/_ai_insights.html
+msgid "No problem has repeated three or more times in this period."
+msgstr "Aucun problème ne s’est répété trois fois ou plus durant cette période."
+
+#: templates/core/_ai_insights.html
+msgid "Worth watching"
+msgstr "À surveiller"
+
+#: templates/core/_ai_usage.html
+msgid "AI usage today"
+msgstr "Utilisation de l’IA aujourd’hui"
+
+#: templates/core/_ai_usage.html
+msgid "Cloudflare account analytics"
+msgstr "Statistiques du compte Cloudflare"
+
+#: templates/core/_ai_usage.html
+msgid "Helply's calls, as reported by Cloudflare"
+msgstr "Appels de Helply, selon Cloudflare"
+
+#: templates/core/_ai_usage.html
+msgid "Cloudflare AI is not set up, so AI features use keyword matching. Add the account ID and token to <code>.env</code> to turn it on."
+msgstr "Cloudflare AI n’est pas configuré : les fonctions d’IA utilisent donc la correspondance par mots-clés. Ajoutez l’identifiant du compte et le jeton dans <code>.env</code> pour l’activer."
+
+#: templates/core/_ai_usage.html
+msgid "Neurons used today"
+msgstr "Neurons utilisés aujourd’hui"
+
+#: templates/core/_ai_usage.html
+#, python-format
+msgid "<b>%(used)s</b> of %(limit)s Neurons used <em>(%(pct)s%%)</em>"
+msgstr "<b>%(used)s</b> Neurons utilisés sur %(limit)s <em>(%(pct)s %%)</em>"
+
+#: templates/core/_ai_usage.html
+#, python-format
+msgid "<b>%(left)s</b> left · resets in %(t)s (at %(at)s)"
+msgstr "<b>%(left)s</b> restants · réinitialisation dans %(t)s (à %(at)s)"
+
+#: templates/core/_ai_usage.html
+msgid "The daily allowance is used up. Until it resets, AI answers fall back to keyword matching and the assistant says it is unavailable."
+msgstr "Le quota quotidien est épuisé. Jusqu’à sa réinitialisation, les réponses de l’IA reviennent à la correspondance par mots-clés et l’assistant se déclare indisponible."
+
+#: templates/core/_ai_usage.html
+msgid "Almost out: at this pace the AI features will stop before the reset. Consider raising the plan or cutting usage."
+msgstr "Presque épuisé : à ce rythme, les fonctions d’IA s’arrêteront avant la réinitialisation. Pensez à relever le forfait ou à réduire l’utilisation."
+
+#: templates/core/_ai_usage.html
+#, python-format
+msgid "More than 70%% of today's allowance is used."
+msgstr "Plus de 70 %% du quota du jour est utilisé."
+
+#: templates/core/_ai_usage.html
+#, python-format
+msgid "<b>%(used)s</b> Neurons used today <em>(no daily cap set)</em>"
+msgstr "<b>%(used)s</b> Neurons utilisés aujourd’hui <em>(aucune limite quotidienne définie)</em>"
+
+#: templates/core/_ai_usage.html
+msgid "Model"
+msgstr "Modèle"
+
+#: templates/core/_ai_usage.html
+msgid "Requests"
+msgstr "Requêtes"
+
+#: templates/core/_ai_usage.html
+msgid "Neurons"
+msgstr "Neurons"
+
+#: templates/core/_ai_usage.html
+msgid "No AI calls recorded yet today."
+msgstr "Aucun appel à l’IA enregistré aujourd’hui."
+
+#: templates/core/_ai_usage.html
+msgid "Neurons used per day over the last 7 days"
+msgstr "Neurons utilisés par jour sur les 7 derniers jours"
+
+#: templates/core/_ai_usage.html
+msgid "These figures are Cloudflare's own usage reports, not estimates. The allowance resets at 00:00 UTC."
+msgstr "Ces chiffres proviennent des rapports d’utilisation de Cloudflare, ce ne sont pas des estimations. Le quota est réinitialisé à 00 h 00 UTC."
+
+#: templates/core/_ai_usage.html
+msgid "Only Helply's calls are counted here; anything else using this Cloudflare account is not. For account-wide numbers, give the API token the <b>Account Analytics: Read</b> permission."
+msgstr "Seuls les appels de Helply sont comptés ici ; tout autre usage de ce compte Cloudflare ne l’est pas. Pour obtenir les chiffres de tout le compte, donnez au jeton d’API la permission <b>Account Analytics: Read</b>."
+
+#: templates/core/_ai_usage.html
+#, python-format
+msgid "%(n)s call came back without a usage figure and is not counted."
+msgid_plural "%(n)s calls came back without a usage figure and are not counted."
+msgstr[0] "%(n)s appel est revenu sans chiffre d’utilisation et n’est pas compté."
+msgstr[1] "%(n)s appels sont revenus sans chiffre d’utilisation et ne sont pas comptés."
+
+#: templates/core/_ai_usage.html
+msgid "External model usage (OpenAI or Anthropic) is billed by that provider and is not shown here."
+msgstr "L’utilisation de modèles externes (OpenAI ou Anthropic) est facturée par le fournisseur et n’apparaît pas ici."
+
+#: apps/core/templatetags/helply.py templates/core/_ai_usage.html
+msgid "M j"
+msgstr "j M"
+
+#: templates/core/_employee.html
+msgid "What do you need help with?"
+msgstr "De quelle aide avez-vous besoin ?"
+
+#: templates/core/_employee.html
+msgid "Ask the Helply Assistant"
+msgstr "Poser une question à l’assistant Helply"
+
+#: templates/core/_employee.html
+msgid "Ask Helply, e.g. “my printer is offline” or “I forgot my password”"
+msgstr "Demandez à Helply, p. ex. « mon imprimante est hors ligne » ou « j’ai oublié mon mot de passe »"
+
+#: templates/core/_employee.html
+msgid "Ask Helply"
+msgstr "Demander à Helply"
+
+#: templates/core/_employee.html
+msgid "Helply answers from our knowledge base and your own tickets. Not solved?"
+msgstr "Helply répond à partir de notre base de connaissances et de vos propres tickets. Pas résolu ?"
+
+#: templates/core/_employee.html
+msgid "Open a ticket"
+msgstr "Ouvrir un ticket"
+
+#: templates/core/_employee.html
+msgid "Please confirm these are fixed"
+msgstr "Merci de confirmer que ces problèmes sont réglés"
+
+#: templates/core/_employee.html
+#, python-format
+msgid "%(r)s · resolved %(d)s by %(who)s"
+msgstr "%(r)s · résolu %(d)s par %(who)s"
+
+#: templates/core/_employee.html
+msgid "Review →"
+msgstr "Vérifier →"
+
+#: templates/core/_employee.html templates/core/_technician.html
+msgid "My open tickets"
+msgstr "Mes tickets ouverts"
+
+#: templates/core/_employee.html
+msgid "All my tickets →"
+msgstr "Tous mes tickets →"
+
+#: templates/core/_employee.html
+#, python-format
+msgid "%(r)s · opened %(d)s"
+msgstr "%(r)s · ouvert %(d)s"
+
+#: templates/core/_employee.html
+#, python-format
+msgid "with %(n)s"
+msgstr "avec %(n)s"
+
+#: templates/core/_employee.html
+msgid "You have no open tickets."
+msgstr "Vous n’avez aucun ticket ouvert."
+
+#: templates/core/_employee.html
+msgid "Recently closed"
+msgstr "Fermés récemment"
+
+#: templates/core/_employee.html
+msgid "Popular answers"
+msgstr "Réponses populaires"
+
+#: templates/core/_employee.html
+msgid "Browse the knowledge base →"
+msgstr "Parcourir la base de connaissances →"
+
+#: templates/core/_employee.html
+msgid "Urgent?"
+msgstr "Urgent ?"
+
+#: templates/core/_employee.html
+msgid "Clicked a suspicious link, lost a device, or the whole office is down? Open a ticket with Impact and Urgency set to <b>High</b> — don't wait."
+msgstr "Vous avez cliqué sur un lien suspect, perdu un appareil, ou tout le bureau est en panne ? Ouvrez un ticket avec l’Impact et l’Urgence à <b>Élevé</b> — n’attendez pas."
+
+#: templates/core/_ov_people.html templates/partials/sidebar.html
+msgid "People"
+msgstr "Personnes"
+
+#: templates/core/_ov_people.html
+msgid "Manage →"
+msgstr "Gérer →"
+
+#: templates/core/_ov_people.html
+#, python-format
+msgid "active people in %(n)s department"
+msgid_plural "active people in %(n)s departments"
+msgstr[0] "personnes actives dans %(n)s service"
+msgstr[1] "personnes actives dans %(n)s services"
+
+#: templates/core/_ov_people.html
+msgid "Administrators"
+msgstr "Administrateurs"
+
+#: templates/core/_ov_people.html
+msgid "Technicians"
+msgstr "Techniciens"
+
+#: templates/core/_ov_people.html
+msgid "Employees"
+msgstr "Employés"
+
+#: templates/core/_ov_people.html
+#, python-format
+msgid "%(n)s account turned off"
+msgid_plural "%(n)s accounts turned off"
+msgstr[0] "%(n)s compte désactivé"
+msgstr[1] "%(n)s comptes désactivés"
+
+#: templates/core/_ov_renewals.html
+msgid "Renewals &amp; assets"
+msgstr "Renouvellements et actifs"
+
+#: templates/core/_ov_renewals.html
+msgid "Asset register →"
+msgstr "Registre des actifs →"
+
+#: templates/core/_ov_renewals.html
+msgid "No subscription renews in the next 30 days."
+msgstr "Aucun abonnement ne se renouvelle dans les 30 prochains jours."
+
+#: templates/core/_ov_renewals.html
+#, python-format
+msgid "+ %(n)s more renewing soon"
+msgstr "+ %(n)s de plus à renouveler bientôt"
+
+#: templates/core/_ov_renewals.html
+msgid "assets in the register"
+msgstr "actifs au registre"
+
+#: templates/core/_ov_renewals.html
+msgid "warranties expired"
+msgstr "garanties expirées"
+
+#: templates/core/_ov_renewals.html
+msgid "in repair"
+msgstr "en réparation"
+
+#: templates/core/_ov_renewals.html
+msgid "M j, Y"
+msgstr "j M Y"
+
+#: templates/core/_ov_servers.html templates/partials/sidebar.html templates/registration/login.html
+msgid "Cloud servers"
+msgstr "Serveurs cloud"
+
+#: templates/core/_ov_servers.html
+msgid "All servers →"
+msgstr "Tous les serveurs →"
+
+#: templates/core/_ov_servers.html
+msgid "Server health"
+msgstr "État des serveurs"
+
+#: templates/core/_ov_servers.html
+msgid "Healthy"
+msgstr "En bonne santé"
+
+#: templates/core/_ov_servers.html
+msgid "Attention"
+msgstr "Attention"
+
+#: templates/core/_ov_servers.html
+msgid "Offline"
+msgstr "Hors ligne"
+
+#: templates/core/_ov_servers.html
+msgid "Waiting"
+msgstr "En attente"
+
+#: templates/core/_ov_servers.html
+msgid "average CPU"
+msgstr "UC moyenne"
+
+#: templates/core/_ov_servers.html
+msgid "open alert"
+msgid_plural "open alerts"
+msgstr[0] "alerte ouverte"
+msgstr[1] "alertes ouvertes"
+
+#: templates/core/_ov_servers.html
+msgid "per month"
+msgstr "par mois"
+
+#: templates/core/_ov_servers.html
+#, python-format
+msgid "%(n)s alert"
+msgid_plural "%(n)s alerts"
+msgstr[0] "%(n)s alerte"
+msgstr[1] "%(n)s alertes"
+
+#: templates/core/_ov_servers.html
+#, python-format
+msgid "+ %(n)s more servers"
+msgstr "+ %(n)s serveurs de plus"
+
+#: templates/core/_ov_servers.html
+msgid "No servers connected yet."
+msgstr "Aucun serveur connecté pour l’instant."
+
+#: templates/core/_ov_servers.html
+msgid "Add the first one →"
+msgstr "Ajouter le premier →"
+
+#: templates/core/_ov_unassigned.html
+msgid "Waiting for a technician"
+msgstr "En attente d’un technicien"
+
+#: templates/core/_ov_unassigned.html
+#, python-format
+msgid "%(n)s unassigned"
+msgstr "%(n)s non assignés"
+
+#: templates/core/_ov_unassigned.html
+msgid "See all →"
+msgstr "Tout voir →"
+
+#: templates/core/_ov_unassigned.html
+msgid "Every open ticket has an owner."
+msgstr "Chaque ticket ouvert a un responsable."
+
+#: templates/core/_ov_unassigned.html
+#, python-format
+msgid "+ %(n)s more"
+msgstr "+ %(n)s de plus"
+
+#: templates/core/_ov_unassigned.html
+msgid "see all"
+msgstr "tout voir"
+
+#: templates/core/_technician.html
+#, python-format
+msgid "%(n)s on hold"
+msgstr "%(n)s en attente"
+
+#: templates/core/_technician.html
+msgid "up for grabs"
+msgstr "à prendre"
+
+#: templates/core/_technician.html
+msgid "Urgent"
+msgstr "Urgents"
+
+#: templates/core/_technician.html
+msgid "at risk or breached"
+msgstr "à risque ou dépassés"
+
+#: templates/core/_technician.html
+msgid "Resolved · 7 days"
+msgstr "Résolus · 7 jours"
+
+#: templates/core/_technician.html
+msgid "by you"
+msgstr "par vous"
+
+#: templates/core/_technician.html
+msgid "My satisfaction"
+msgstr "Ma satisfaction"
+
+#: templates/core/_technician.html
+msgid "average rating"
+msgstr "note moyenne"
+
+#: templates/core/_technician.html
+msgid "My queue"
+msgstr "Ma file"
+
+#: templates/core/_technician.html
+msgid "most urgent first"
+msgstr "les plus urgents d’abord"
+
+#: templates/core/_technician.html
+msgid "All tickets →"
+msgstr "Tous les tickets →"
+
+#: templates/core/_technician.html
+#, python-format
+msgid "Due %(d)s"
+msgstr "Échéance %(d)s"
+
+#: apps/core/views.py apps/tickets/choices.py templates/core/_technician.html
+msgid "On hold"
+msgstr "En attente"
+
+#: templates/core/_technician.html
+msgid "Your queue is empty."
+msgstr "Votre file est vide."
+
+#: templates/core/_technician.html
+msgid "Resolved · waiting for the requester to confirm"
+msgstr "Résolus · en attente de confirmation du demandeur"
+
+#: apps/core/views.py apps/tickets/choices.py templates/core/_technician.html
+msgid "Resolved"
+msgstr "Résolu"
+
+#: templates/core/_technician.html
+#, python-format
+msgid "%(r)s · %(q)s · resolved %(d)s"
+msgstr "%(r)s · %(q)s · résolu %(d)s"
+
+#: templates/core/_technician.html
+msgid "Overview"
+msgstr "Vue d’ensemble"
+
+#: templates/core/dashboard.html templates/partials/sidebar.html
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#: templates/core/dashboard.html templates/partials/sidebar.html templates/tickets/form.html
+msgid "New ticket"
+msgstr "Nouveau ticket"
+
+#: templates/notifications/list.html
+msgid "Notifications"
+msgstr "Notifications"
+
+#: templates/notifications/list.html
+msgid "Updates on tickets you raised or work on."
+msgstr "Mises à jour sur les tickets que vous avez ouverts ou sur lesquels vous travaillez."
+
+#: templates/notifications/list.html
+msgid "Mark all as read"
+msgstr "Tout marquer comme lu"
+
+#: templates/notifications/list.html
+msgid "· emailed"
+msgstr "· envoyé par courriel"
+
+#: apps/tickets/choices.py templates/notifications/list.html
+msgid "New"
+msgstr "Nouveau"
+
+#: templates/notifications/list.html
+msgid "No notifications yet. You'll see updates here when someone replies to or updates your tickets."
+msgstr "Aucune notification pour l’instant. Les mises à jour apparaîtront ici lorsque quelqu’un répondra à vos tickets ou les modifiera."
+
+#: apps/tickets/choices.py templates/notifications/list.html
+msgid "Email"
+msgstr "Courriel"
+
+#: templates/notifications/list.html
+msgid "Also email me about replies, tickets waiting for my confirmation and SLA problems"
+msgstr "Me prévenir aussi par courriel des réponses, des tickets en attente de ma confirmation et des problèmes de SLA"
+
+#: templates/notifications/list.html templates/tickets/detail.html
+msgid "Save"
+msgstr "Enregistrer"
+
+#: templates/notifications/list.html
+#, python-format
+msgid "Sent to %(email)s. Repeated updates of the same kind are grouped into one email."
+msgstr "Envoyé à %(email)s. Les mises à jour répétées du même type sont regroupées dans un seul courriel."
+
+#: templates/notifications/list.html
+msgid "(no email address on file)"
+msgstr "(aucune adresse courriel enregistrée)"
+
+#: templates/partials/lang_switch.html
+msgid "Language"
+msgstr "Langue"
+
+#: templates/partials/sidebar.html
+msgid "Main navigation"
+msgstr "Navigation principale"
+
+#: templates/partials/sidebar.html templates/registration/login.html templates/tickets/list.html
+msgid "Tickets"
+msgstr "Tickets"
+
+#: templates/partials/sidebar.html
+msgid "Knowledge base"
+msgstr "Base de connaissances"
+
+#: templates/partials/sidebar.html templates/registration/login.html
+msgid "Assets"
+msgstr "Actifs"
+
+#: templates/partials/sidebar.html
+msgid "My devices"
+msgstr "Mes appareils"
+
+#: templates/partials/sidebar.html
+msgid "SLA policies"
+msgstr "Politiques SLA"
+
+#: templates/partials/sidebar.html
+msgid "Help and guided tour"
+msgstr "Aide et visite guidée"
+
+#: templates/partials/sidebar.html
+msgid "Help"
+msgstr "Aide"
+
+#: templates/partials/theme_toggle.html templates/registration/login.html
+msgid "Switch between light and dark mode"
+msgstr "Basculer entre le mode clair et le mode sombre"
+
+#: templates/partials/theme_toggle.html templates/registration/login.html
+msgid "Switch theme"
+msgstr "Changer de thème"
+
+#: templates/registration/login.html
+msgid "Helply · IT help, handled"
+msgstr "Helply · le soutien informatique, simplifié"
+
+#: templates/registration/login.html
+msgid "Helply, back to the first slide"
+msgstr "Helply, retour à la première page"
+
+#: templates/registration/login.html
+msgid "Sections"
+msgstr "Sections"
+
+#: templates/registration/login.html templates/tickets/list.html
+msgid "AI"
+msgstr "IA"
+
+#: templates/registration/login.html templates/tickets/list.html
+msgid "SLA"
+msgstr "SLA"
+
+#: templates/registration/login.html
+msgid "Servers"
+msgstr "Serveurs"
+
+#: templates/registration/login.html templates/registration/password_reset_complete.html
+msgid "Sign in"
+msgstr "Se connecter"
+
+#: templates/registration/login.html
+msgid "The IT service desk for teams of 10 to 100"
+msgstr "Le centre de services TI pour les équipes de 10 à 100 personnes"
+
+#: templates/registration/login.html
+msgid "IT help,"
+msgstr "Le soutien TI,"
+
+#: templates/registration/login.html
+msgid "handled."
+msgstr "simplifié."
+
+#: templates/registration/login.html
+msgid "Tickets that sort themselves. Servers that speak up. Renewals that never sneak up on you. One calm place for the people who keep the company running."
+msgstr "Des tickets qui se trient tout seuls. Des serveurs qui se manifestent. Des renouvellements qui ne vous surprennent jamais. Un seul endroit, calme, pour ceux qui font tourner l’entreprise."
+
+#: templates/registration/login.html
+msgid "Get Helply from GitHub"
+msgstr "Obtenir Helply sur GitHub"
+
+#: templates/registration/login.html
+msgid "Helply for Windows, on GitHub"
+msgstr "Helply pour Windows, sur GitHub"
+
+#: templates/registration/login.html
+msgid "Helply for Linux, on GitHub"
+msgstr "Helply pour Linux, sur GitHub"
+
+#: templates/registration/login.html
+msgid "Helply on GitHub"
+msgstr "Helply sur GitHub"
+
+#: templates/registration/login.html
+msgid "Explore Helply"
+msgstr "Découvrir Helply"
+
+#: templates/registration/login.html
+msgid "Use the account your administrator created for you."
+msgstr "Utilisez le compte que votre administrateur a créé pour vous."
+
+#: templates/registration/login.html
+msgid "Username"
+msgstr "Nom d’utilisateur"
+
+#: templates/registration/login.html
+msgid "Password"
+msgstr "Mot de passe"
+
+#: templates/registration/login.html
+msgid "Show password"
+msgstr "Afficher le mot de passe"
+
+#: templates/registration/login.html
+msgid "Forgot your password?"
+msgstr "Mot de passe oublié ?"
+
+#: templates/registration/login.html
+msgid "Encrypted connection. Repeated wrong passwords are temporarily blocked."
+msgstr "Connexion chiffrée. Les mots de passe erronés répétés sont bloqués temporairement."
+
+#: templates/registration/login.html
+msgid "A rack of servers with glowing status lights"
+msgstr "Une baie de serveurs aux voyants lumineux"
+
+#: templates/registration/login.html
+msgid "Category suggested"
+msgstr "Catégorie suggérée"
+
+#: templates/registration/login.html
+msgid "Routed to the right team"
+msgstr "Dirigé vers la bonne équipe"
+
+#: templates/registration/login.html
+msgid "Response clock started"
+msgstr "Chronomètre de réponse lancé"
+
+#: templates/registration/login.html
+msgid "From first message to a closed ticket."
+msgstr "Du premier message au ticket fermé."
+
+#: templates/registration/login.html
+msgid "Raised your way"
+msgstr "Ouvert à votre façon"
+
+#: templates/registration/login.html
+msgid "Describe the problem in plain words."
+msgstr "Décrivez le problème avec vos mots."
+
+#: templates/registration/login.html
+msgid "Sorted on arrival"
+msgstr "Trié dès l’arrivée"
+
+#: templates/registration/login.html
+msgid "Suggested category, then routed to the right team."
+msgstr "Catégorie suggérée, puis dirigé vers la bonne équipe."
+
+#: templates/registration/login.html
+msgid "Priority from impact and urgency"
+msgstr "Priorité selon l’impact et l’urgence"
+
+#: templates/registration/login.html
+msgid "P1 to P4, the same for everyone."
+msgstr "De P1 à P4, la même pour tous."
+
+#: templates/registration/login.html
+msgid "SLA clocks that pause"
+msgstr "Des chronomètres SLA qui se mettent en pause"
+
+#: templates/registration/login.html
+msgid "Deadlines pause while you wait on someone."
+msgstr "Les échéances s’arrêtent pendant que vous attendez quelqu’un."
+
+#: templates/registration/login.html
+msgid "Replies and private notes"
+msgstr "Réponses et notes privées"
+
+#: templates/registration/login.html
+msgid "Internal notes stay with IT."
+msgstr "Les notes internes restent entre techniciens."
+
+#: templates/registration/login.html
+msgid "Closed with feedback"
+msgstr "Fermé avec évaluation"
+
+#: templates/registration/login.html
+msgid "Requesters rate the fix."
+msgstr "Les demandeurs évaluent la solution."
+
+#: templates/registration/login.html
+msgid "AI inside the workflow"
+msgstr "L’IA au cœur du flux de travail"
+
+#: templates/registration/login.html
+msgid "Intelligence, built in"
+msgstr "L’intelligence, intégrée"
+
+#: templates/registration/login.html
+msgid "AI inside the workflow."
+msgstr "L’IA au cœur du flux de travail."
+
+#: templates/registration/login.html
+msgid "Not a chat box."
+msgstr "Pas une simple fenêtre de clavardage."
+
+#: templates/registration/login.html
+msgid "It sorts."
+msgstr "Elle trie."
+
+#: templates/registration/login.html
+msgid "Suggests a category and triages when sure."
+msgstr "Elle suggère une catégorie et trie quand elle est sûre."
+
+#: templates/registration/login.html
+msgid "It routes."
+msgstr "Elle dirige."
+
+#: templates/registration/login.html
+msgid "To the lightest-loaded technician on the right team."
+msgstr "Vers le technicien le moins chargé de la bonne équipe."
+
+#: templates/registration/login.html
+msgid "It remembers."
+msgstr "Elle se souvient."
+
+#: templates/registration/login.html
+msgid "Related articles and past tickets appear beside new ones."
+msgstr "Les articles liés et les anciens tickets apparaissent à côté des nouveaux."
+
+#: templates/registration/login.html
+msgid "Service levels"
+msgstr "Niveaux de service"
+
+#: templates/registration/login.html
+msgid "Network patch cables plugged into a switch"
+msgstr "Câbles de brassage réseau branchés dans un commutateur"
+
+#: templates/registration/login.html
+msgid "Clock paused while you wait"
+msgstr "Chronomètre en pause pendant votre attente"
+
+#: templates/registration/login.html
+msgid "Warned before it is late"
+msgstr "Alerte avant le retard"
+
+#: templates/registration/login.html
+msgid "A promise you can see being kept."
+msgstr "Une promesse dont on voit qu’elle est tenue."
+
+#: templates/registration/login.html
+msgid "Set response and resolution targets per priority. The clock pauses while you wait, and Helply warns before a ticket is late."
+msgstr "Définissez des cibles de réponse et de résolution par priorité. Le chronomètre s’arrête pendant votre attente, et Helply vous avertit avant qu’un ticket soit en retard."
+
+#: templates/registration/login.html
+msgid "P1 to P4 targets you control"
+msgstr "Des cibles P1 à P4 que vous maîtrisez"
+
+#: templates/registration/login.html
+msgid "Changed in seconds on one page."
+msgstr "Modifiées en quelques secondes sur une seule page."
+
+#: templates/registration/login.html
+msgid "At risk and breached tickets rise"
+msgstr "Les tickets à risque ou en retard remontent"
+
+#: templates/registration/login.html
+msgid "They go to the top of every dashboard."
+msgstr "Ils passent en tête de chaque tableau de bord."
+
+#: templates/registration/login.html
+msgid "Cables and glowing ports on a network switch"
+msgstr "Câbles et ports lumineux sur un commutateur réseau"
+
+#: templates/registration/login.html
+msgid "Reporting every 10 seconds"
+msgstr "Rapport toutes les 10 secondes"
+
+#: templates/registration/login.html
+msgid "Offline for 2 minutes opens a ticket"
+msgstr "Hors ligne pendant 2 minutes : un ticket s’ouvre"
+
+#: templates/registration/login.html
+msgid "See your servers before your users do."
+msgstr "Voyez vos serveurs avant vos utilisateurs."
+
+#: templates/registration/login.html
+msgid "One command installs a tiny agent. Live CPU, memory, disk and network, and a ticket when something breaks."
+msgstr "Une commande installe un petit agent. UC, mémoire, disque et réseau en direct, et un ticket dès que quelque chose tombe en panne."
+
+#: templates/registration/login.html
+msgid "Read-only by design"
+msgstr "Lecture seule par conception"
+
+#: templates/registration/login.html
+msgid "Sends readings only. Accepts no commands."
+msgstr "N’envoie que des mesures. N’accepte aucune commande."
+
+#: templates/registration/login.html
+msgid "Where it runs, what it costs"
+msgstr "Où il tourne, ce qu’il coûte"
+
+#: templates/registration/login.html
+msgid "Country, provider and renewal date, beside the graphs."
+msgstr "Pays, fournisseur et date de renouvellement, à côté des graphiques."
+
+#: templates/registration/login.html
+msgid "Recovery noted for you"
+msgstr "Le rétablissement est consigné pour vous"
+
+#: templates/registration/login.html
+msgid "When the server returns, the ticket says so."
+msgstr "Quand le serveur revient, le ticket l’indique."
+
+#: templates/registration/login.html
+msgid "Assets and renewals"
+msgstr "Actifs et renouvellements"
+
+#: templates/registration/login.html
+msgid "Network equipment on a desk in front of a server room"
+msgstr "Équipement réseau sur un bureau devant une salle de serveurs"
+
+#: templates/registration/login.html
+msgid "Renews in 14 days"
+msgstr "Renouvellement dans 14 jours"
+
+#: templates/registration/login.html
+msgid "Know what you own, and when it expires."
+msgstr "Sachez ce que vous possédez, et quand cela expire."
+
+#: templates/registration/login.html
+msgid "Devices, licences and cloud servers in one register, with owners and renewal dates. Reminders at 30, 14 and 7 days."
+msgstr "Appareils, licences et serveurs cloud dans un seul registre, avec responsables et dates de renouvellement. Rappels à 30, 14 et 7 jours."
+
+#: templates/registration/login.html
+msgid "Every device keeps its story"
+msgstr "Chaque appareil garde son historique"
+
+#: templates/registration/login.html
+msgid "Including the tickets raised against it."
+msgstr "Y compris les tickets ouverts à son sujet."
+
+#: templates/registration/login.html
+msgid "Repeat faults stand out"
+msgstr "Les pannes répétées ressortent"
+
+#: templates/registration/login.html
+msgid "Replacing a laptop becomes a decision, not a hunch."
+msgstr "Remplacer un portable devient une décision, pas une intuition."
+
+#: templates/registration/login.html
+msgid "Made for small teams"
+msgstr "Conçu pour les petites équipes"
+
+#: templates/registration/login.html
+msgid "Tiny figures plugging in a network cable"
+msgstr "De minuscules personnages qui branchent un câble réseau"
+
+#: templates/registration/login.html
+msgid "One to five people in IT"
+msgstr "Une à cinq personnes en TI"
+
+#: templates/registration/login.html
+msgid "Big-company discipline. Small-company calm."
+msgstr "La rigueur d’une grande entreprise. Le calme d’une petite."
+
+#: templates/registration/login.html
+msgid "One to five people in IT?"
+msgstr "Une à cinq personnes en TI ?"
+
+#: templates/registration/login.html
+msgid "That is who Helply is for. No consultants, no long setup."
+msgstr "C’est pour vous que Helply existe. Pas de consultants, pas de longue installation."
+
+#: templates/registration/login.html
+msgid "Three roles, nothing extra"
+msgstr "Trois rôles, rien de superflu"
+
+#: templates/registration/login.html
+msgid "Employees, technicians, administrators."
+msgstr "Employés, techniciens, administrateurs."
+
+#: templates/registration/login.html
+msgid "Fix it yourself first"
+msgstr "Essayez d’abord de régler le problème vous-même"
+
+#: templates/registration/login.html
+msgid "Suggested answers appear while people type."
+msgstr "Des réponses suggérées apparaissent pendant la saisie."
+
+#: templates/registration/login.html
+msgid "Quiet, useful notifications"
+msgstr "Des notifications discrètes et utiles"
+
+#: templates/registration/login.html
+msgid "Only when someone has to act."
+msgstr "Seulement quand quelqu’un doit agir."
+
+#: templates/registration/login.html
+msgid "Ready when you are"
+msgstr "Prêt quand vous l’êtes"
+
+#: templates/registration/login.html
+msgid "Ready when you are."
+msgstr "Prêt quand vous l’êtes."
+
+#: templates/registration/login.html
+msgid "Sign in to see what needs you today."
+msgstr "Connectez-vous pour voir ce qui vous attend aujourd’hui."
+
+#: templates/registration/login.html
+msgid "10 to 100"
+msgstr "10 à 100"
+
+#: templates/registration/login.html
+msgid "people, the size Helply is designed for"
+msgstr "personnes, la taille pour laquelle Helply est conçu"
+
+#: templates/registration/login.html
+msgid "remote commands. The agent only reports"
+msgstr "commande à distance. L’agent ne fait que transmettre des mesures"
+
+#: templates/registration/login.html
+msgid "database as the single source of truth"
+msgstr "base de données comme unique source de vérité"
+
+#: templates/registration/login.html
+msgid "2 themes"
+msgstr "2 thèmes"
+
+#: templates/registration/login.html
+msgid "light and dark, following your device"
+msgstr "clair et sombre, selon votre appareil"
+
+#: templates/registration/login.html
+msgid "Helply · IT service desk · A Fanshawe College capstone project"
+msgstr "Helply · centre de services TI · Un projet de fin d’études du Collège Fanshawe"
+
+#: templates/registration/login.html
+msgid "Back to the first page"
+msgstr "Retour à la première page"
+
+#: templates/registration/login.html
+msgid "Back to start"
+msgstr "Retour au début"
+
+#: templates/registration/login.html
+msgid "Slides"
+msgstr "Pages"
+
+#: templates/registration/login.html
+msgid "Slide controls"
+msgstr "Commandes de navigation"
+
+#: templates/registration/login.html
+msgid "Previous slide"
+msgstr "Page précédente"
+
+#: templates/registration/login.html
+msgid "Next slide"
+msgstr "Page suivante"
+
+#: templates/registration/password_change_done.html
+msgid "Password changed"
+msgstr "Mot de passe modifié"
+
+#: templates/registration/password_change_done.html
+msgid "Your password was changed. Other devices where you were signed in have been signed out."
+msgstr "Votre mot de passe a été modifié. Les autres appareils où vous étiez connecté ont été déconnectés."
+
+#: templates/registration/password_change_done.html
+msgid "Back to the dashboard"
+msgstr "Retour au tableau de bord"
+
+#: templates/registration/password_change_form.html
+msgid "Enter your current password, then your new one twice so we can check you typed it correctly."
+msgstr "Saisissez votre mot de passe actuel, puis le nouveau deux fois pour que nous puissions vérifier votre saisie."
+
+#: apps/tickets/workflow.py templates/registration/password_change_form.html
+msgid "Cancel"
+msgstr "Annuler"
+
+#: templates/registration/password_reset_complete.html
+msgid "Password saved"
+msgstr "Mot de passe enregistré"
+
+#: templates/registration/password_reset_complete.html
+msgid "All set"
+msgstr "Tout est prêt"
+
+#: templates/registration/password_reset_complete.html
+msgid "Your password is saved. You can sign in now."
+msgstr "Votre mot de passe est enregistré. Vous pouvez maintenant vous connecter."
+
+#: templates/registration/password_reset_confirm.html
+msgid "Choose a password"
+msgstr "Choisir un mot de passe"
+
+#: templates/registration/password_reset_confirm.html
+msgid "Choose a password for your account."
+msgstr "Choisissez un mot de passe pour votre compte."
+
+#: templates/registration/password_reset_confirm.html
+msgid "Save password"
+msgstr "Enregistrer le mot de passe"
+
+#: templates/registration/password_reset_confirm.html
+msgid "This link has already been used or has expired."
+msgstr "Ce lien a déjà été utilisé ou a expiré."
+
+#: templates/registration/password_reset_confirm.html
+msgid "Ask an administrator for a new one, or"
+msgstr "Demandez-en un nouveau à un administrateur, ou"
+
+#: templates/registration/password_reset_confirm.html
+msgid "request a reset by email"
+msgstr "demandez une réinitialisation par courriel"
+
+#: templates/registration/password_reset_done.html
+msgid "Password reset sent"
+msgstr "Réinitialisation envoyée"
+
+#: templates/registration/password_reset_done.html
+msgid "Check your email"
+msgstr "Vérifiez vos courriels"
+
+#: templates/registration/password_reset_done.html
+msgid "If an account exists with the email you entered, we have sent instructions for choosing a new password. They should arrive shortly."
+msgstr "Si un compte existe avec l’adresse courriel saisie, nous avons envoyé les instructions pour choisir un nouveau mot de passe. Elles devraient arriver sous peu."
+
+#: templates/registration/password_reset_done.html
+msgid "Nothing there? Check your spam folder and make sure you used the address registered with Helply."
+msgstr "Rien reçu ? Vérifiez vos courriers indésirables et assurez-vous d’avoir utilisé l’adresse enregistrée dans Helply."
+
+#: templates/registration/password_reset_done.html
+msgid "Back to sign in"
+msgstr "Retour à la connexion"
+
+#: templates/registration/password_reset_form.html
+msgid "Password reset"
+msgstr "Réinitialisation du mot de passe"
+
+#: templates/registration/password_reset_form.html
+msgid "Enter the email address on your account and we will send you a link to choose a new password."
+msgstr "Saisissez l’adresse courriel de votre compte et nous vous enverrons un lien pour choisir un nouveau mot de passe."
+
+#: templates/registration/password_reset_form.html
+msgid "Send reset link"
+msgstr "Envoyer le lien de réinitialisation"
+
+#: templates/registration/password_reset_form.html
+msgid "← Back to sign in"
+msgstr "← Retour à la connexion"
+
+#: templates/tickets/detail.html
+msgid "← All tickets"
+msgstr "← Tous les tickets"
+
+#: templates/tickets/detail.html
+msgid "SLA:"
+msgstr "SLA :"
+
+#: templates/tickets/detail.html
+msgid "AI-classified"
+msgstr "Classé par l’IA"
+
+#: apps/tickets/forms.py templates/tickets/detail.html
+msgid "Description"
+msgstr "Description"
+
+#: templates/tickets/detail.html
+msgid "Resolution"
+msgstr "Résolution"
+
+#: templates/tickets/detail.html
+msgid "Actions"
+msgstr "Actions"
+
+#: templates/tickets/detail.html
+msgid "Note (required)"
+msgstr "Note (obligatoire)"
+
+#: templates/tickets/detail.html
+msgid "How did we do?"
+msgstr "Comment avons-nous fait ?"
+
+#: templates/tickets/detail.html
+msgid "Send feedback"
+msgstr "Envoyer l’évaluation"
+
+#: templates/tickets/detail.html
+msgid "Conversation"
+msgstr "Conversation"
+
+#: templates/tickets/detail.html
+msgid "· internal"
+msgstr "· interne"
+
+#: templates/tickets/detail.html
+msgid "No comments yet."
+msgstr "Aucun commentaire pour l’instant."
+
+#: templates/tickets/detail.html
+msgid "Add comment"
+msgstr "Ajouter un commentaire"
+
+#: templates/tickets/detail.html
+msgid "Details"
+msgstr "Détails"
+
+#: templates/tickets/detail.html
+msgid "Requester"
+msgstr "Demandeur"
+
+#: apps/tickets/forms.py templates/tickets/detail.html templates/tickets/list.html
+msgid "Category"
+msgstr "Catégorie"
+
+#: templates/tickets/detail.html
+msgid "Group"
+msgstr "Équipe"
+
+#: templates/tickets/detail.html templates/tickets/list.html
+msgid "Assignee"
+msgstr "Assigné à"
+
+#: templates/tickets/detail.html
+msgid "Impact / urgency"
+msgstr "Impact / urgence"
+
+#: apps/tickets/forms.py templates/tickets/detail.html
+msgid "Asset"
+msgstr "Actif"
+
+#: templates/tickets/detail.html
+msgid "Response due"
+msgstr "Réponse due"
+
+#: templates/tickets/detail.html
+msgid "Resolution due"
+msgstr "Résolution due"
+
+#: templates/tickets/detail.html
+msgid "Similar resolved tickets"
+msgstr "Tickets similaires résolus"
+
+#: templates/tickets/detail.html
+msgid "Related articles"
+msgstr "Articles liés"
+
+#: templates/tickets/detail.html
+msgid "History"
+msgstr "Historique"
+
+#: templates/tickets/detail.html templates/tickets/list.html
+msgid "M j, H:i"
+msgstr "j M, H:i"
+
+#: templates/tickets/form.html
+msgid "Report an IT issue"
+msgstr "Signaler un problème informatique"
+
+#: templates/tickets/form.html
+msgid "Raising this for someone else? Pick their department, then their name. Leave Employee as “Myself” to log your own issue."
+msgstr "Vous ouvrez ce ticket pour quelqu’un d’autre ? Choisissez son service, puis son nom. Laissez « Moi-même » dans Employé pour signaler votre propre problème."
+
+#: templates/tickets/form.html
+msgid "Submit ticket"
+msgstr "Soumettre le ticket"
+
+#: templates/tickets/list.html
+msgid "+ New ticket"
+msgstr "+ Nouveau ticket"
+
+#: templates/tickets/list.html
+msgid "Showing tickets no technician has picked up yet"
+msgstr "Affichage des tickets qu’aucun technicien n’a encore pris en charge"
+
+#: templates/tickets/list.html
+msgid "show all"
+msgstr "tout afficher"
+
+#: templates/tickets/list.html
+msgid "Ref"
+msgstr "Réf."
+
+#: apps/tickets/forms.py templates/tickets/list.html
+msgid "Title"
+msgstr "Titre"
+
+#: templates/tickets/list.html
+msgid "Priority"
+msgstr "Priorité"
+
+#: templates/tickets/list.html
+msgid "Status"
+msgstr "Statut"
+
+#: templates/tickets/list.html
+msgid "Created"
+msgstr "Créé"
+
+#: templates/tickets/list.html
+msgid "Classified by AI"
+msgstr "Classé par l’IA"
+
+#: templates/tickets/list.html
+msgid "No tickets."
+msgstr "Aucun ticket."
+
+#: apps/accounts/models.py apps/tickets/forms.py
+msgid "Employee"
+msgstr "Employé"
+
+#: apps/accounts/models.py
+msgid "Technician"
+msgstr "Technicien"
+
+#: apps/accounts/models.py
+msgid "Administrator"
+msgstr "Administrateur"
+
+#: apps/accounts/throttle.py
+#, python-format
+msgid "Too many failed sign-in attempts. Try again in %(n)d minute."
+msgid_plural "Too many failed sign-in attempts. Try again in %(n)d minutes."
+msgstr[0] "Trop de tentatives de connexion échouées. Réessayez dans %(n)d minute."
+msgstr[1] "Trop de tentatives de connexion échouées. Réessayez dans %(n)d minutes."
+
+#: apps/core/overview.py
+msgid "No department"
+msgstr "Aucun service"
+
+#: apps/core/templatetags/helply.py
+#, python-format
+msgid "%(m)sm"
+msgstr "%(m)s min"
+
+#: apps/core/templatetags/helply.py
+msgid "just now"
+msgstr "à l’instant"
+
+#: apps/core/templatetags/helply.py
+#, python-format
+msgid "%(t)s ago"
+msgstr "il y a %(t)s"
+
+#: apps/core/templatetags/helply.py
+#, python-format
+msgid "in %(t)s"
+msgstr "dans %(t)s"
+
+#: apps/core/templatetags/helply.py
+#, python-format
+msgid "%(t)s overdue"
+msgstr "%(t)s de retard"
+
+#: apps/core/templatetags/helply.py
+#, python-format
+msgid "on %(date)s"
+msgstr "le %(date)s"
+
+#: apps/core/templatetags/helply.py
+#, python-format
+msgid "%(d)sd %(h)sh"
+msgstr "%(d)s j %(h)s h"
+
+#: apps/core/templatetags/helply.py
+#, python-format
+msgid "%(d)sd"
+msgstr "%(d)s j"
+
+#: apps/core/templatetags/helply.py
+#, python-format
+msgid "%(h)sh %(m)sm"
+msgstr "%(h)s h %(m)s min"
+
+#: apps/core/templatetags/helply.py
+#, python-format
+msgid "%(h)sh"
+msgstr "%(h)s h"
+
+#: apps/core/templatetags/helply.py
+msgid "No SLA"
+msgstr "Sans SLA"
+
+#: apps/core/templatetags/helply.py
+msgid "On track"
+msgstr "Dans les temps"
+
+#: apps/core/templatetags/helply.py
+msgid "At risk"
+msgstr "À risque"
+
+#: apps/core/templatetags/helply.py
+msgid "Breached"
+msgstr "Dépassé"
+
+#: apps/core/templatetags/helply.py
+msgid "Paused"
+msgstr "En pause"
+
+#: apps/core/templatetags/helply.py
+msgid "Met"
+msgstr "Respecté"
+
+#: apps/core/views.py
+msgid "Submitted"
+msgstr "Soumis"
+
+#: apps/core/views.py apps/tickets/choices.py
+msgid "Assigned"
+msgstr "Assigné"
+
+#: apps/core/views.py apps/tickets/choices.py
+msgid "In progress"
+msgstr "En cours"
+
+#: apps/tickets/choices.py
+msgid "Triaged"
+msgstr "Trié"
+
+#: apps/tickets/choices.py
+msgid "Closed"
+msgstr "Fermé"
+
+#: apps/tickets/choices.py
+msgid "Cancelled"
+msgstr "Annulé"
+
+#: apps/tickets/choices.py
+msgid "High"
+msgstr "Élevé"
+
+#: apps/tickets/choices.py
+msgid "Medium"
+msgstr "Moyen"
+
+#: apps/tickets/choices.py
+msgid "Low"
+msgstr "Faible"
+
+#: apps/tickets/choices.py
+msgid "P1 - Critical"
+msgstr "P1 - Critique"
+
+#: apps/tickets/choices.py
+msgid "P2 - High"
+msgstr "P2 - Élevée"
+
+#: apps/tickets/choices.py
+msgid "P3 - Medium"
+msgstr "P3 - Moyenne"
+
+#: apps/tickets/choices.py
+msgid "P4 - Low"
+msgstr "P4 - Faible"
+
+#: apps/tickets/choices.py
+msgid "Self-service portal"
+msgstr "Portail libre-service"
+
+#: apps/tickets/choices.py
+msgid "Phone"
+msgstr "Téléphone"
+
+#: apps/tickets/choices.py
+msgid "Monitoring alert"
+msgstr "Alerte de surveillance"
+
+#: apps/tickets/choices.py
+msgid "Open"
+msgstr "Ouverts"
+
+#: apps/tickets/choices.py
+msgid "Not started"
+msgstr "Non démarrés"
+
+#: apps/tickets/choices.py
+msgid "All"
+msgstr "Tous"
+
+#: apps/tickets/forms.py
+msgid "Not sure - let Helply decide"
+msgstr "Je ne sais pas : laissez Helply décider"
+
+#: apps/tickets/forms.py
+msgid "None / not listed"
+msgstr "Aucun / non listé"
+
+#: apps/tickets/forms.py
+msgid "All departments"
+msgstr "Tous les services"
+
+#: apps/tickets/forms.py
+msgid "Department"
+msgstr "Service"
+
+#: apps/tickets/forms.py
+msgid "Myself"
+msgstr "Moi-même"
+
+#: apps/tickets/forms.py
+msgid "Impact"
+msgstr "Impact"
+
+#: apps/tickets/forms.py
+msgid "Urgency"
+msgstr "Urgence"
+
+#: apps/tickets/forms.py
+msgid "How many people or how much of the business is affected?"
+msgstr "Combien de personnes, ou quelle part de l’activité, sont touchées ?"
+
+#: apps/tickets/forms.py
+msgid "How quickly does this need to be fixed?"
+msgstr "À quelle vitesse faut-il le régler ?"
+
+#: apps/tickets/forms.py
+msgid "Internal note (hidden from requester)"
+msgstr "Note interne (masquée au demandeur)"
+
+#: apps/tickets/forms.py
+msgid "This employee is not in the selected department."
+msgstr "Cet employé ne fait pas partie du service sélectionné."
+
+#: apps/tickets/forms.py
+msgid "This device belongs to someone else."
+msgstr "Cet appareil appartient à quelqu’un d’autre."
+
+#: apps/tickets/views.py
+#, python-format
+msgid "Ticket is now %(status)s."
+msgstr "Le ticket est maintenant « %(status)s »."
+
+#: apps/tickets/views.py
+msgid "Thanks for your feedback!"
+msgstr "Merci pour votre évaluation !"
+
+#: apps/tickets/views.py
+#, python-format
+msgid "Ticket %(ref)s submitted for %(who)s."
+msgstr "Ticket %(ref)s soumis pour %(who)s."
+
+#: apps/tickets/views.py
+#, python-format
+msgid "Ticket %(ref)s submitted."
+msgstr "Ticket %(ref)s soumis."
+
+#: apps/tickets/views.py
+#, python-format
+msgid "Assigned to %(who)s."
+msgstr "Assigné à %(who)s."
+
+#: apps/tickets/views.py
+#, python-format
+msgid "Category set to %(c)s."
+msgstr "Catégorie définie : %(c)s."
+
+#: apps/tickets/workflow.py
+msgid "You are not allowed to perform this action."
+msgstr "Vous n’avez pas le droit d’effectuer cette action."
+
+#: apps/tickets/workflow.py
+msgid "Only resolved tickets can be closed automatically."
+msgstr "Seuls les tickets résolus peuvent être fermés automatiquement."
+
+#: apps/tickets/workflow.py
+msgid "Only IT staff can assign tickets."
+msgstr "Seul le personnel TI peut assigner des tickets."
+
+#: apps/tickets/workflow.py
+msgid "Only open tickets can be assigned."
+msgstr "Seuls les tickets ouverts peuvent être assignés."
+
+#: apps/tickets/workflow.py
+msgid "Tickets can only be assigned to technicians or administrators."
+msgstr "Les tickets ne peuvent être assignés qu’à des techniciens ou des administrateurs."
+
+#: apps/tickets/workflow.py
+msgid "Only IT staff can change the category."
+msgstr "Seul le personnel TI peut changer la catégorie."
+
+#: apps/tickets/workflow.py
+msgid "Mark triaged"
+msgstr "Marquer comme trié"
+
+#: apps/tickets/workflow.py
+msgid "Start work"
+msgstr "Commencer le travail"
+
+#: apps/tickets/workflow.py
+msgid "Put on hold"
+msgstr "Mettre en attente"
+
+#: apps/tickets/workflow.py
+msgid "Resume"
+msgstr "Reprendre"
+
+#: apps/tickets/workflow.py
+msgid "Resolve"
+msgstr "Résoudre"
+
+#: apps/tickets/workflow.py
+msgid "Reopen"
+msgstr "Rouvrir"
+
+#: apps/tickets/workflow.py
+msgid "Confirm & close"
+msgstr "Confirmer et fermer"

@@ -20,6 +20,8 @@ from apps.sla.services import SLAState, sla_state
 from apps.tickets.choices import LIST_FILTERS, OPEN_STATUSES, Status
 from apps.tickets.models import Satisfaction, Ticket
 
+from django.utils.translation import gettext_lazy
+
 from . import overview
 
 # Most urgent first when sorting a queue.
@@ -27,10 +29,10 @@ URGENCY = {SLAState.BREACHED: 0, SLAState.AT_RISK: 1, SLAState.OK: 2, SLAState.N
 
 # Employee-facing progress steps: (label, statuses that are "at" this step).
 PROGRESS_STEPS = [
-    ("Submitted", (Status.NEW, Status.TRIAGED)),
-    ("Assigned", (Status.ASSIGNED,)),
-    ("In progress", (Status.IN_PROGRESS, Status.ON_HOLD)),
-    ("Resolved", (Status.RESOLVED, Status.CLOSED)),
+    (gettext_lazy("Submitted"), (Status.NEW, Status.TRIAGED)),
+    (gettext_lazy("Assigned"), (Status.ASSIGNED,)),
+    (gettext_lazy("In progress"), (Status.IN_PROGRESS, Status.ON_HOLD)),
+    (gettext_lazy("Resolved"), (Status.RESOLVED, Status.CLOSED)),
 ]
 
 
@@ -155,7 +157,7 @@ def progress(ticket):
     steps = []
     for i, (label, _) in enumerate(PROGRESS_STEPS):
         if i == current and ticket.status == Status.ON_HOLD:
-            label = "On hold"
+            label = gettext_lazy("On hold")
         steps.append((label, "done" if i < current else "current" if i == current else "todo"))
     return steps
 

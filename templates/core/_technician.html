@@ -1,36 +1,36 @@
-{% load helply %}
+{% load i18n %}{% load helply %}
 <section class="kpis">
   <div class="kpi">
-    <span class="kpi-label">My open tickets</span>
+    <span class="kpi-label">{% trans "My open tickets" %}</span>
     <span class="kpi-value">{{ kpi.open }}</span>
-    <span class="kpi-sub">{{ kpi.on_hold }} on hold</span>
+    <span class="kpi-sub">{% blocktrans with n=kpi.on_hold %}{{ n }} on hold{% endblocktrans %}</span>
   </div>
   <a class="kpi {% if kpi.unassigned %}kpi-warn{% endif %}" href="{% url 'tickets:list' %}?status=open&assignee=none">
-    <span class="kpi-label">Unassigned</span>
+    <span class="kpi-label">{% trans "Unassigned" %}</span>
     <span class="kpi-value">{{ kpi.unassigned }}</span>
-    <span class="kpi-sub">{% if kpi.unassigned %}up for grabs{% else %}everything has an owner{% endif %}</span>
+    <span class="kpi-sub">{% if kpi.unassigned %}{% trans "up for grabs" %}{% else %}{% trans "everything has an owner" %}{% endif %}</span>
   </a>
   <div class="kpi {% if kpi.urgent %}kpi-warn{% endif %}">
-    <span class="kpi-label">Urgent</span>
+    <span class="kpi-label">{% trans "Urgent" %}</span>
     <span class="kpi-value">{{ kpi.urgent }}</span>
-    <span class="kpi-sub">at risk or breached</span>
+    <span class="kpi-sub">{% trans "at risk or breached" %}</span>
   </div>
   <div class="kpi">
-    <span class="kpi-label">Resolved · 7 days</span>
+    <span class="kpi-label">{% trans "Resolved · 7 days" %}</span>
     <span class="kpi-value">{{ kpi.resolved_7d }}</span>
-    <span class="kpi-sub">by you</span>
+    <span class="kpi-sub">{% trans "by you" %}</span>
   </div>
   <div class="kpi">
-    <span class="kpi-label">My satisfaction</span>
+    <span class="kpi-label">{% trans "My satisfaction" %}</span>
     <span class="kpi-value">{% if kpi.csat %}{{ kpi.csat|floatformat:1 }}<small>/5</small>{% else %}–{% endif %}</span>
-    <span class="kpi-sub">average rating</span>
+    <span class="kpi-sub">{% trans "average rating" %}</span>
   </div>
 </section>
 
 <section class="card" id="dash-queue">
   <div class="panel-head">
-    <h2>My queue <small class="muted">· most urgent first</small></h2>
-    <a class="small" href="{% url 'tickets:list' %}?status=open">All tickets →</a>
+    <h2>{% trans "My queue" %} <small class="muted">· {% trans "most urgent first" %}</small></h2>
+    <a class="small" href="{% url 'tickets:list' %}?status=open">{% trans "All tickets →" %}</a>
   </div>
   {% for t, state in queue %}
     <a class="attn-row" href="{{ t.get_absolute_url }}">
@@ -40,23 +40,23 @@
         <span class="attn-meta">{{ t.reference }} · {{ t.requester }} · {{ t.get_status_display }}</span>
       </span>
       {% if state == "breached" %}<span class="chip chip-danger">{{ t.resolution_due_at|due_in }}</span>
-      {% elif state == "at_risk" %}<span class="chip chip-warn">Due {{ t.resolution_due_at|due_in }}</span>
-      {% elif state == "paused" %}<span class="chip chip-paused">On hold</span>
-      {% else %}<span class="chip">Due {{ t.resolution_due_at|due_in }}</span>{% endif %}
+      {% elif state == "at_risk" %}<span class="chip chip-warn">{% blocktrans with d=t.resolution_due_at|due_in %}Due {{ d }}{% endblocktrans %}</span>
+      {% elif state == "paused" %}<span class="chip chip-paused">{% trans "On hold" %}</span>
+      {% else %}<span class="chip">{% blocktrans with d=t.resolution_due_at|due_in %}Due {{ d }}{% endblocktrans %}</span>{% endif %}
     </a>
   {% empty %}
-    <p class="empty">Your queue is empty.</p>
+    <p class="empty">{% trans "Your queue is empty." %}</p>
   {% endfor %}
 </section>
 
 {% if awaiting %}
 <section class="card" id="dash-awaiting">
-  <h2>Resolved · waiting for the requester to confirm</h2>
+  <h2>{% trans "Resolved · waiting for the requester to confirm" %}</h2>
   {% for t in awaiting %}
     <a class="attn-row" href="{{ t.get_absolute_url }}">
-      <span class="badge st-resolved">Resolved</span>
+      <span class="badge st-resolved">{% trans "Resolved" %}</span>
       <span class="attn-main"><span class="attn-title">{{ t.title }}</span>
-        <span class="attn-meta">{{ t.reference }} · {{ t.requester }} · resolved {{ t.resolved_at|ago }}</span></span>
+        <span class="attn-meta">{% blocktrans with r=t.reference q=t.requester d=t.resolved_at|ago %}{{ r }} · {{ q }} · resolved {{ d }}{% endblocktrans %}</span></span>
     </a>
   {% endfor %}
 </section>
@@ -64,7 +64,7 @@
 
 {% include "core/_ov_unassigned.html" %}
 
-<h2 class="ov-title">Overview</h2>
+<h2 class="ov-title">{% trans "Overview" %}</h2>
 <div class="ov-grid ov-grid-2">
   {% include "core/_ov_servers.html" %}
   {% include "core/_ov_renewals.html" %}

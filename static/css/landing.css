@@ -678,3 +678,14 @@ html.lp-deck-on:not([data-theme="dark"]) .lp-top:hover { background: #ececef; }
   border-radius .8s cubic-bezier(.32, .72, 0, 1), background-color .5s, border-color .5s, color .4s, backdrop-filter .35s; }
 /* The page turn plays whatever the system "reduce motion" setting says: Windows Server and remote desktops report it as on
    by default, which silently turned the slide into a plain cut. Decorative loops stay off under that setting (see above). */
+
+/* ---------- Language switch (EN | FR) in the top bar ---------- */
+.lp .lang-switch { display: inline-flex; align-items: center; gap: 2px; margin: 0; padding: 2px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 999px; }
+.lp .lang-switch button { min-width: 34px; height: 28px; padding: 0 .55rem; border: 0; border-radius: 999px; background: transparent; color: inherit; opacity: .7; font: 600 .74rem/1 var(--font); letter-spacing: .05em; cursor: pointer; }
+.lp .lang-switch button:hover { opacity: 1; background: rgba(255, 255, 255, .12); }
+.lp .lang-switch button[aria-current="true"] { opacity: 1; background: rgba(255, 255, 255, .18); cursor: default; }
+.lp .lang-switch button:focus-visible { outline: 2px solid #7ea6ff; outline-offset: 1px; }
+html:not([data-theme="dark"]) .lp-nav.is-light .lang-switch { border-color: rgba(0, 0, 0, .2); }
+html:not([data-theme="dark"]) .lp-nav.is-light .lang-switch button:hover { background: rgba(0, 0, 0, .06); }
+html:not([data-theme="dark"]) .lp-nav.is-light .lang-switch button[aria-current="true"] { background: rgba(0, 0, 0, .1); }
+@media (max-width: 640px) { .lp .lang-switch button { min-width: 38px; height: 34px; } }

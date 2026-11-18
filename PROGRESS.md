@@ -71,6 +71,10 @@
 | RackNerd 107.173.15.18 | 测试服务器 |
 | 学校 Windows Server 2025 | 2 vCPU，15.6 GB；等学校确认 |
 
+## 6.5 双语（英/法）
+- 2026-11-18 起步：框架（LocaleMiddleware、`/i18n/setlang`、EN/FR 切换按钮）和第一批页面（见 CLAUDE.md「代码风格」里的清单）已完成；工具在 `tools/`（无需 GNU gettext）。
+- 待办：知识库、资产、云服务器、人员、SLA 页，Help tour 和命令面板的 JS 文字，通知邮件正文；知识库文章是否做法语版本待 Kevin 决定（目前不翻译数据库内容）。
+
 ## 7. 注意事项
 - 新依赖 `maxminddb`：其他机器要重跑 `setup.bat`，否则国家识别静默失效。
 - 公网站点的代码和静态文件只在 `start-online.bat` 启动时加载，改完要重启。

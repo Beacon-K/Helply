@@ -1,39 +1,39 @@
-{# Administrator-only: how much of the daily Workers AI allowance is used (apps.ai.metering). Numbers come from Cloudflare. #}
+{% load i18n %}{# Administrator-only: how much of the daily Workers AI allowance is used (apps.ai.metering). Numbers come from Cloudflare. #}
 {% load helply %}
 <section class="card usage lv-{{ ai_usage.level }}" id="ai-usage">
   <div class="panel-head">
-    <h2><span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>AI usage today</span></h2>
-    {% if ai_usage.configured %}<span class="ins-meta">{% if ai_usage.source == "account" %}Cloudflare account analytics{% else %}Helply's calls, as reported by Cloudflare{% endif %}</span>{% endif %}
+    <h2><span class="ai-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>{% trans "AI usage today" %}</span></h2>
+    {% if ai_usage.configured %}<span class="ins-meta">{% if ai_usage.source == "account" %}{% trans "Cloudflare account analytics" %}{% else %}{% trans "Helply's calls, as reported by Cloudflare" %}{% endif %}</span>{% endif %}
   </div>
   {% if not ai_usage.configured %}
-    <p class="muted">Cloudflare AI is not set up, so AI features use keyword matching. Add the account ID and token to <code>.env</code> to turn it on.</p>
+    <p class="muted">{% blocktrans %}Cloudflare AI is not set up, so AI features use keyword matching. Add the account ID and token to <code>.env</code> to turn it on.{% endblocktrans %}</p>
   {% else %}
     {% if ai_usage.limit %}
-    <div class="usage-bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{ ai_usage.limit }}" aria-valuenow="{{ ai_usage.used|floatformat:0 }}" aria-label="Neurons used today"><span style="width: {{ ai_usage.percent }}%"></span></div>
+    <div class="usage-bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{ ai_usage.limit }}" aria-valuenow="{{ ai_usage.used|floatformat:0 }}" aria-label="{% trans "Neurons used today" %}"><span style="width: {{ ai_usage.percent }}%"></span></div>
     <div class="usage-nums">
-      <span><b>{{ ai_usage.used|num }}</b> of {{ ai_usage.limit|num }} Neurons used <em>({{ ai_usage.percent }}%)</em></span>
-      <span><b>{{ ai_usage.remaining|num }}</b> left · resets in {{ ai_usage.resets_at|timeuntil }} (at {{ ai_usage.resets_at|date:"H:i" }})</span>
+      <span>{% blocktrans with used=ai_usage.used|num limit=ai_usage.limit|num pct=ai_usage.percent %}<b>{{ used }}</b> of {{ limit }} Neurons used <em>({{ pct }}%)</em>{% endblocktrans %}</span>
+      <span>{% blocktrans with left=ai_usage.remaining|num t=ai_usage.resets_at|timeuntil at=ai_usage.resets_at|date:"H:i" %}<b>{{ left }}</b> left · resets in {{ t }} (at {{ at }}){% endblocktrans %}</span>
     </div>
-    {% if ai_usage.level == "exhausted" %}<p class="usage-alert">The daily allowance is used up. Until it resets, AI answers fall back to keyword matching and the assistant says it is unavailable.</p>
-    {% elif ai_usage.level == "critical" %}<p class="usage-alert">Almost out: at this pace the AI features will stop before the reset. Consider raising the plan or cutting usage.</p>
-    {% elif ai_usage.level == "warn" %}<p class="usage-note">More than 70% of today's allowance is used.</p>{% endif %}
+    {% if ai_usage.level == "exhausted" %}<p class="usage-alert">{% trans "The daily allowance is used up. Until it resets, AI answers fall back to keyword matching and the assistant says it is unavailable." %}</p>
+    {% elif ai_usage.level == "critical" %}<p class="usage-alert">{% trans "Almost out: at this pace the AI features will stop before the reset. Consider raising the plan or cutting usage." %}</p>
+    {% elif ai_usage.level == "warn" %}<p class="usage-note">{% trans "More than 70%% of today's allowance is used." %}</p>{% endif %}
     {% else %}
-    <div class="usage-nums"><span><b>{{ ai_usage.used|num }}</b> Neurons used today <em>(no daily cap set)</em></span></div>
+    <div class="usage-nums"><span>{% blocktrans with used=ai_usage.used|num %}<b>{{ used }}</b> Neurons used today <em>(no daily cap set)</em>{% endblocktrans %}</span></div>
     {% endif %}
     {% if ai_usage.models %}
     <div class="usage-scroll"><table class="usage-table">
-      <thead><tr><th>Model</th><th>Requests</th><th>Neurons</th></tr></thead>
+      <thead><tr><th>{% trans "Model" %}</th><th>{% trans "Requests" %}</th><th>{% trans "Neurons" %}</th></tr></thead>
       <tbody>{% for m in ai_usage.models %}<tr><td>{{ m.model }}</td><td>{{ m.requests }}</td><td>{{ m.neurons|num }}</td></tr>{% endfor %}</tbody>
     </table></div>
-    {% else %}<p class="muted">No AI calls recorded yet today.</p>{% endif %}
-    <div class="usage-week" aria-label="Neurons used per day over the last 7 days">
-      {% for d in ai_usage.days %}<div class="usage-day" title="{{ d.day|date:'M j' }}: {{ d.neurons|floatformat:0 }} Neurons"><i style="height: {% widthratio d.neurons ai_usage.days_max 100 %}%"></i><span>{{ d.day|date:"D" }}</span></div>{% endfor %}
+    {% else %}<p class="muted">{% trans "No AI calls recorded yet today." %}</p>{% endif %}
+    <div class="usage-week" aria-label="{% trans "Neurons used per day over the last 7 days" %}">
+      {% for d in ai_usage.days %}<div class="usage-day" title="{{ d.day|date:_('M j') }}: {{ d.neurons|floatformat:0 }} Neurons"><i style="height: {% widthratio d.neurons ai_usage.days_max 100 %}%"></i><span>{{ d.day|date:"D" }}</span></div>{% endfor %}
     </div>
     <p class="muted small usage-foot">
-      These figures are Cloudflare's own usage reports, not estimates. The allowance resets at 00:00 UTC.
-      {% if ai_usage.source == "helply" %}Only Helply's calls are counted here; anything else using this Cloudflare account is not. For account-wide numbers, give the API token the <b>Account Analytics: Read</b> permission.{% endif %}
-      {% if ai_usage.unknown %} {{ ai_usage.unknown }} call{{ ai_usage.unknown|pluralize }} came back without a usage figure and {{ ai_usage.unknown|pluralize:"is,are" }} not counted.{% endif %}
-      {% if ai_usage.external %} External model usage (OpenAI or Anthropic) is billed by that provider and is not shown here.{% endif %}
+      {% trans "These figures are Cloudflare's own usage reports, not estimates. The allowance resets at 00:00 UTC." %}
+      {% if ai_usage.source == "helply" %}{% blocktrans %}Only Helply's calls are counted here; anything else using this Cloudflare account is not. For account-wide numbers, give the API token the <b>Account Analytics: Read</b> permission.{% endblocktrans %}{% endif %}
+      {% if ai_usage.unknown %} {% blocktrans count n=ai_usage.unknown %}{{ n }} call came back without a usage figure and is not counted.{% plural %}{{ n }} calls came back without a usage figure and are not counted.{% endblocktrans %}{% endif %}
+      {% if ai_usage.external %} {% trans "External model usage (OpenAI or Anthropic) is billed by that provider and is not shown here." %}{% endif %}
     </p>
   {% endif %}
 </section>
