@@ -22,36 +22,34 @@
    * target CSS selector to spotlight (omit or not found = centred card).
    * click  true = the person must click the target to continue. */
   var TOPICS = [
-    { id: "start", title: "Find your way around", desc: "Dashboard, menu, notifications and account.", roles: ["employee", "technician", "administrator"], steps: [
+    { id: "dashboard", title: "Dashboard", desc: "Your overview, the menu, search, the Assistant and your account.", roles: ["employee", "technician", "administrator"], steps: [
       { path: "/", target: "h1", title: "Your dashboard", body: isAdmin ? "This is the company overview: tickets waiting for an owner, SLA risk, people, cloud servers and renewals. Everything here is live." : isAgent ? "Your queue and the tickets that need attention first. It updates as work comes in." : "Your open requests and what is happening with them, at a glance." },
       { target: ".sidebar .side-nav", title: "The menu", body: "Every area of Helply is here. On a phone this becomes the row of icons along the top." },
+      { target: "[data-cmdk]", click: true, title: "Search everything", body: "Click here (or press " + mod + " K) to open the command palette. Type a page name or a ticket number such as 42 and press Enter." },
+      { target: ".tc-palette", title: "The command palette", body: "Pages, tickets and actions in one list. Tip: press G and then a letter (G T for Tickets) to jump without the mouse. Press Esc to close.", needsOpen: true },
+      { target: "[data-ai-open]", click: true, title: "Ask the Assistant", body: "Click Assistant (or press " + mod + " J). It answers from your company's knowledge base" + (isAgent ? " and ticket history" : " and your own past tickets") + ", and tells you when an answer is general IT advice instead." },
+      { target: "#ai-drawer", title: "A real conversation", body: "Ask follow-up questions; it remembers the conversation. Close it with Esc.", needsOpen: true },
       { target: "[data-bell]", title: "Notifications", body: "A number appears here when a ticket you follow changes. Click the bell any time to see them all." },
       { target: ".who-name", title: "Your account", body: "Your name and role. Click it to change your password. Log out is next to it." },
       { target: "[data-theme-toggle]", title: "Light or dark", body: "Pick whichever is easier on your eyes. Helply remembers your choice." }
     ] },
-    { id: "search", title: "Search & the Assistant", desc: "Jump anywhere in two keystrokes, or just ask.", roles: ["employee", "technician", "administrator"], steps: [
-      { target: "[data-cmdk]", click: true, title: "Search everything", body: "Click here (or press " + mod + " K) to open the command palette. Type a page name or a ticket number such as 42 and press Enter." },
-      { target: ".tc-palette", title: "The command palette", body: "Pages, tickets and actions in one list. Tip: press G and then a letter (G T for Tickets) to jump without the mouse. Press Esc to close.", needsOpen: true },
-      { target: "[data-ai-open]", click: true, title: "Ask the Assistant", body: "Click Assistant (or press " + mod + " J). It answers from your company's knowledge base" + (isAgent ? " and ticket history" : " and your own past tickets") + ", and tells you when an answer is general IT advice instead." },
-      { target: "#ai-drawer", title: "A real conversation", body: "Ask follow-up questions; it remembers the conversation. Close it with Esc.", needsOpen: true }
+    { id: "tickets", title: "Tickets", desc: isAgent ? "Filter, open, update and resolve." : "See status and reply to technicians.", roles: ["employee", "technician", "administrator"], steps: [
+      { target: nav("/tickets/"), click: true, title: "Open the tickets list", body: "Click \"Tickets\"." },
+      { path: "/tickets/", target: ".filters", title: "Filter by status", body: "Switch between open, in progress, resolved and more. The list always shows the most important first." },
+      { path: "/tickets/", target: ".table-wrap", title: "Open a ticket", body: isAgent ? "Click any row to open it. Inside you can change status, reassign, add notes, and get an AI copilot summary with similar past tickets." : "Click any row to see the conversation, add details, and follow progress. Priority and SLA status are shown in the columns." }
     ] },
-    { id: "ticket", title: role === "employee" ? "Report an IT issue" : "Create a ticket", desc: "Describe the problem once, and Helply routes it.", roles: ["employee", "technician", "administrator"], steps: [
+    { id: "ticket", title: "New ticket", desc: "Describe the problem once, and Helply routes it.", roles: ["employee", "technician", "administrator"], steps: [
       { target: nav("/tickets/new/"), click: true, title: "Start a new ticket", body: "Click \"New ticket\" in the menu." },
       { path: "/tickets/new/", target: "[data-ai-ask]", title: "Try the Assistant first", body: "Describe your problem here. If the knowledge base already has the answer you'll see it immediately; if not, one click turns your question into a ticket.", optional: true },
       { path: "/tickets/new/", target: "form[method=post]", title: "Fill in the form", body: "A clear title and a few details are enough. Helply suggests the category and priority from what you write, and the right team is assigned automatically." },
       { path: "/tickets/new/", target: "form[method=post] button[type=submit], form[method=post] .btn.primary", title: "Submit", body: "You'll get notified on every update, and an SLA clock starts so nothing gets forgotten. (Nothing is sent until you click this.)" }
-    ] },
-    { id: "tickets", title: isAgent ? "Work the ticket queue" : "Track your tickets", desc: isAgent ? "Filter, open, update and resolve." : "See status and reply to technicians.", roles: ["employee", "technician", "administrator"], steps: [
-      { target: nav("/tickets/"), click: true, title: "Open the tickets list", body: "Click \"Tickets\"." },
-      { path: "/tickets/", target: ".filters", title: "Filter by status", body: "Switch between open, in progress, resolved and more. The list always shows the most important first." },
-      { path: "/tickets/", target: ".table-wrap", title: "Open a ticket", body: isAgent ? "Click any row to open it. Inside you can change status, reassign, add notes, and get an AI copilot summary with similar past tickets." : "Click any row to see the conversation, add details, and follow progress. Priority and SLA status are shown in the columns." }
     ] },
     { id: "kb", title: "Knowledge base", desc: "Step-by-step answers written by IT.", roles: ["employee", "technician", "administrator"], steps: [
       { target: nav("/kb/"), click: true, title: "Open the knowledge base", body: "Click \"Knowledge base\"." },
       { path: "/kb/", target: "[data-ai-ask]", title: "Ask the Assistant", body: "Describe your problem in your own words before opening a ticket: the Assistant answers from the knowledge base. Many problems (Wi-Fi, VPN, printers, passwords) already have a guide." },
       { path: "/kb/", target: ".filters", title: "Browse by category", body: "Pick a category to narrow the list. On an article, use the helpful / not helpful buttons: it improves the Assistant's answers." }
     ] },
-    { id: "assets", title: isAgent ? "Asset register" : "My devices", desc: isAgent ? "Every laptop, phone and licence in one place." : "See the devices assigned to you.", roles: ["employee", "technician", "administrator"], steps: [
+    { id: "assets", title: isAgent ? "Assets" : "My devices", desc: isAgent ? "Every laptop, phone and licence in one place." : "See the devices assigned to you.", roles: ["employee", "technician", "administrator"], steps: [
       { target: nav("/assets/"), click: true, title: isAgent ? "Open the asset register" : "Open My devices", body: "Click the highlighted menu item." },
       { path: "/assets/", target: ".asset-toolbar, main .card", title: isAgent ? "Find and filter assets" : "Your equipment", body: isAgent ? "Search by name, serial number or owner, and filter by type or status. Open an asset to see its history and linked tickets." : "Everything IT has assigned to you. If something is broken, open the device and report an issue from there so the ticket already knows which machine it is." }
     ] },
@@ -59,7 +57,7 @@
       { target: nav("/monitoring/"), click: true, title: "Open Cloud servers", body: "Click \"Cloud servers\"." },
       { path: "/monitoring/", target: "h1.fx-title", title: "Your servers, live", body: "Each server reports CPU, memory, disk and uptime through a small read-only agent. It can never receive commands. When something crosses a threshold, Helply opens a ticket for you." }
     ] },
-    { id: "people", title: "Manage people", desc: "Add colleagues and set their roles.", roles: ["administrator"], steps: [
+    { id: "people", title: "People", desc: "Add colleagues and set their roles.", roles: ["administrator"], steps: [
       { target: nav("/people/"), click: true, title: "Open People", body: "Click \"People\"." },
       { path: "/people/", target: "form.fx-toolbar", title: "Find a person", body: "Search by name or filter by role and department. Open a person to change their role, team or access." },
       { path: "/people/", target: "main a[href='/people/new/']", title: "Add someone", body: "New people get a one-time link to choose their own password; no one ever sees or sets it for them." }
@@ -74,6 +72,8 @@
   function find(id) { for (var i = 0; i < TOPICS.length; i++) if (TOPICS[i].id === id) return TOPICS[i]; return null; }
   /* The full tour is every lesson for this role, back to back. */
   function stepsFor(id) {
+    /* "pick:a,b,c" is the lessons the person ticked, in the menu's order. */
+    if (id.indexOf("pick:") === 0) { var ids = id.slice(5).split(","), out2 = []; topicsForRole().forEach(function (t) { if (ids.indexOf(t.id) >= 0) t.steps.forEach(function (s) { out2.push(s); }); }); return out2; }
     if (id === "all") { var out = []; topicsForRole().forEach(function (t) { t.steps.forEach(function (s) { out.push(s); }); }); return out; }
     var t = find(id); return t ? t.steps : [];
   }
@@ -93,25 +93,39 @@
   var menu = el("div", "hp-menu"); menu.hidden = true; menu.setAttribute("role", "dialog"); menu.setAttribute("aria-label", "Help and tour");
   document.body.appendChild(menu);
 
-  function renderMenu() {
-    var d = done(), list = topicsForRole();
+  /* Ticking a lesson only selects it; nothing starts until "Start" is pressed. */
+  var picked = {};
+  function pickedIds() { return topicsForRole().filter(function (t) { return picked[t.id]; }).map(function (t) { return t.id; }); }
+  function renderMenu(focusSel) {
+    var d = done(), list = topicsForRole(), n = pickedIds().length;
     var h = '<div class="hp-menu-head"><strong>Learn Helply</strong><button type="button" class="hp-x" data-hp-close aria-label="Close help">&times;</button></div>' +
       '<p class="hp-sub">Short, hands-on lessons. You click through the real screens, and nothing is changed.</p>' +
       '<button type="button" class="hp-all" data-hp-start="all"><span><strong>Take the full tour</strong><small>' + list.length + ' lessons · about ' + Math.max(2, Math.round(stepsFor("all").length * 0.3)) + ' minutes</small></span><span aria-hidden="true">→</span></button>' +
+      '<div class="hp-bulk"><span class="hp-count">' + (n ? n + ' selected' : 'Pick lessons below') + '</span>' +
+      '<span><button type="button" data-hp-selall' + (n === list.length ? ' disabled' : '') + '>Select all</button><button type="button" data-hp-clearall' + (n ? '' : ' disabled') + '>Clear all</button></span></div>' +
       '<ul class="hp-list">';
     list.forEach(function (t) {
-      h += '<li><button type="button" data-hp-start="' + t.id + '"><span class="hp-tick' + (d[t.id] ? " is-done" : "") + '" aria-hidden="true">' + (d[t.id] ? "✓" : "") + '</span><span class="hp-t"><strong>' + esc(t.title) + '</strong><small>' + esc(t.desc) + '</small></span></button></li>';
+      var on = !!picked[t.id];
+      h += '<li><button type="button" role="checkbox" aria-checked="' + on + '" data-hp-pick="' + t.id + '"><span class="hp-tick' + (on ? " is-on" : "") + '" aria-hidden="true">' + (on ? "✓" : "") + '</span><span class="hp-t"><strong>' + esc(t.title) + (d[t.id] ? ' <em class="hp-done">Done</em>' : '') + '</strong><small>' + esc(t.desc) + '</small></span></button></li>';
     });
-    h += '</ul><p class="hp-foot">Press <kbd>' + mod + '</kbd> <kbd>K</kbd> any time to search, or ask the Assistant with <kbd>' + mod + '</kbd> <kbd>J</kbd>.</p>';
-    menu.innerHTML = h;
+    h += '</ul><button type="button" class="hp-go" data-hp-go' + (n ? '' : ' disabled') + '>' + (n ? 'Start ' + n + (n === 1 ? ' lesson' : ' lessons') : 'Start selected lessons') + '</button>' +
+      '<p class="hp-foot">Press <kbd>' + mod + '</kbd> <kbd>K</kbd> any time to search, or ask the Assistant with <kbd>' + mod + '</kbd> <kbd>J</kbd>.</p>';
+    var top = menu.scrollTop;
+    menu.innerHTML = h; menu.scrollTop = top;
+    if (focusSel) { var f = menu.querySelector(focusSel); if (f && !f.disabled) f.focus(); }
   }
-  function openMenu() { endTour(false); renderMenu(); menu.hidden = false; btn.setAttribute("aria-expanded", "true"); var f = menu.querySelector("[data-hp-start]"); if (f) f.focus(); }
+  function openMenu() { endTour(false); renderMenu("[data-hp-start]"); menu.hidden = false; btn.setAttribute("aria-expanded", "true"); }
   function closeMenu() { menu.hidden = true; btn.setAttribute("aria-expanded", "false"); }
   btn.setAttribute("aria-haspopup", "dialog"); btn.setAttribute("aria-expanded", "false");
   btn.addEventListener("click", function () { menu.hidden ? openMenu() : closeMenu(); });
   menu.addEventListener("click", function (e) {
     var s = e.target.closest("[data-hp-start]");
     if (s) { closeMenu(); start(s.getAttribute("data-hp-start")); return; }
+    var p = e.target.closest("[data-hp-pick]");
+    if (p) { var id = p.getAttribute("data-hp-pick"); picked[id] = !picked[id]; renderMenu('[data-hp-pick="' + id + '"]'); return; }
+    if (e.target.closest("[data-hp-selall]")) { topicsForRole().forEach(function (t) { picked[t.id] = true; }); renderMenu("[data-hp-clearall]"); return; }
+    if (e.target.closest("[data-hp-clearall]")) { picked = {}; renderMenu("[data-hp-selall]"); return; }
+    if (e.target.closest("[data-hp-go]")) { var ids = pickedIds(); if (ids.length) { closeMenu(); start("pick:" + ids.join(",")); } return; }
     if (e.target.closest("[data-hp-close]")) { closeMenu(); btn.focus(); }
   });
   document.addEventListener("pointerdown", function (e) { if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) closeMenu(); });
@@ -132,7 +146,7 @@
     active = { topic: id, i: 0 }; save(active); show();
   }
   function endTour(finished) {
-    if (finished && active) { if (active.topic === "all") topicsForRole().forEach(function (t) { markDone(t.id); }); else markDone(active.topic); }
+    if (finished && active) { if (active.topic === "all") topicsForRole().forEach(function (t) { markDone(t.id); }); else if (active.topic.indexOf("pick:") === 0) active.topic.slice(5).split(",").forEach(markDone); else markDone(active.topic); }
     active = null; clear(); detachClick();
     cancelAnimationFrame(raf);
     [shade, ring, card].forEach(function (n) { if (n) n.remove(); }); shade = ring = card = null;
@@ -163,7 +177,7 @@
     s._el = target;
 
     var total = steps.length, n = active.i + 1;
-    var topic = active.topic === "all" ? "Full tour" : (find(active.topic) || {}).title;
+    var topic = active.topic === "all" ? "Full tour" : active.topic.indexOf("pick:") === 0 ? "Your lessons" : (find(active.topic) || {}).title;
     var html = '<div class="hp-meta"><span>' + esc(topic) + '</span><span>' + n + ' / ' + total + '</span></div>' +
       '<h3>' + esc(s.title) + '</h3><p>' + esc(s.body) + '</p>';
     if (!onPage) html += '<p class="hp-where">This step is on another page.</p>';

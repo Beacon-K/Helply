@@ -18,11 +18,21 @@
   background: var(--primary); color: var(--primary-ink); font: inherit; cursor: pointer; text-align: left; }
 .hp-all small { display: block; opacity: .8; font-size: .8rem; margin-top: .1rem; }
 .hp-all:hover { background: var(--navy-hover); }
-.hp-list { list-style: none; margin: .7rem 0 0; padding: 0; display: grid; gap: .1rem; }
+.hp-list { list-style: none; margin: .2rem 0 0; padding: 0; display: grid; gap: .1rem; }
 .hp-list button { display: flex; gap: .7rem; align-items: center; width: 100%; padding: .5rem .55rem; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; text-align: left; }
 .hp-list button:hover { background: var(--hover); }
-.hp-tick { flex: none; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; font-size: .72rem; color: var(--primary-ink); }
-.hp-tick.is-done { background: var(--primary); border-color: var(--primary); }
+.hp-group { margin: .7rem .55rem .2rem; color: var(--muted); font-size: .75rem; font-weight: 600; letter-spacing: .02em; }
+.hp-tick { flex: none; width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--line); display: grid; place-items: center; font-size: .72rem; color: var(--primary-ink); }
+.hp-tick.is-on { background: var(--primary); border-color: var(--primary); }
+.hp-list button[aria-checked="true"] { background: var(--hover); }
+.hp-done { font-style: normal; font-weight: 500; font-size: .7rem; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 0 .4rem; margin-left: .35rem; vertical-align: 1px; }
+.hp-bulk { display: flex; justify-content: space-between; align-items: center; gap: .6rem; margin: .8rem 0 0; font-size: .8rem; color: var(--muted); }
+.hp-bulk button { border: 0; background: transparent; color: var(--primary); font: inherit; font-weight: 600; cursor: pointer; padding: .35rem .45rem; min-height: 36px; border-radius: 6px; }
+.hp-bulk button:hover:not(:disabled) { background: var(--hover); }
+.hp-bulk button:disabled { color: var(--muted); opacity: .5; cursor: default; }
+.hp-go { display: block; width: 100%; margin: .8rem 0 0; padding: .65rem; border: 0; border-radius: 10px; background: var(--primary); color: var(--primary-ink); font: inherit; font-weight: 600; cursor: pointer; }
+.hp-go:hover:not(:disabled) { background: var(--navy-hover); }
+.hp-go:disabled { background: var(--hover); color: var(--muted); cursor: default; }
 .hp-t strong { display: block; font-weight: 600; font-size: .92rem; }
 .hp-t small { display: block; color: var(--muted); font-size: .8rem; }
 .hp-foot { margin: .9rem 0 0; color: var(--muted); font-size: .8rem; }

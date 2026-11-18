@@ -446,13 +446,17 @@ html.lp-deck-on:not([data-theme="dark"]) .lp-top:hover { background: #ececef; }
 /* ---------- One layout for every content page: picture on the left, words on the right ----------
    Each page has to fit one screen without scrolling, so sizes follow the window height as well as its width,
    and the less important lines (.opt) drop out when the window is short or narrow. */
-.lp-fit { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: clamp(1.5rem, 5vw, 5rem); align-items: center; }
-.lp-fig { position: relative; margin: 0; width: 100%; aspect-ratio: 4 / 3; max-height: min(64vh, 560px); overflow: hidden; border-radius: 16px; background: #0b0f14; border: 1px solid var(--tile-line); }
+.lp-fit { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.5rem, 2.8vw, 3rem); align-items: center; }
+.lp-fig { position: relative; margin: 0; width: 100%; aspect-ratio: 4 / 3; max-height: min(72vh, 640px); overflow: hidden; border-radius: 22px; background: color-mix(in srgb, var(--ink) 6%, var(--bg)); border: 0; box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 24px 56px -24px rgba(0, 0, 0, .28), inset 0 0 0 1px rgba(255, 255, 255, .06); }
 .lp-fig img { width: 100%; height: 100%; object-fit: cover; }
-.lp-fig::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0, 0, 0, .45), transparent 45%); pointer-events: none; }
+.lp-fig::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0, 0, 0, .18), transparent 40%); pointer-events: none; }
 .lp-fig .chip { z-index: 2; }
+/* on the black page the photo has no frame: its edges fade into the background */
+.lp-feature.dark .lp-fig { background: none; box-shadow: none; overflow: visible; border-radius: 0; }
+.lp-feature.dark .lp-fig::after { display: none; }
+.lp-feature.dark .lp-fig img { -webkit-mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, #000 52%, transparent 100%); mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, #000 52%, transparent 100%); }
 /* the AI picture has no frame: it dissolves into the page */
-.lp-fig.art { aspect-ratio: 10 / 7; background: none; border: 0; overflow: visible; }
+.lp-fig.art { aspect-ratio: 10 / 7; background: none; border: 0; box-shadow: none; overflow: visible; }
 .lp-fig.art::after { display: none; }
 .lp-fig.art img { filter: saturate(.78) brightness(.92); opacity: .92; -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 34%, transparent 98%); mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 34%, transparent 98%); }
 .lp-feats { list-style: none; margin: clamp(1rem, 2.6vh, 1.6rem) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(.7rem, 1.9vh, 1.1rem) clamp(1.2rem, 2.4vw, 2rem); }
@@ -464,7 +468,6 @@ html.lp-deck-on:not([data-theme="dark"]) .lp-top:hover { background: #ececef; }
 .lp-ai .lp-ico.sm, .lp-feature.dark .lp-ico.sm { color: #f5f5f7; }
 /* every second page puts the picture on the right, so turning pages doesn't feel like the same slide twice */
 @media (min-width: 981px) {
-  .lp-fit.rev { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); }
   .lp-fit.rev > .lp-copy { order: 1; }
   .lp-fit.rev > :not(.lp-copy) { order: 2; }
 }
